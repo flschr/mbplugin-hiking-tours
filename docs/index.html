@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hiking Tours Plugin - Interactive Demo</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            display: block;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .sidebar {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .map-container {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        #map {
+            height: 600px;
+            border-radius: 8px;
+        }
+
+        .filters {
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-group {
+            margin-bottom: 1rem;
+        }
+
+        .filter-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #555;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .tour-list {
+            list-style: none;
+        }
+
+        .tour-item {
+            background: #f9f9f9;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 4px solid transparent;
+        }
+
+        .tour-item:hover {
+            background: #f0f0f0;
+            border-left-color: #667eea;
+            transform: translateX(2px);
+        }
+
+        .tour-item.active {
+            background: #e8ebfa;
+            border-left-color: #667eea;
+        }
+
+        .tour-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.3rem;
+        }
+
+        .tour-meta {
+            font-size: 0.85rem;
+            color: #666;
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .tour-meta span {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .difficulty {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.3rem;
+        }
+
+        .difficulty-easy { background: #d4edda; color: #155724; }
+        .difficulty-moderate { background: #fff3cd; color: #856404; }
+        .difficulty-hard { background: #f8d7da; color: #721c24; }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .summit-book {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .summit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .summit-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 1.25rem;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .summit-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .summit-elevation {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .summit-date {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .legend {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .legend-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 4px;
+            margin-right: 0.5rem;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .view-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .view-btn:hover {
+            background: #f0f2ff;
+        }
+
+        .view-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .no-results {
+            text-align: center;
+            color: #999;
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🥾 Meine Wandertouren</h1>
+        <p>Interaktive Demo des Hiking Tours Plugins</p>
+    </div>
+
+    <div class="container">
+        <!-- Statistics Overview -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-value" id="totalTours">0</span>
+                <span class="stat-label">Touren</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" id="totalDistance">0</span>
+                <span class="stat-label">Kilometer</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" id="totalElevation">0</span>
+                <span class="stat-label">Höhenmeter</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" id="totalSummits">0</span>
+                <span class="stat-label">Gipfel</span>
+            </div>
+        </div>
+
+        <!-- Main Content: Sidebar + Map -->
+        <div class="main-content">
+            <div class="sidebar">
+                <h2 class="section-title">Filter & Touren</h2>
+
+                <!-- View Toggle -->
+                <div class="view-toggle">
+                    <button class="view-btn active" data-view="heatmap">Heatmap</button>
+                    <button class="view-btn" data-view="all">Alle Routen</button>
+                </div>
+
+                <!-- Filters -->
+                <div class="filters">
+                    <div class="filter-group">
+                        <label>Suche</label>
+                        <input type="text" id="searchInput" placeholder="Tour suchen...">
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Schwierigkeit</label>
+                        <select id="difficultyFilter">
+                            <option value="">Alle</option>
+                            <option value="easy">Leicht</option>
+                            <option value="moderate">Mittel</option>
+                            <option value="hard">Schwer</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Min. Distanz (km)</label>
+                        <input type="number" id="minDistance" min="0" step="1" placeholder="0">
+                    </div>
+
+                    <div class="filter-group">
+                        <label>Min. Höhenmeter</label>
+                        <input type="number" id="minElevation" min="0" step="100" placeholder="0">
+                    </div>
+                </div>
+
+                <!-- Tour List -->
+                <ul class="tour-list" id="tourList"></ul>
+                <div class="no-results" id="noResults" style="display: none;">
+                    Keine Touren gefunden
+                </div>
+            </div>
+
+            <div class="map-container">
+                <div id="map"></div>
+                <div class="legend">
+                    <div class="legend-title">Legende</div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #00ff00;"></div>
+                        <span>Heatmap: Wenige Touren</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ff0000;"></div>
+                        <span>Heatmap: Viele Touren</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summit Book -->
+        <div class="summit-book">
+            <h2 class="section-title">⛰️ Gipfelbuch</h2>
+            <div class="summit-grid" id="summitGrid"></div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Leaflet Heat Plugin -->
+    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+
+    <script>
+        // Demo Tour Data - simuliert geparste GPX-Dateien
+        const tours = [
+            {
+                id: 1,
+                name: "Zugspitze über Höllental",
+                date: "2024-08-15",
+                distance: 19.2,
+                elevation: 2200,
+                duration: "09:30",
+                difficulty: "hard",
+                summits: [{name: "Zugspitze", elevation: 2962, lat: 47.4211, lng: 10.9853}],
+                track: generateTrack(47.4667, 11.0833, 47.4211, 10.9853, 150)
+            },
+            {
+                id: 2,
+                name: "Watzmann Überschreitung",
+                date: "2024-07-22",
+                distance: 22.5,
+                elevation: 2450,
+                duration: "11:15",
+                difficulty: "hard",
+                summits: [
+                    {name: "Watzmann Mittelspitze", elevation: 2713, lat: 47.5564, lng: 12.9472},
+                    {name: "Watzmann Südspitze", elevation: 2712, lat: 47.5544, lng: 12.9492}
+                ],
+                track: generateTrack(47.5900, 12.9600, 47.5564, 12.9472, 180)
+            },
+            {
+                id: 3,
+                name: "Hochkalter Nordwand",
+                date: "2024-07-10",
+                distance: 16.8,
+                elevation: 1950,
+                duration: "08:45",
+                difficulty: "hard",
+                summits: [{name: "Hochkalter", elevation: 2607, lat: 47.5886, lng: 12.8628}],
+                track: generateTrack(47.6100, 12.8800, 47.5886, 12.8628, 120)
+            },
+            {
+                id: 4,
+                name: "Alpspitze Ferrata",
+                date: "2024-06-28",
+                distance: 12.4,
+                elevation: 1450,
+                duration: "06:30",
+                difficulty: "moderate",
+                summits: [{name: "Alpspitze", elevation: 2628, lat: 47.4319, lng: 11.0483}],
+                track: generateTrack(47.4500, 11.0700, 47.4319, 11.0483, 100)
+            },
+            {
+                id: 5,
+                name: "Benediktenwand",
+                date: "2024-06-14",
+                distance: 14.6,
+                elevation: 1250,
+                duration: "06:00",
+                difficulty: "moderate",
+                summits: [{name: "Benediktenwand", elevation: 1801, lat: 47.6819, lng: 11.3806}],
+                track: generateTrack(47.7000, 11.4000, 47.6819, 11.3806, 90)
+            },
+            {
+                id: 6,
+                name: "Herzogstand Rundtour",
+                date: "2024-05-30",
+                distance: 11.2,
+                elevation: 980,
+                duration: "05:15",
+                difficulty: "easy",
+                summits: [{name: "Herzogstand", elevation: 1731, lat: 47.5944, lng: 11.3294}],
+                track: generateTrack(47.6100, 11.3500, 47.5944, 11.3294, 80)
+            },
+            {
+                id: 7,
+                name: "Wendelstein via Südwand",
+                date: "2024-05-18",
+                distance: 13.8,
+                elevation: 1340,
+                duration: "06:45",
+                difficulty: "moderate",
+                summits: [{name: "Wendelstein", elevation: 1838, lat: 47.7042, lng: 12.0131}],
+                track: generateTrack(47.7200, 12.0300, 47.7042, 12.0131, 95)
+            },
+            {
+                id: 8,
+                name: "Schönfeldspitze",
+                date: "2024-08-03",
+                distance: 18.3,
+                elevation: 1680,
+                duration: "07:30",
+                difficulty: "moderate",
+                summits: [{name: "Schönfeldspitze", elevation: 2653, lat: 47.1994, lng: 11.0589}],
+                track: generateTrack(47.2200, 11.0800, 47.1994, 11.0589, 110)
+            },
+            {
+                id: 9,
+                name: "Kreuzspitze Nordgrat",
+                date: "2024-07-05",
+                distance: 15.7,
+                elevation: 1520,
+                duration: "07:00",
+                difficulty: "hard",
+                summits: [{name: "Kreuzspitze", elevation: 2185, lat: 47.5211, lng: 10.9344}],
+                track: generateTrack(47.5400, 10.9500, 47.5211, 10.9344, 105)
+            },
+            {
+                id: 10,
+                name: "Großer Daumen",
+                date: "2024-06-20",
+                distance: 10.5,
+                elevation: 1120,
+                duration: "05:30",
+                difficulty: "easy",
+                summits: [{name: "Großer Daumen", elevation: 2280, lat: 47.3492, lng: 10.3417}],
+                track: generateTrack(47.3700, 10.3600, 47.3492, 10.3417, 75)
+            }
+        ];
+
+        // Generate realistic track points between start and summit
+        function generateTrack(startLat, startLng, endLat, endLng, points) {
+            const track = [];
+            for (let i = 0; i <= points; i++) {
+                const ratio = i / points;
+                // Add some randomness for realistic paths
+                const noise = (Math.random() - 0.5) * 0.01;
+                const lat = startLat + (endLat - startLat) * ratio + noise;
+                const lng = startLng + (endLng - startLng) * ratio + noise;
+                track.push([lat, lng]);
+            }
+            return track;
+        }
+
+        // Initialize map
+        const map = L.map('map').setView([47.5, 11.5], 8);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 18
+        }).addTo(map);
+
+        // Store layers
+        let heatmapLayer = null;
+        let routeLayers = [];
+        let currentView = 'heatmap';
+
+        // Create heatmap from all tours
+        function createHeatmap() {
+            const heatPoints = [];
+            tours.forEach(tour => {
+                tour.track.forEach(point => {
+                    heatPoints.push([point[0], point[1], 0.5]);
+                });
+            });
+
+            if (heatmapLayer) {
+                map.removeLayer(heatmapLayer);
+            }
+
+            heatmapLayer = L.heatLayer(heatPoints, {
+                radius: 15,
+                blur: 20,
+                maxZoom: 13,
+                gradient: {
+                    0.0: '#0000ff',
+                    0.2: '#00ffff',
+                    0.4: '#00ff00',
+                    0.6: '#ffff00',
+                    0.8: '#ff9900',
+                    1.0: '#ff0000'
+                }
+            }).addTo(map);
+        }
+
+        // Show all routes
+        function showAllRoutes() {
+            clearRoutes();
+
+            tours.forEach(tour => {
+                const color = getDifficultyColor(tour.difficulty);
+                const polyline = L.polyline(tour.track, {
+                    color: color,
+                    weight: 3,
+                    opacity: 0.7
+                }).addTo(map);
+
+                polyline.bindPopup(`
+                    <b>${tour.name}</b><br>
+                    📏 ${tour.distance} km<br>
+                    ⬆️ ${tour.elevation} hm<br>
+                    ⏱️ ${tour.duration}
+                `);
+
+                routeLayers.push(polyline);
+
+                // Add summit markers
+                tour.summits.forEach(summit => {
+                    const marker = L.marker([summit.lat, summit.lng], {
+                        icon: L.divIcon({
+                            className: 'summit-marker',
+                            html: '⛰️',
+                            iconSize: [30, 30]
+                        })
+                    }).addTo(map);
+
+                    marker.bindPopup(`
+                        <b>${summit.name}</b><br>
+                        ${summit.elevation} m
+                    `);
+
+                    routeLayers.push(marker);
+                });
+            });
+        }
+
+        // Show single tour
+        function showTour(tour) {
+            clearRoutes();
+
+            const color = getDifficultyColor(tour.difficulty);
+            const polyline = L.polyline(tour.track, {
+                color: color,
+                weight: 4,
+                opacity: 0.9
+            }).addTo(map);
+
+            routeLayers.push(polyline);
+
+            // Add summit markers
+            tour.summits.forEach(summit => {
+                const marker = L.marker([summit.lat, summit.lng], {
+                    icon: L.divIcon({
+                        className: 'summit-marker',
+                        html: '⛰️',
+                        iconSize: [35, 35]
+                    })
+                }).addTo(map);
+
+                marker.bindPopup(`
+                    <b>${summit.name}</b><br>
+                    ${summit.elevation} m
+                `);
+
+                routeLayers.push(marker);
+            });
+
+            // Fit bounds to tour
+            map.fitBounds(polyline.getBounds(), { padding: [50, 50] });
+        }
+
+        // Clear routes
+        function clearRoutes() {
+            routeLayers.forEach(layer => map.removeLayer(layer));
+            routeLayers = [];
+        }
+
+        // Get difficulty color
+        function getDifficultyColor(difficulty) {
+            const colors = {
+                easy: '#28a745',
+                moderate: '#ffc107',
+                hard: '#dc3545'
+            };
+            return colors[difficulty] || '#6c757d';
+        }
+
+        // Render tour list
+        function renderTourList(filteredTours = tours) {
+            const tourList = document.getElementById('tourList');
+            const noResults = document.getElementById('noResults');
+
+            tourList.innerHTML = '';
+
+            if (filteredTours.length === 0) {
+                tourList.style.display = 'none';
+                noResults.style.display = 'block';
+                return;
+            }
+
+            tourList.style.display = 'block';
+            noResults.style.display = 'none';
+
+            filteredTours.forEach(tour => {
+                const li = document.createElement('li');
+                li.className = 'tour-item';
+                li.innerHTML = `
+                    <div class="tour-name">${tour.name}</div>
+                    <div class="tour-meta">
+                        <span>📏 ${tour.distance} km</span>
+                        <span>⬆️ ${tour.elevation} hm</span>
+                        <span>⏱️ ${tour.duration}</span>
+                    </div>
+                    <div>
+                        <span class="difficulty difficulty-${tour.difficulty}">
+                            ${tour.difficulty === 'easy' ? 'Leicht' : tour.difficulty === 'moderate' ? 'Mittel' : 'Schwer'}
+                        </span>
+                    </div>
+                `;
+
+                li.addEventListener('click', () => {
+                    document.querySelectorAll('.tour-item').forEach(item => item.classList.remove('active'));
+                    li.classList.add('active');
+                    showTour(tour);
+                });
+
+                tourList.appendChild(li);
+            });
+        }
+
+        // Render summit book
+        function renderSummitBook() {
+            const summitGrid = document.getElementById('summitGrid');
+            const allSummits = [];
+
+            tours.forEach(tour => {
+                tour.summits.forEach(summit => {
+                    allSummits.push({
+                        ...summit,
+                        tourName: tour.name,
+                        date: tour.date
+                    });
+                });
+            });
+
+            // Sort by elevation
+            allSummits.sort((a, b) => b.elevation - a.elevation);
+
+            allSummits.forEach(summit => {
+                const card = document.createElement('div');
+                card.className = 'summit-card';
+                card.innerHTML = `
+                    <div class="summit-name">${summit.name}</div>
+                    <div class="summit-elevation">${summit.elevation} m</div>
+                    <div class="summit-date">
+                        ${summit.tourName}<br>
+                        📅 ${new Date(summit.date).toLocaleDateString('de-DE')}
+                    </div>
+                `;
+                summitGrid.appendChild(card);
+            });
+        }
+
+        // Update statistics
+        function updateStats() {
+            const totalDistance = tours.reduce((sum, tour) => sum + tour.distance, 0);
+            const totalElevation = tours.reduce((sum, tour) => sum + tour.elevation, 0);
+            const totalSummits = tours.reduce((sum, tour) => sum + tour.summits.length, 0);
+
+            document.getElementById('totalTours').textContent = tours.length;
+            document.getElementById('totalDistance').textContent = Math.round(totalDistance);
+            document.getElementById('totalElevation').textContent = Math.round(totalElevation).toLocaleString();
+            document.getElementById('totalSummits').textContent = totalSummits;
+        }
+
+        // Filter tours
+        function filterTours() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const difficulty = document.getElementById('difficultyFilter').value;
+            const minDistance = parseFloat(document.getElementById('minDistance').value) || 0;
+            const minElevation = parseFloat(document.getElementById('minElevation').value) || 0;
+
+            const filtered = tours.filter(tour => {
+                const matchesSearch = tour.name.toLowerCase().includes(search);
+                const matchesDifficulty = !difficulty || tour.difficulty === difficulty;
+                const matchesDistance = tour.distance >= minDistance;
+                const matchesElevation = tour.elevation >= minElevation;
+
+                return matchesSearch && matchesDifficulty && matchesDistance && matchesElevation;
+            });
+
+            renderTourList(filtered);
+        }
+
+        // View toggle
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                const view = btn.dataset.view;
+                currentView = view;
+
+                if (view === 'heatmap') {
+                    clearRoutes();
+                    createHeatmap();
+                    map.setView([47.5, 11.5], 8);
+                } else if (view === 'all') {
+                    if (heatmapLayer) {
+                        map.removeLayer(heatmapLayer);
+                    }
+                    showAllRoutes();
+                }
+            });
+        });
+
+        // Event listeners for filters
+        document.getElementById('searchInput').addEventListener('input', filterTours);
+        document.getElementById('difficultyFilter').addEventListener('change', filterTours);
+        document.getElementById('minDistance').addEventListener('input', filterTours);
+        document.getElementById('minElevation').addEventListener('input', filterTours);
+
+        // Initialize
+        createHeatmap();
+        renderTourList();
+        renderSummitBook();
+        updateStats();
+    </script>
+</body>
+</html>
