@@ -1,0 +1,14 @@
+{
+  "name": "tours-scripts",
+  "version": "1.0.0",
+  "description": "Scripts for generating tour data and map images",
+  "private": true,
+  "scripts": {
+    "parse-tours": "node parse-tours.js",
+    "generate-maps": "node generate-map-images.js"
+  },
+  "dependencies": {
+    "staticmaps": "^1.14.0",
+    "xmldom": "^0.6.0"
+  }
+}

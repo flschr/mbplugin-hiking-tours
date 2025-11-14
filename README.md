@@ -1,15 +1,17 @@
 # fischr Tours Plugin for Micro.blog
 
-A comprehensive tours system for Micro.blog/Hugo that adds GPX-powered tour tracking with interactive Leaflet maps, filterable archive pages, and automated data aggregation.
+A comprehensive tours system for Micro.blog/Hugo that adds GPX-powered tour tracking with auto-generated static maps, filterable archive pages, and automated data aggregation.
 
 ## Features
 
-- **Tour Shortcode**: Display tour info boxes with interactive Leaflet maps in blog posts
+- **Tour Shortcode**: Display tour info boxes with static map images in blog posts
 - **Tours Archive Page**: Central `/tours/` page with filters (year, type) and live statistics
-- **GPX Support**: Automatically renders GPX tracks on OpenStreetMap tiles
+- **Automatic Map Generation**: GitHub Actions auto-generate static PNG maps from GPX files
 - **Automated Data**: GitHub Action auto-generates tours.json from your blog posts
+- **GPX Download**: Direct download links for GPX files in tour boxes
 - **Responsive Design**: Mobile-friendly tour boxes and archive layout
 - **Multiple Tour Types**: Hike, MTB, Gravel, Run, and custom types
+- **Zero External Dependencies**: No CDN libraries, no JavaScript mapping libraries
 
 ## Installation
 
@@ -19,7 +21,7 @@ A comprehensive tours system for Micro.blog/Hugo that adds GPX-powered tour trac
 2. Enter the repository URL: `https://github.com/flschr/mbplugin-fischr-tours`
 3. Click **Install**
 
-The plugin automatically loads Leaflet map libraries from CDN - no additional setup required!
+No additional setup required - the plugin is ready to use immediately!
 
 ### 2. Create Tours Page
 
@@ -76,6 +78,7 @@ The views were spectacular...
 - `min_alt_m`: Minimum altitude
 - `bergfex_url`: Link to Bergfex activity
 - `cover_image`: Path to cover image
+- `map_image`: Path to custom static map image (defaults to auto-generated `/maps/{id}.png`)
 
 ### GPX File Locations
 
@@ -84,15 +87,17 @@ GPX files can be stored in two locations:
 1. **Micro.blog Uploads**: `/uploads/YYYY/filename.gpx`
 2. **Plugin Static**: `/gpx/filename.gpx` (place in `static/gpx/` in this repo)
 
-## Automated Data Aggregation
+## Automated Data & Map Generation
 
-Tours are automatically collected from your blog posts and aggregated into `data/tours.json` via GitHub Actions.
+Tours are automatically collected from your blog posts, aggregated into `data/tours.json`, and static map images are generated from GPX files - all via GitHub Actions.
 
 ### Setup (in your Micro.blog backup repo)
 
 1. Copy `.github/workflows/build-tours.yml` to your backup repo
 2. Copy `.github/scripts/parse-tours.js` to your backup repo
-3. Set up GitHub secrets:
+3. Copy `.github/scripts/generate-map-images.js` to your backup repo
+4. Copy `.github/scripts/package.json` to your backup repo
+5. Set up GitHub secrets:
 
 #### Option A: Deploy Key (Recommended)
 
@@ -125,6 +130,15 @@ env:
   CONTENT_DIR: "./content/posts"
 ```
 
+### What the Workflow Does
+
+When triggered, the GitHub Action:
+1. Parses all tour shortcodes from your markdown posts
+2. Generates `tours.json` with aggregated tour data
+3. Finds all GPX files referenced in tours
+4. Generates static PNG map images for each GPX track
+5. Commits both `tours.json` and map images to the plugin repo
+
 ### Manual Trigger
 
 Run the workflow manually:
@@ -135,19 +149,28 @@ Run the workflow manually:
 
 ```
 mbplugin-fischr-tours/
-├── plugin.json                  # Plugin metadata
+├── plugin.json                           # Plugin metadata
 ├── data/
-│   └── tours.json              # Auto-generated tours data
+│   └── tours.json                       # Auto-generated tours data
 ├── layouts/
 │   ├── shortcodes/
-│   │   └── tour.html           # Tour shortcode template (loads Leaflet from CDN)
+│   │   └── tour.html                    # Tour shortcode template
 │   └── page/
-│       └── tours.html          # Tours archive page
-├── static/tours/
-│   ├── app.js                 # Map initialization
-│   └── archive.js             # Archive filters & stats
-└── assets/tours/
-    └── styles.css             # Tour component styles
+│       └── tours.html                   # Tours archive page
+├── static/
+│   ├── tours/
+│   │   └── archive.js                   # Archive filters & stats
+│   └── maps/
+│       └── *.png                        # Auto-generated map images
+├── assets/tours/
+│   └── styles.css                       # Tour component styles
+└── .github/
+    ├── workflows/
+    │   └── build-tours.yml              # GitHub Action workflow
+    └── scripts/
+        ├── parse-tours.js               # Tour data parser
+        ├── generate-map-images.js       # Static map generator
+        └── package.json                 # Script dependencies
 ```
 
 ## Tours Archive Page
@@ -200,14 +223,22 @@ The plugin supports these tour types with emoji indicators:
 ## Troubleshooting
 
 ### Maps not displaying
-- Check browser console for JavaScript errors
-- Verify GPX file path is correct and file exists
-- Ensure Leaflet CDN resources can be loaded (check network tab in browser dev tools)
+- Check that the GitHub Action ran successfully and generated map images
+- Verify map images exist in `static/maps/` directory in plugin repo
+- Check that GPX file paths in tours are correct
+- Look for `*.png` files matching your tour IDs
 
 ### Tours not appearing on /tours/ page
 - Check `data/tours.json` exists and contains tours
 - Verify GitHub Action ran successfully
 - Ensure page layout is set to `tours`
+- Check browser console for JavaScript errors in archive.js
+
+### Map generation failing
+- Ensure GPX files are accessible in your backup repo
+- Check GitHub Action logs for errors
+- Verify `staticmaps` npm package installed correctly
+- Ensure GPX files are valid and contain track points
 
 ### Shortcode not rendering
 - Verify all required parameters are present
@@ -224,9 +255,8 @@ MIT License - see LICENSE file
 
 ## Credits
 
-- [Leaflet](https://leafletjs.com/) - Interactive map library
-- [Leaflet GPX](https://github.com/mpetazzoni/leaflet-gpx) - GPX track rendering
-- [OpenStreetMap](https://www.openstreetmap.org/) - Map tiles
+- [staticmaps](https://github.com/StephanGeorg/staticmaps) - Static map image generation
+- [OpenStreetMap](https://www.openstreetmap.org/) - Map tiles and data
 
 ---
 

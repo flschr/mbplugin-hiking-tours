@@ -19,10 +19,9 @@
 {{- $coverImage := .Get "cover_image" -}}
 {{- $bergfexUrl := .Get "bergfex_url" -}}
 
-{{- /* Ensure styles and scripts are loaded only once per page */ -}}
+{{- /* Load tour styles only once per page */ -}}
 {{- if not (.Page.Scratch.Get "tour-assets-loaded") -}}
   {{- .Page.Scratch.Set "tour-assets-loaded" true -}}
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <link rel="stylesheet" href="{{ "tours/styles.css" | relURL }}" />
 {{- end -}}
 
@@ -85,21 +84,28 @@
     {{- end -}}
   </div>
 
-  {{- if $gpx -}}
+  {{- /* Display static map image if available */ -}}
+  {{- $mapImage := .Get "map_image" -}}
+  {{- if not $mapImage -}}
+    {{- /* Check for auto-generated map */ -}}
+    {{- $mapImage = printf "/maps/%s.png" $id -}}
+  {{- end -}}
+
+  {{- if $mapImage -}}
   <div class="tour-map-container">
-    <div class="tour-map"
-         data-gpx="{{ $gpx | htmlEscape }}"
-         data-tour-id="{{ $id | htmlEscape }}"
-         id="map-{{ $id | htmlEscape }}">
-    </div>
+    <img src="{{ $mapImage | htmlEscape }}"
+         alt="Map of {{ $title | htmlEscape }}"
+         class="tour-map-static"
+         loading="lazy" />
+  </div>
+  {{- end -}}
+
+  {{- /* Add GPX download link if available */ -}}
+  {{- if $gpx -}}
+  <div class="tour-gpx-download">
+    <a href="{{ $gpx | htmlEscape }}" download class="tour-gpx-link">
+      📥 Download GPX
+    </a>
   </div>
   {{- end -}}
 </div>
-
-{{- /* Load scripts at the end, only once per page */ -}}
-{{- if not (.Page.Scratch.Get "tour-scripts-loaded") -}}
-  {{- .Page.Scratch.Set "tour-scripts-loaded" true -}}
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="https://cdn.jsdelivr.net/npm/leaflet-gpx@1.7.0/gpx.min.js"></script>
-  <script src="/tours/app.js"></script>
-{{- end -}}
