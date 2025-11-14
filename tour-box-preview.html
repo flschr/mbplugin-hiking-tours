@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tour-Box Design Vorschläge</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #f0f0f0;
+      padding: 2rem;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 3rem;
+      color: #222;
+    }
+
+    .comparison {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .option-wrapper {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .option-label {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #0066cc;
+      margin-bottom: 0.5rem;
+    }
+
+    .option-description {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ============================================
+       OPTION 1: Card-Style mit Icons
+       ============================================ */
+
+    .tour-box-v1 {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .tour-box-v1:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+
+    .tour-box-v1 .tour-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #222;
+      margin-bottom: 0.5rem;
+    }
+
+    .tour-box-v1 .tour-type {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background: #e3f2fd;
+      color: #1976d2;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .tour-box-v1 .tour-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .tour-box-v1 .metric-card {
+      text-align: center;
+      padding: 1rem;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border: 1px solid #e9ecef;
+    }
+
+    .tour-box-v1 .metric-card.distance {
+      border-left: 3px solid #2196f3;
+    }
+
+    .tour-box-v1 .metric-card.elevation {
+      border-left: 3px solid #4caf50;
+    }
+
+    .tour-box-v1 .metric-card.duration {
+      border-left: 3px solid #ff9800;
+    }
+
+    .tour-box-v1 .metric-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .tour-box-v1 .metric-value {
+      display: block;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #222;
+    }
+
+    .tour-box-v1 .metric-label {
+      display: block;
+      font-size: 0.75rem;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 0.25rem;
+    }
+
+    /* ============================================
+       OPTION 2: Minimalistisch mit Left Border
+       ============================================ */
+
+    .tour-box-v2 {
+      background: white;
+      border-radius: 8px;
+      border-left: 4px solid #4caf50;
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      transition: all 0.3s ease;
+    }
+
+    .tour-box-v2:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+
+    .tour-box-v2 .tour-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #222;
+      margin-bottom: 1rem;
+    }
+
+    .tour-box-v2 .tour-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .tour-box-v2 .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.4rem 0.8rem;
+      background: #f5f5f5;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      color: #444;
+    }
+
+    .tour-box-v2 .badge-icon {
+      font-size: 1rem;
+    }
+
+    .tour-box-v2 .badge-value {
+      font-weight: 600;
+    }
+
+    /* ============================================
+       OPTION 3: Gradient Header
+       ============================================ */
+
+    .tour-box-v3 {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+    }
+
+    .tour-box-v3:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+
+    .tour-box-v3 .tour-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 1.5rem;
+      color: white;
+    }
+
+    .tour-box-v3 .tour-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: white;
+    }
+
+    .tour-box-v3 .tour-type-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background: rgba(255,255,255,0.2);
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      backdrop-filter: blur(10px);
+    }
+
+    .tour-box-v3 .tour-content {
+      padding: 1.5rem;
+    }
+
+    .tour-box-v3 .tour-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .tour-box-v3 .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 25px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .tour-box-v3 .pill.distance {
+      background: #e3f2fd;
+      color: #1976d2;
+    }
+
+    .tour-box-v3 .pill.elevation {
+      background: #e8f5e9;
+      color: #388e3c;
+    }
+
+    .tour-box-v3 .pill.duration {
+      background: #fff3e0;
+      color: #f57c00;
+    }
+
+    .tour-box-v3 .pill-icon {
+      font-size: 1.1rem;
+    }
+
+    /* Map preview */
+    .map-preview {
+      margin-top: 1rem;
+      height: 200px;
+      background: linear-gradient(135deg, #667eea22 0%, #764ba233 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #999;
+      font-size: 0.9rem;
+    }
+
+    .current-design {
+      background: #fff9e6;
+      border: 2px dashed #ffc107;
+      padding: 1.5rem;
+      border-radius: 8px;
+    }
+
+    .current-label {
+      font-weight: 700;
+      color: #f57c00;
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+    }
+
+    .tour-box-current {
+      margin: 0;
+      padding: 1.5rem;
+      background: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+    }
+
+    .tour-box-current .tour-title {
+      margin: 0 0 0.75rem 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #222;
+    }
+
+    .tour-box-current .tour-meta {
+      font-size: 0.95rem;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 Tour-Box Design Vergleich</h1>
+
+    <div class="current-design">
+      <div class="current-label">⚠️ Aktuelles Design (zum Vergleich)</div>
+      <div class="tour-box-current">
+        <h3 class="tour-title">Wanderung zum Watzmann</h3>
+        <div class="tour-meta">
+          <span class="tour-info">Berchtesgaden · 2024-05-15 · 🥾 Hike · 18.5 km · 1450 hm · 7.5 h</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="comparison">
+      <!-- Option 1 -->
+      <div class="option-wrapper">
+        <div class="option-label">Option 1: Card-Style mit Icons ⭐</div>
+        <div class="option-description">
+          Moderne Card mit Schatten, Grid-Layout für Metriken, farbcodierte Akzente
+        </div>
+
+        <div class="tour-box-v1">
+          <h3 class="tour-title">Wanderung zum Watzmann</h3>
+          <span class="tour-type">🥾 Hike · Berchtesgaden</span>
+
+          <div class="tour-metrics">
+            <div class="metric-card distance">
+              <div class="metric-icon">📏</div>
+              <span class="metric-value">18.5</span>
+              <span class="metric-label">Kilometer</span>
+            </div>
+
+            <div class="metric-card elevation">
+              <div class="metric-icon">⛰️</div>
+              <span class="metric-value">1450</span>
+              <span class="metric-label">Höhenmeter</span>
+            </div>
+
+            <div class="metric-card duration">
+              <div class="metric-icon">⏱️</div>
+              <span class="metric-value">7.5</span>
+              <span class="metric-label">Stunden</span>
+            </div>
+          </div>
+
+          <div class="map-preview">🗺️ Karte wird hier angezeigt</div>
+        </div>
+      </div>
+
+      <!-- Option 2 -->
+      <div class="option-wrapper">
+        <div class="option-label">Option 2: Minimalistisch</div>
+        <div class="option-description">
+          Clean Design mit farbigem Left-Border, Badge-Liste für Metriken
+        </div>
+
+        <div class="tour-box-v2">
+          <h3 class="tour-title">Wanderung zum Watzmann</h3>
+
+          <div class="tour-badges">
+            <div class="badge">
+              <span class="badge-icon">🥾</span>
+              <span>Hike</span>
+            </div>
+            <div class="badge">
+              <span class="badge-icon">📍</span>
+              <span>Berchtesgaden</span>
+            </div>
+            <div class="badge">
+              <span class="badge-icon">📏</span>
+              <span class="badge-value">18.5 km</span>
+            </div>
+            <div class="badge">
+              <span class="badge-icon">⛰️</span>
+              <span class="badge-value">1450 hm</span>
+            </div>
+            <div class="badge">
+              <span class="badge-icon">⏱️</span>
+              <span class="badge-value">7.5 h</span>
+            </div>
+          </div>
+
+          <div class="map-preview">🗺️ Karte wird hier angezeigt</div>
+        </div>
+      </div>
+
+      <!-- Option 3 -->
+      <div class="option-wrapper">
+        <div class="option-label">Option 3: Gradient Header</div>
+        <div class="option-description">
+          Eye-catching Design mit Gradient-Header, farbige Pills für Metriken
+        </div>
+
+        <div class="tour-box-v3">
+          <div class="tour-header">
+            <h3 class="tour-title">Wanderung zum Watzmann</h3>
+            <span class="tour-type-badge">🥾 Hike · Berchtesgaden</span>
+          </div>
+
+          <div class="tour-content">
+            <div class="tour-pills">
+              <div class="pill distance">
+                <span class="pill-icon">📏</span>
+                <span>18.5 km</span>
+              </div>
+              <div class="pill elevation">
+                <span class="pill-icon">⛰️</span>
+                <span>1450 hm</span>
+              </div>
+              <div class="pill duration">
+                <span class="pill-icon">⏱️</span>
+                <span>7.5 h</span>
+              </div>
+            </div>
+
+            <div class="map-preview">🗺️ Karte wird hier angezeigt</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
