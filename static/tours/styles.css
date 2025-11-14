@@ -75,6 +75,8 @@
 
 .badge-icon {
   font-size: 0.95rem;
+  width: 1em;
+  text-align: center;
 }
 
 /* Metric tiles grid (2x2) */
@@ -101,6 +103,8 @@
 .tile-icon {
   font-size: 1.5rem;
   margin-bottom: 0.25rem;
+  display: block;
+  color: inherit;
 }
 
 .tile-value {

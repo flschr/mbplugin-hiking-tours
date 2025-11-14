@@ -6,6 +6,7 @@
   Features: Year/type filters, live statistics, links to posts
 */ -}}
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="stylesheet" href="{{ "tours/styles.css" | relURL }}" />
 
 <article class="tours-archive">
@@ -75,10 +76,10 @@
         {{- end -}}
         {{- range sort (uniq $types) -}}
           <option value="{{ . }}">
-            {{- if eq . "hike" -}}🥾 Hike
-            {{- else if eq . "mtb" -}}🚵 MTB
-            {{- else if eq . "gravel" -}}🚴 Gravel
-            {{- else if eq . "run" -}}🏃 Run
+            {{- if eq . "hike" -}}Hike
+            {{- else if eq . "mtb" -}}MTB
+            {{- else if eq . "gravel" -}}Gravel
+            {{- else if eq . "run" -}}Run
             {{- else -}}{{ . | title }}
             {{- end -}}
           </option>
@@ -119,10 +120,10 @@
 
           {{- if .type -}}
             {{- $typeLabel := .type -}}
-            {{- if eq .type "hike" -}}{{ $typeLabel = "🥾 Hike" -}}
-            {{- else if eq .type "mtb" -}}{{ $typeLabel = "🚵 MTB" -}}
-            {{- else if eq .type "gravel" -}}{{ $typeLabel = "🚴 Gravel" -}}
-            {{- else if eq .type "run" -}}{{ $typeLabel = "🏃 Run" -}}
+            {{- if eq .type "hike" -}}{{ $typeLabel = "Hike" -}}
+            {{- else if eq .type "mtb" -}}{{ $typeLabel = "MTB" -}}
+            {{- else if eq .type "gravel" -}}{{ $typeLabel = "Gravel" -}}
+            {{- else if eq .type "run" -}}{{ $typeLabel = "Run" -}}
             {{- end -}}
             {{- $metaParts = $metaParts | append $typeLabel -}}
           {{- end -}}
