@@ -14,7 +14,7 @@
   margin: 2rem 0;
   padding: 1.5rem;
   background: white;
-  border-left: 4px solid #4caf50;
+  border: 1px solid #e0e0e0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   transition: all 0.3s ease;
 }
@@ -58,25 +58,21 @@
 .tour-meta-badges {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.6rem;
+  gap: 1rem;
   margin-bottom: 1rem;
 }
 
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.4rem 0.75rem;
-  background: #f5f5f5;
-  border: 1px solid #e0e0e0;
-  font-size: 0.85rem;
-  color: #444;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  color: #555;
 }
 
 .badge-icon {
-  font-size: 0.95rem;
-  width: 1em;
-  text-align: center;
+  font-size: 1rem;
+  color: #666;
 }
 
 /* Metric tiles grid (2x2) */
@@ -91,8 +87,10 @@
   background: #f8f9fa;
   border: 1px solid #e0e0e0;
   padding: 0.75rem;
-  text-align: center;
   transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .tile:hover {
@@ -101,17 +99,14 @@
 }
 
 .tile-icon {
-  font-size: 1.5rem;
-  margin-bottom: 0.25rem;
-  display: block;
-  color: inherit;
+  font-size: 1.3rem;
+  color: #333;
 }
 
 .tile-value {
   font-size: 1.4rem;
   font-weight: 700;
   color: #222;
-  margin-bottom: 0.15rem;
 }
 
 .tile-label {
@@ -121,21 +116,44 @@
   letter-spacing: 0.05em;
 }
 
+.tile-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
 /* Tile color accents */
 .tile-distance {
-  border-left: 3px solid #2196f3;
+  border-left: 3px solid #1565c0;
+}
+
+.tile-distance .tile-icon {
+  color: #1565c0;
 }
 
 .tile-elevation {
-  border-left: 3px solid #4caf50;
+  border-left: 3px solid #2e7d32;
+}
+
+.tile-elevation .tile-icon {
+  color: #2e7d32;
 }
 
 .tile-maxheight {
-  border-left: 3px solid #9c27b0;
+  border-left: 3px solid #6a1b9a;
+}
+
+.tile-maxheight .tile-icon {
+  color: #6a1b9a;
 }
 
 .tile-duration {
-  border-left: 3px solid #ff9800;
+  border-left: 3px solid #e65100;
+}
+
+.tile-duration .tile-icon {
+  color: #e65100;
 }
 
 /* Links section */

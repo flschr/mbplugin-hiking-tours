@@ -73,8 +73,10 @@
         {{- /* Distance tile */ -}}
         {{- if $distanceKm -}}
         <div class="tile tile-distance">
-          <i class="fa-solid fa-route tile-icon"></i>
-          <div class="tile-value">{{ $distanceKm | htmlEscape }}</div>
+          <div class="tile-main">
+            <i class="fa-solid fa-route tile-icon"></i>
+            <div class="tile-value">{{ $distanceKm | htmlEscape }}</div>
+          </div>
           <div class="tile-label">Distanz (km)</div>
         </div>
         {{- end -}}
@@ -82,17 +84,21 @@
         {{- /* Elevation tile */ -}}
         {{- if $elevationM -}}
         <div class="tile tile-elevation">
-          <i class="fa-solid fa-mountain tile-icon"></i>
-          <div class="tile-value">{{ $elevationM | htmlEscape }}</div>
-          <div class="tile-label">Höhenmeter</div>
+          <div class="tile-main">
+            <i class="fa-solid fa-arrow-trend-up tile-icon"></i>
+            <div class="tile-value">{{ $elevationM | htmlEscape }}</div>
+          </div>
+          <div class="tile-label">Aufstieg (m)</div>
         </div>
         {{- end -}}
 
         {{- /* Max height tile */ -}}
         {{- if $maxHeight -}}
         <div class="tile tile-maxheight">
-          <i class="fa-solid fa-mountain-sun tile-icon"></i>
-          <div class="tile-value">{{ $maxHeight | htmlEscape }}</div>
+          <div class="tile-main">
+            <i class="fa-solid fa-arrow-up-to-line tile-icon"></i>
+            <div class="tile-value">{{ $maxHeight | htmlEscape }}</div>
+          </div>
           <div class="tile-label">Max. Höhe (m)</div>
         </div>
         {{- end -}}
@@ -100,8 +106,10 @@
         {{- /* Duration tile */ -}}
         {{- if $durationH -}}
         <div class="tile tile-duration">
-          <i class="fa-regular fa-clock tile-icon"></i>
-          <div class="tile-value">{{ $durationH | htmlEscape }}</div>
+          <div class="tile-main">
+            <i class="fa-regular fa-clock tile-icon"></i>
+            <div class="tile-value">{{ $durationH | htmlEscape }}</div>
+          </div>
           <div class="tile-label">Dauer (h)</div>
         </div>
         {{- end -}}
