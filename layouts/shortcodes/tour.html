@@ -2,7 +2,7 @@
   Tour Shortcode - Renders a tour info box with optional Leaflet map
 
   Required params: id, title, date, type, distance_km, elevation_m, gpx
-  Optional params: region, duration_h, max_alt_m, min_alt_m, bergfex_url, cover_image
+  Optional params: region, duration_h, max_alt_m, min_alt_m, bergfex_url, cover_image, peaks
 
   XSS Safety: All user parameters are properly escaped via htmlEscape or used only as attributes
 */ -}}
@@ -18,6 +18,7 @@
 {{- $gpx := .Get "gpx" -}}
 {{- $coverImage := .Get "cover_image" -}}
 {{- $bergfexUrl := .Get "bergfex_url" -}}
+{{- $peaks := .Get "peaks" -}}
 
 {{- /* Load tour styles only once per page */ -}}
 {{- if not (.Page.Scratch.Get "tour-assets-loaded") -}}
@@ -26,81 +27,117 @@
 {{- end -}}
 
 <div class="tour-box" id="tour-{{ $id | htmlEscape }}" data-tour-id="{{ $id | htmlEscape }}">
-  <div class="tour-header">
-    <h3 class="tour-title">{{ $title | htmlEscape }}</h3>
+  <h3 class="tour-title">{{ $title | htmlEscape }}</h3>
 
-    {{- if $coverImage -}}
-    <div class="tour-cover">
-      <img src="{{ $coverImage | htmlEscape }}" alt="{{ $title | htmlEscape }}" loading="lazy" />
-    </div>
-    {{- end -}}
+  {{- if $coverImage -}}
+  <div class="tour-cover">
+    <img src="{{ $coverImage | htmlEscape }}" alt="{{ $title | htmlEscape }}" loading="lazy" />
+  </div>
+  {{- end -}}
 
-    <div class="tour-meta">
-      {{- /* Build metadata line with available fields */ -}}
-      {{- $metaParts := slice -}}
-
-      {{- if $region -}}
-        {{- $metaParts = $metaParts | append (printf "%s" ($region | htmlEscape)) -}}
-      {{- end -}}
-
-      {{- if $date -}}
-        {{- $metaParts = $metaParts | append (printf "%s" ($date | htmlEscape)) -}}
-      {{- end -}}
-
-      {{- if $type -}}
-        {{- $typeLabel := $type -}}
-        {{- if eq $type "hike" -}}{{ $typeLabel = "🥾 Hike" -}}
-        {{- else if eq $type "mtb" -}}{{ $typeLabel = "🚵 MTB" -}}
-        {{- else if eq $type "gravel" -}}{{ $typeLabel = "🚴 Gravel" -}}
-        {{- else if eq $type "run" -}}{{ $typeLabel = "🏃 Run" -}}
-        {{- else -}}{{ $typeLabel = printf "⛰️ %s" $type -}}
+  <div class="tour-main">
+    {{- /* Left column: Badges */ -}}
+    <div class="tour-info-section">
+      <div class="tour-badges">
+        {{- /* Type badge */ -}}
+        {{- if $type -}}
+        <div class="badge">
+          {{- if eq $type "hike" -}}<span class="badge-icon">🥾</span><span>Hike</span>
+          {{- else if eq $type "mtb" -}}<span class="badge-icon">🚵</span><span>MTB</span>
+          {{- else if eq $type "gravel" -}}<span class="badge-icon">🚴</span><span>Gravel</span>
+          {{- else if eq $type "run" -}}<span class="badge-icon">🏃</span><span>Run</span>
+          {{- else -}}<span class="badge-icon">⛰️</span><span>{{ $type | htmlEscape }}</span>
+          {{- end -}}
+        </div>
         {{- end -}}
-        {{- $metaParts = $metaParts | append $typeLabel -}}
-      {{- end -}}
 
-      {{- if $distanceKm -}}
-        {{- $metaParts = $metaParts | append (printf "%s km" ($distanceKm | htmlEscape)) -}}
-      {{- end -}}
+        {{- /* Region badge */ -}}
+        {{- if $region -}}
+        <div class="badge">
+          <span class="badge-icon">📍</span>
+          <span>{{ $region | htmlEscape }}</span>
+        </div>
+        {{- end -}}
 
-      {{- if $elevationM -}}
-        {{- $metaParts = $metaParts | append (printf "%s hm" ($elevationM | htmlEscape)) -}}
-      {{- end -}}
+        {{- /* Date badge */ -}}
+        {{- if $date -}}
+        <div class="badge">
+          <span class="badge-icon">📅</span>
+          <span>{{ $date | htmlEscape }}</span>
+        </div>
+        {{- end -}}
 
-      {{- if $durationH -}}
-        {{- $metaParts = $metaParts | append (printf "%s h" ($durationH | htmlEscape)) -}}
-      {{- end -}}
+        {{- /* Distance badge */ -}}
+        {{- if $distanceKm -}}
+        <div class="badge">
+          <span class="badge-icon">📏</span>
+          <span class="badge-value">{{ $distanceKm | htmlEscape }} km</span>
+        </div>
+        {{- end -}}
 
-      {{- if $metaParts -}}
-        <span class="tour-info">{{ delimit $metaParts " · " }}</span>
+        {{- /* Elevation badge */ -}}
+        {{- if $elevationM -}}
+        <div class="badge">
+          <span class="badge-icon">⛰️</span>
+          <span class="badge-value">{{ $elevationM | htmlEscape }} hm</span>
+        </div>
+        {{- end -}}
+
+        {{- /* Duration badge */ -}}
+        {{- if $durationH -}}
+        <div class="badge">
+          <span class="badge-icon">⏱️</span>
+          <span class="badge-value">{{ $durationH | htmlEscape }} h</span>
+        </div>
+        {{- end -}}
+      </div>
+
+      {{- /* Bergfex link */ -}}
+      {{- if $bergfexUrl -}}
+      <div class="tour-links">
+        <a href="{{ $bergfexUrl | htmlEscape }}" target="_blank" rel="noopener noreferrer" class="tour-external-link">
+          View on Bergfex →
+        </a>
+      </div>
       {{- end -}}
     </div>
 
-    {{- if $bergfexUrl -}}
-    <div class="tour-links">
-      <a href="{{ $bergfexUrl | htmlEscape }}" target="_blank" rel="noopener noreferrer" class="tour-external-link">
-        View on Bergfex →
-      </a>
+    {{- /* Right column: Map */ -}}
+    {{- $mapImage := .Get "map_image" -}}
+    {{- if not $mapImage -}}
+      {{- /* Check for auto-generated map */ -}}
+      {{- $mapImage = printf "/maps/%s.png" $id -}}
+    {{- end -}}
+
+    {{- if $mapImage -}}
+    <div class="tour-map-section">
+      <img src="{{ $mapImage | htmlEscape }}"
+           alt="Map of {{ $title | htmlEscape }}"
+           class="tour-map-static"
+           loading="lazy" />
     </div>
     {{- end -}}
   </div>
 
-  {{- /* Display static map image if available */ -}}
-  {{- $mapImage := .Get "map_image" -}}
-  {{- if not $mapImage -}}
-    {{- /* Check for auto-generated map */ -}}
-    {{- $mapImage = printf "/maps/%s.png" $id -}}
-  {{- end -}}
-
-  {{- if $mapImage -}}
-  <div class="tour-map-container">
-    <img src="{{ $mapImage | htmlEscape }}"
-         alt="Map of {{ $title | htmlEscape }}"
-         class="tour-map-static"
-         loading="lazy" />
+  {{- /* Peaks section (if provided) */ -}}
+  {{- if $peaks -}}
+  <div class="tour-peaks-section">
+    <div class="peaks-title">Mitgenommene Gipfel</div>
+    <div class="peaks-list">
+      {{- range split $peaks "," -}}
+        {{- $peak := trim . " " -}}
+        {{- if $peak -}}
+        <div class="peak-badge">
+          <span>🏔️</span>
+          <span>{{ $peak | htmlEscape }}</span>
+        </div>
+        {{- end -}}
+      {{- end -}}
+    </div>
   </div>
   {{- end -}}
 
-  {{- /* Add GPX download link if available */ -}}
+  {{- /* GPX download link */ -}}
   {{- if $gpx -}}
   <div class="tour-gpx-download">
     <a href="{{ $gpx | htmlEscape }}" download class="tour-gpx-link">
