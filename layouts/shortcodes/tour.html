@@ -53,13 +53,6 @@
         </div>
         {{- end -}}
 
-        {{- if $region -}}
-        <div class="badge">
-          <i class="fa-solid fa-location-dot badge-icon"></i>
-          <span>{{ $region | htmlEscape }}</span>
-        </div>
-        {{- end -}}
-
         {{- if $date -}}
         <div class="badge">
           <i class="fa-solid fa-calendar-days badge-icon"></i>
@@ -68,20 +61,6 @@
             {{- $parsedDate.Format "02.01.2006" -}}
           </span>
         </div>
-        {{- end -}}
-
-        {{- if $gpx -}}
-        <a href="{{ $gpx | htmlEscape }}" download class="badge badge-link">
-          <i class="fa-solid fa-download badge-icon"></i>
-          <span>GPX</span>
-        </a>
-        {{- end -}}
-
-        {{- if $bergfexUrl -}}
-        <a href="{{ $bergfexUrl | htmlEscape }}" target="_blank" rel="noopener noreferrer" class="badge badge-link">
-          <i class="fa-solid fa-arrow-up-right-from-square badge-icon"></i>
-          <span>Bergfex</span>
-        </a>
         {{- end -}}
       </div>
 
@@ -164,6 +143,25 @@
            alt="Map of {{ $title | htmlEscape }}"
            class="tour-map-static"
            loading="lazy" />
+
+      {{- /* Action buttons positioned at bottom-right */ -}}
+      {{- if or $gpx $bergfexUrl -}}
+      <div class="tour-map-actions">
+        {{- if $gpx -}}
+        <a href="{{ $gpx | htmlEscape }}" download class="map-action-btn" title="GPX herunterladen">
+          <i class="fa-solid fa-download"></i>
+          <span>GPX</span>
+        </a>
+        {{- end -}}
+
+        {{- if $bergfexUrl -}}
+        <a href="{{ $bergfexUrl | htmlEscape }}" target="_blank" rel="noopener noreferrer" class="map-action-btn" title="Auf Bergfex ansehen">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          <span>Bergfex</span>
+        </a>
+        {{- end -}}
+      </div>
+      {{- end -}}
     </div>
     {{- end -}}
   </div>

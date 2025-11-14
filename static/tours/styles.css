@@ -156,6 +156,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 
 .tour-map-static {
@@ -163,6 +164,38 @@
   height: auto;
   display: block;
   border: 1px solid #e0e0e0;
+}
+
+/* Map action buttons (GPX, Bergfex) positioned at bottom-right */
+.tour-map-actions {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 0.75rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.map-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.7rem;
+  background: #6b7280;
+  color: white;
+  text-decoration: none;
+  font-size: 0.8rem;
+  border-radius: 4px;
+  transition: background 0.2s ease, opacity 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.map-action-btn:hover {
+  background: #4b5563;
+  opacity: 0.95;
+}
+
+.map-action-btn i {
+  font-size: 0.85rem;
 }
 
 /* Peaks section */
