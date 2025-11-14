@@ -127,9 +127,12 @@
       {{- if $distanceKm -}}
       <div class="tour-stat-card">
         <div class="stat-icon"><i class="fa-solid fa-ruler" aria-hidden="true"></i></div>
-        <div>
+        <div class="stat-text">
           <p class="stat-label">Distanz</p>
-          <p class="stat-value">{{ $distanceKm | htmlEscape }} <span>km</span></p>
+          <p class="stat-value">
+            <span class="stat-number">{{ $distanceKm | htmlEscape }}</span>
+            <span class="stat-unit">km</span>
+          </p>
         </div>
       </div>
       {{- end -}}
@@ -137,9 +140,12 @@
       {{- if $elevationM -}}
       <div class="tour-stat-card">
         <div class="stat-icon"><i class="fa-solid fa-chart-line" aria-hidden="true"></i></div>
-        <div>
+        <div class="stat-text">
           <p class="stat-label">Aufstieg</p>
-          <p class="stat-value">{{ $elevationM | htmlEscape }} <span>m</span></p>
+          <p class="stat-value">
+            <span class="stat-number">{{ $elevationM | htmlEscape }}</span>
+            <span class="stat-unit">m</span>
+          </p>
         </div>
       </div>
       {{- end -}}
@@ -147,9 +153,12 @@
       {{- if $maxHeight -}}
       <div class="tour-stat-card">
         <div class="stat-icon"><i class="fa-solid fa-mountain" aria-hidden="true"></i></div>
-        <div>
+        <div class="stat-text">
           <p class="stat-label">Max. Höhe</p>
-          <p class="stat-value">{{ $maxHeight | htmlEscape }} <span>m</span></p>
+          <p class="stat-value">
+            <span class="stat-number">{{ $maxHeight | htmlEscape }}</span>
+            <span class="stat-unit">m</span>
+          </p>
         </div>
       </div>
       {{- end -}}
@@ -157,9 +166,12 @@
       {{- if $durationH -}}
       <div class="tour-stat-card">
         <div class="stat-icon"><i class="fa-solid fa-clock" aria-hidden="true"></i></div>
-        <div>
+        <div class="stat-text">
           <p class="stat-label">Dauer</p>
-          <p class="stat-value">{{ $durationH | htmlEscape }} <span>Std</span></p>
+          <p class="stat-value">
+            <span class="stat-number">{{ $durationH | htmlEscape }}</span>
+            <span class="stat-unit">Std</span>
+          </p>
         </div>
       </div>
       {{- end -}}
@@ -179,22 +191,5 @@
     </div>
     {{- end -}}
 
-    {{- if or $gpx $bergfexUrl -}}
-    <div class="tour-links">
-      {{- if $gpx -}}
-      <a href="{{ $gpx | htmlEscape }}" download class="tour-link">
-        <i class="fa-solid fa-file-arrow-down" aria-hidden="true"></i>
-        <span>GPX herunterladen</span>
-      </a>
-      {{- end -}}
-
-      {{- if $bergfexUrl -}}
-      <a href="{{ $bergfexUrl | htmlEscape }}" target="_blank" rel="noopener noreferrer" class="tour-link">
-        <i class="fa-solid fa-up-right-from-square" aria-hidden="true"></i>
-        <span>Auf Bergfex ansehen</span>
-      </a>
-      {{- end -}}
-    </div>
-    {{- end -}}
   </div>
 </div>
