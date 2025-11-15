@@ -180,9 +180,9 @@
   {{- if $hasPeaks -}}
   <section>
     <h4>Gipfelbuch</h4>
-    <ol>
-      {{- range $peaksList -}}
-      <li>{{ .label | htmlEscape }}</li>
+    <ol class="tour-peaks-list">
+      {{- range $idx, $peak := $peaksList -}}
+      <li class="tour-peak-item" data-peak-index="{{ $idx }}" tabindex="0">{{ $peak.label | htmlEscape }}</li>
       {{- end -}}
     </ol>
   </section>

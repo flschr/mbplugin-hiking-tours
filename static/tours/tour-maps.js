@@ -27,6 +27,95 @@
     return peakMarkerIcon;
   }
 
+  function setupPeakInteractions(canvas, markerLookup) {
+    var entry = canvas.closest('.tour-entry');
+    if (!entry) {
+      return;
+    }
+    var list = entry.querySelector('.tour-peaks-list');
+    if (!list) {
+      return;
+    }
+
+    var activeIndex = null;
+
+    function getListItemByIndex(index) {
+      return list.querySelector('[data-peak-index="' + index + '"]');
+    }
+
+    function setActive(index, item) {
+      if (activeIndex === index) {
+        return;
+      }
+      if (activeIndex !== null) {
+        clearActive(activeIndex);
+      }
+      activeIndex = index;
+      if (item) {
+        item.classList.add('tour-peak-active');
+      }
+      var marker = markerLookup[index];
+      if (marker) {
+        if (typeof marker.openPopup === 'function') {
+          marker.openPopup();
+        }
+        var element = marker.getElement && marker.getElement();
+        if (element) {
+          element.classList.add('tour-peak-marker-active');
+        }
+      }
+    }
+
+    function clearActive(index) {
+      var item = getListItemByIndex(index);
+      if (item) {
+        item.classList.remove('tour-peak-active');
+      }
+      var marker = markerLookup[index];
+      if (marker) {
+        if (typeof marker.closePopup === 'function') {
+          marker.closePopup();
+        }
+        var element = marker.getElement && marker.getElement();
+        if (element) {
+          element.classList.remove('tour-peak-marker-active');
+        }
+      }
+      if (activeIndex === index) {
+        activeIndex = null;
+      }
+    }
+
+    function handleEnter(event) {
+      var item = event.target.closest('.tour-peak-item');
+      if (!item || !list.contains(item)) {
+        return;
+      }
+      var index = item.getAttribute('data-peak-index');
+      if (index === null) {
+        return;
+      }
+      setActive(index, item);
+    }
+
+    function handleLeave(event) {
+      var item = event.target.closest('.tour-peak-item');
+      if (!item || !list.contains(item)) {
+        return;
+      }
+      var index = item.getAttribute('data-peak-index');
+      if (index === null) {
+        return;
+      }
+      clearActive(index);
+    }
+
+    list.addEventListener('pointerenter', handleEnter, true);
+    list.addEventListener('pointerleave', handleLeave, true);
+    list.addEventListener('focusin', handleEnter);
+    list.addEventListener('focusout', handleLeave);
+  }
+
   function initMap(canvas) {
     if (!window.L || !canvas) {
       return;
@@ -98,7 +187,13 @@
           marker.bindPopup(peak.label);
         }
         markerLayer.addLayer(marker);
+        markerLookup[index] = marker;
+        hasMarkers = true;
       });
+
+      if (hasMarkers) {
+        setupPeakInteractions(canvas, markerLookup);
+      }
     } catch (err) {
       console.error('[Tours] Failed to parse peak data', err);
     }
