@@ -9,10 +9,118 @@
     }
   }
 
+  function collectTrackLines(layer) {
+    var collected = [];
+    if (!layer) {
+      return collected;
+    }
+
+    var stack = [layer];
+    while (stack.length) {
+      var current = stack.pop();
+      if (!current) {
+        continue;
+      }
+
+      if (typeof current.getLayers === 'function') {
+        var children = current.getLayers();
+        if (children && children.length) {
+          children.forEach(function(child) {
+            stack.push(child);
+          });
+        }
+        continue;
+      }
+
+      if (current._layers) {
+        Object.keys(current._layers).forEach(function(key) {
+          stack.push(current._layers[key]);
+        });
+        continue;
+      }
+
+      if (window.L && L.Polyline && current instanceof L.Polyline) {
+        collected.push(current);
+      }
+    }
+
+    return collected;
+  }
+
+  function bringLayerToBackWhenReady(layer, attemptsLeft) {
+    if (!layer || typeof layer.bringToBack !== 'function') {
+      return;
+    }
+
+    if (layer._path && layer._path.parentNode) {
+      try {
+        layer.bringToBack();
+      } catch (err) {
+        console.warn('[Tours] Failed to move outline behind track', err);
+      }
+      return;
+    }
+
+    if (!attemptsLeft) {
+      return;
+    }
+
+    var schedule = window.requestAnimationFrame || function(cb) { return setTimeout(cb, 16); };
+    schedule(function() {
+      bringLayerToBackWhenReady(layer, attemptsLeft - 1);
+    });
+  }
+
+  function addTrackOutline(layer, map, color) {
+    if (!window.L || !layer || !map) {
+      return;
+    }
+
+    var lines = collectTrackLines(layer);
+    if (!lines.length) {
+      return;
+    }
+
+    lines.forEach(function(line) {
+      if (typeof line.getLatLngs !== 'function') {
+        return;
+      }
+      var latLngs = line.getLatLngs();
+      if (!latLngs || !latLngs.length) {
+        return;
+      }
+      var baseWeight = 4;
+      if (line.options && line.options.weight) {
+        baseWeight = line.options.weight;
+      }
+      var outline = L.polyline(latLngs, {
+        color: '#ffffff',
+        weight: baseWeight + 4,
+        opacity: 0.95,
+        lineJoin: 'round',
+        lineCap: 'round'
+      }).addTo(map);
+      bringLayerToBackWhenReady(outline, 10);
+      if (typeof line.setStyle === 'function') {
+        line.setStyle({
+          color: color,
+          lineJoin: 'round',
+          lineCap: 'round'
+        });
+      }
+    });
+  }
+
   function initMap(canvas) {
     if (!window.L || !canvas) {
       return;
     }
+
+    if (canvas._toursMapInitialized || canvas.getAttribute('data-map-initialized') === 'true') {
+      return;
+    }
+    canvas._toursMapInitialized = true;
+    canvas.setAttribute('data-map-initialized', 'true');
 
     var gpxUrl = canvas.getAttribute('data-gpx');
     if (!gpxUrl) {
@@ -45,24 +153,7 @@
       }
     }).on('loaded', function(e) {
       map.fitBounds(e.target.getBounds(), { padding: [16, 16] });
-    }).on('addline', function(e) {
-      var latLngs = e.line.getLatLngs();
-      var outlineWeight = (e.line.options.weight || 4) + 4;
-      var outline = L.polyline(latLngs, {
-        color: '#ffffff',
-        weight: outlineWeight,
-        opacity: 0.95,
-        lineJoin: 'round',
-        lineCap: 'round'
-      }).addTo(map);
-      if (outline.bringToBack) {
-        outline.bringToBack();
-      }
-      e.line.setStyle({
-        color: trackColor,
-        lineJoin: 'round',
-        lineCap: 'round'
-      });
+      addTrackOutline(e.target, map, trackColor);
     }).addTo(map);
 
     var baseIconSize = 28;
