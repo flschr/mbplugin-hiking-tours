@@ -126,30 +126,7 @@
     }
 
     .tour-entry > header .tour-entry-meta {
-      margin-bottom: 0.25rem;
-    }
-
-    .tour-entry > header .tour-entry-meta .btn-gpx {
-      display: inline-block;
-      padding: 0.2rem 0.6rem;
-      margin-left: 0.5rem;
-      background-color: #f5f5f5;
-      border: 1px solid #ddd;
-      border-radius: 3px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      color: #666;
-      text-decoration: none;
-      line-height: 1.2;
-      transition: all 0.2s ease;
-    }
-
-    .tour-entry > header .tour-entry-meta .btn-gpx:hover {
-      background-color: #e0e0e0;
-      border-color: #ccc;
-      color: #333;
+      margin-bottom: 0.125rem;
     }
 
     .tour-entry > header h3 {
@@ -164,7 +141,7 @@
 
     .tour-entry .tour-stats-grid {
       margin: 1.5rem auto 0;
-      padding: 0 1.5rem 0.75rem;
+      padding: 0 1.5rem 0.375rem;
       list-style: none;
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -252,6 +229,27 @@
       font-size: 0.875rem;
       flex-shrink: 0;
     }
+
+    .tour-entry .gpx-download-link {
+      display: block;
+      text-align: right;
+      padding: 0 1.5rem 1.5rem;
+    }
+
+    .tour-entry .gpx-download-link a {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #999;
+      text-decoration: underline;
+      text-decoration-style: dashed;
+      text-underline-offset: 0.2em;
+    }
+
+    .tour-entry .gpx-download-link a:hover {
+      color: #666;
+    }
   </style>
 {{- end -}}
 
@@ -277,15 +275,12 @@
       {{- if $region -}}
       <span class="tour-entry-meta-label">{{ $region | htmlEscape }}</span>
       {{- end -}}
-      {{- if $gpx -}}
-      <a href="{{ $gpx | htmlEscape }}" download class="btn-gpx">GPX</a>
-      {{- end -}}
     </p>
     <h3>{{ $title | htmlEscape }}</h3>
   </header>
 
   {{- if $shouldRenderMap -}}
-  <div class="tour-map" data-tour-map data-gpx="{{ $gpx | htmlEscape }}"{{ if $peaksDataJSON }} data-peaks='{{ $peaksDataJSON | safeHTMLAttr }}'{{ end }} style="min-height:320px; margin:0.5rem 0 0.75rem;"></div>
+  <div class="tour-map" data-tour-map data-gpx="{{ $gpx | htmlEscape }}"{{ if $peaksDataJSON }} data-peaks='{{ $peaksDataJSON | safeHTMLAttr }}'{{ end }} style="min-height:320px; margin:0.25rem 0 0.75rem;"></div>
   {{- else if $coverImage -}}
   <figure class="tour-image">
     <img src="{{ $coverImage | htmlEscape }}" alt="{{ $title | htmlEscape }}" loading="lazy" />
@@ -340,6 +335,12 @@
       {{- end -}}
     </ol>
   </section>
+  {{- end -}}
+
+  {{- if $gpx -}}
+  <div class="gpx-download-link">
+    <a href="{{ $gpx | htmlEscape }}" download>Download GPX</a>
+  </div>
   {{- end -}}
 </section>
 {{- end -}}
