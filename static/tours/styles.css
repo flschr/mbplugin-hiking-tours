@@ -22,6 +22,11 @@
   --tour-peak-number-bg: #1565c0;
   --tour-peak-number-color: #ffffff;
   --tour-peak-number-border: #ffffff;
+  --tour-peak-chip-bg: rgba(15, 23, 42, 0.02);
+  --tour-peak-chip-border: rgba(15, 23, 42, 0.08);
+  --tour-peak-chip-color: #0f172a;
+  --tour-peak-chip-bg-active: rgba(21, 101, 192, 0.15);
+  --tour-peak-chip-color-active: #0f172a;
   --tour-type-hike: #10b981;
   --tour-type-mtb: #ea580c;
   --tour-type-gravel: var(--tour-accent);
@@ -514,10 +519,33 @@
   font-family: inherit;
   line-height: 1.2;
   text-decoration: none;
+  border: 1px solid var(--tour-peak-chip-border);
+  background: var(--tour-peak-chip-bg);
+  color: var(--tour-peak-chip-color);
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.tour-peak-chip--action {
+  cursor: pointer;
 }
 
 .tour-peak-chip--static {
   pointer-events: none;
+  opacity: 0.75;
+}
+
+.tour-peak-chip--action:hover,
+.tour-peak-chip--action:focus-visible {
+  outline: none;
+  border-color: var(--tour-peak-number-bg);
+  box-shadow: 0 0 0 2px rgba(0, 148, 255, 0.08);
+}
+
+.tour-peak-chip--active {
+  background: var(--tour-peak-chip-bg-active);
+  color: var(--tour-peak-chip-color-active);
+  border-color: var(--tour-peak-number-bg);
 }
 
 .tour-peak-chip-number {
@@ -849,9 +877,14 @@
     --tour-card-text: #e2e8f0;
     --tour-pill-bg: rgba(255, 255, 255, 0.15);
     --tour-pill-color: #f0fdf4;
-    --tour-peak-number-bg: #1565c0;
-    --tour-peak-number-color: #ffffff;
-    --tour-peak-number-border: rgba(255, 255, 255, 0.95);
+    --tour-peak-number-bg: #38bdf8;
+    --tour-peak-number-color: #0b1120;
+    --tour-peak-number-border: rgba(11, 17, 32, 0.85);
+    --tour-peak-chip-bg: rgba(15, 23, 42, 0.55);
+    --tour-peak-chip-border: rgba(148, 163, 184, 0.35);
+    --tour-peak-chip-color: #e2e8f0;
+    --tour-peak-chip-bg-active: rgba(56, 189, 248, 0.25);
+    --tour-peak-chip-color-active: #f8fafc;
   }
 
   .tour-box {
@@ -888,6 +921,23 @@
   .tour-stat-card .stat-value,
   .tour-stat-card .stat-unit {
     color: #f8fafc;
+  }
+
+  .tour-peak-chip {
+    background: var(--tour-peak-chip-bg);
+    border-color: var(--tour-peak-chip-border);
+    color: var(--tour-peak-chip-color);
+  }
+
+  .tour-peak-chip--static {
+    opacity: 0.55;
+  }
+
+  .tour-peak-chip--action:hover,
+  .tour-peak-chip--action:focus-visible,
+  .tour-peak-chip--active {
+    border-color: rgba(248, 250, 252, 0.55);
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25);
   }
 
   .map-action-btn {
