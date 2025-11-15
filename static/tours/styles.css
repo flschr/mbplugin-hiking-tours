@@ -14,7 +14,7 @@
   --tour-card-bg: #ffffff;
   --tour-card-border: #dce3ec;
   --tour-card-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
-  --tour-header-gradient: linear-gradient(135deg, #0f766e, #0ea5e9);
+  --tour-header-gradient: linear-gradient(135deg, #0f5f36, #2d8a48);
   --tour-muted-bg: #f4f7fb;
   --tour-pill-bg: rgba(255, 255, 255, 0.18);
   --tour-pill-color: #ecfeff;
@@ -39,10 +39,9 @@
   background: var(--tour-header-gradient);
   color: #ecfdf5;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 1rem;
-  justify-content: space-between;
-  align-items: flex-end;
+  align-items: flex-start;
 }
 
 .tour-card-heading {
@@ -59,62 +58,35 @@
 }
 
 .tour-card-region {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.95rem;
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.tour-card-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
   align-items: center;
+  gap: 0.65rem;
+  font-size: 0.95rem;
+  color: rgba(236, 253, 245, 0.9);
 }
 
-.tour-meta-pill,
-.tour-type-badge {
+.tour-region-meta {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.35rem 0.9rem;
-  border-radius: 999px;
-  font-size: 0.85rem;
+  gap: 0.35rem;
+  line-height: 1.2;
+}
+
+.tour-meta-divider {
+  color: rgba(236, 253, 245, 0.65);
   font-weight: 600;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
+  font-size: 1rem;
+  line-height: 1;
 }
 
-.tour-meta-pill {
-  background: var(--tour-pill-bg);
-  color: var(--tour-pill-color);
+.tour-meta-icon {
+  width: 1rem;
+  height: 1rem;
+  display: inline-block;
+  color: inherit;
 }
 
-.tour-type-badge {
-  color: #fff;
-  background: rgba(15, 23, 42, 0.18);
-}
-
-.tour-type-hike {
-  background: rgba(16, 185, 129, 0.2);
-  color: #ecfdf5;
-}
-
-.tour-type-mtb {
-  background: rgba(234, 88, 12, 0.22);
-  color: #fff7ed;
-}
-
-.tour-type-gravel {
-  background: rgba(37, 99, 235, 0.22);
-  color: #eff6ff;
-}
-
-.tour-type-run {
-  background: rgba(219, 39, 119, 0.22);
-  color: #fdf2f8;
-}
 
 .tour-card-visuals {
   display: grid;
