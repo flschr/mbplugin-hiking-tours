@@ -45,24 +45,12 @@
     }).addTo(map);
 
     var peakIcon = L.icon({
-      iconUrl: '/tours/peak-flag.svg',
+      iconUrl: 'https://www.openstreetmap.org/assets/note.svg',
+      iconRetinaUrl: 'https://www.openstreetmap.org/assets/note.svg',
       iconSize: [28, 28],
       iconAnchor: [14, 24],
-      popupAnchor: [0, -22],
-      className: 'tour-peak-icon'
+      popupAnchor: [0, -22]
     });
-
-    var peakIconLarge = L.icon({
-      iconUrl: peakIcon.options.iconUrl,
-      iconSize: [36, 36],
-      iconAnchor: [18, 30],
-      popupAnchor: [0, -26],
-      className: peakIcon.options.className
-    });
-
-    function getPeakIcon(repeatCount) {
-      return repeatCount > 1 ? peakIconLarge : peakIcon;
-    }
 
     var peaksRaw = canvas.getAttribute('data-peaks');
     if (!peaksRaw) {
@@ -102,7 +90,7 @@
       Object.keys(peakIndex).forEach(function(key) {
         var info = peakIndex[key];
         var marker = L.marker([info.lat, info.lng], {
-          icon: getPeakIcon(info.count)
+          icon: peakIcon
         });
         if (info.label) {
           marker.bindPopup(info.label);
