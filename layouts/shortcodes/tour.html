@@ -136,7 +136,7 @@
     }
 
     .tour-entry h4 {
-      margin-top: 0.5rem;
+      margin-top: 0.75rem;
       margin-bottom: 0.5rem;
     }
 
@@ -288,7 +288,7 @@
   </header>
 
   {{- if $shouldRenderMap -}}
-  <div class="tour-map" data-tour-map data-gpx="{{ $gpx | htmlEscape }}"{{ if $peaksDataJSON }} data-peaks='{{ $peaksDataJSON | safeHTMLAttr }}'{{ end }} style="min-height:320px; margin:0.25rem 0 0.75rem;"></div>
+  <div class="tour-map" data-tour-map data-gpx="{{ $gpx | htmlEscape }}"{{ if $peaksDataJSON }} data-peaks='{{ $peaksDataJSON | safeHTMLAttr }}'{{ end }} style="min-height:320px; margin:0.1625rem 0 0.75rem;"></div>
   {{- else if $coverImage -}}
   <figure class="tour-image">
     <img src="{{ $coverImage | htmlEscape }}" alt="{{ $title | htmlEscape }}" loading="lazy" />
