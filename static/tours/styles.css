@@ -325,20 +325,21 @@
   gap: 1.25rem;
 }
 
+
 .tour-stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   gap: 0.6rem;
 }
 
-@media (max-width: 640px) {
+@media (orientation: portrait) and (max-width: 900px) {
   .tour-stats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.5rem;
   }
 }
 
-@media (min-width: 900px) {
+@media (orientation: landscape) and (max-width: 900px), (min-width: 900px) {
   .tour-stats-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
