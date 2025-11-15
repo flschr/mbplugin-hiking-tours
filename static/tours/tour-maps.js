@@ -111,6 +111,51 @@
     });
   }
 
+  var toursAssetBase = null;
+
+  function resolveAssetPath(fileName) {
+    if (!fileName) {
+      return '';
+    }
+
+    if (!toursAssetBase) {
+      var scripts = document.getElementsByTagName('script');
+      for (var i = 0; i < scripts.length; i++) {
+        var script = scripts[i];
+        if (!script || !script.src) {
+          continue;
+        }
+        if (script.src.indexOf('tours/tour-maps.js') === -1) {
+          continue;
+        }
+        var resolvedSrc = script.src;
+        try {
+          var absolute = new URL(script.src, window.location.href);
+          resolvedSrc = absolute.href;
+        } catch (err) {
+          // Ignore – fall back to the raw attribute value.
+        }
+        var cleanSrc = resolvedSrc.split('?')[0].split('#')[0];
+        var lastSlash = cleanSrc.lastIndexOf('/');
+        if (lastSlash !== -1) {
+          toursAssetBase = cleanSrc.slice(0, lastSlash + 1);
+        }
+        break;
+      }
+
+      if (!toursAssetBase) {
+        toursAssetBase = '/tours/';
+      }
+    }
+
+    var separator = '';
+    if (toursAssetBase.charAt(toursAssetBase.length - 1) !== '/' && fileName.charAt(0) !== '/') {
+      separator = '/';
+    }
+
+    return toursAssetBase + separator + fileName.replace(/^\//, '');
+  }
+
   function initMap(canvas) {
     if (!window.L || !canvas) {
       return;
@@ -159,11 +204,13 @@
     var baseIconSize = 28;
     var baseAnchor = [14, 24];
     var basePopupAnchor = [0, -22];
+    var noteIconPath = resolveAssetPath('note.svg');
+
     function createPeakIcon(scale) {
       var size = Math.round(baseIconSize * scale);
       return L.icon({
-        iconUrl: '/tours/note.svg',
-        iconRetinaUrl: '/tours/note.svg',
+        iconUrl: noteIconPath,
+        iconRetinaUrl: noteIconPath,
         iconSize: [size, size],
         iconAnchor: [Math.round(baseAnchor[0] * scale), Math.round(baseAnchor[1] * scale)],
         popupAnchor: [basePopupAnchor[0], Math.round(basePopupAnchor[1] * scale)]
