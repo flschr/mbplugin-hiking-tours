@@ -1,12 +1,41 @@
 {
   "version": "1.0.0",
   "title": "fischr Tours",
-  "description": "A tours system for Micro.blog with GPX support, Leaflet maps, and filterable archive page",
+  "description": "A tours system for Micro.blog with GPX support, static map previews, and filterable archive page",
   "author": {
     "name": "fischr",
     "url": "https://fischr.org"
   },
   "microblog": {
     "version": "1.0"
-  }
+  },
+  "fields": [
+    {
+      "field": "params.geoapify_api_key",
+      "label": "Geoapify API Key",
+      "type": "string",
+      "description": "API key for generating static map previews. Get a free key at geoapify.com (3000 requests/day)"
+    },
+    {
+      "field": "params.tour_map_style",
+      "label": "Map Style",
+      "type": "string",
+      "default": "osm-carto",
+      "description": "Geoapify map style: osm-carto, osm-bright, osm-bright-grey, dark-matter, positron, etc."
+    },
+    {
+      "field": "params.tour_map_width",
+      "label": "Map Width",
+      "type": "string",
+      "default": "768",
+      "description": "Static map width in pixels"
+    },
+    {
+      "field": "params.tour_map_height",
+      "label": "Map Height",
+      "type": "string",
+      "default": "432",
+      "description": "Static map height in pixels (16:9 aspect ratio recommended)"
+    }
+  ]
 }

@@ -1,14 +1,19 @@
 #!/usr/bin/env node
 
 /**
- * Generate Static Map Images from GPX Files using Mapbox Static Image API
+ * Generate Static Map Images from GPX Files using Geoapify Static Map API
+ *
+ * Geoapify advantages over Mapbox:
+ * - No URL length limitations (uses POST requests)
+ * - No need for polyline encoding
+ * - Better support for complex GPX tracks
+ * - More generous free tier
  */
 
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
 const { DOMParser } = require('xmldom');
-const polyline = require('@mapbox/polyline');
 
 // Configuration
 const PLUGIN_REPO_DIR = process.env.PLUGIN_REPO_DIR || './mbplugin-fischr-tours';
@@ -16,17 +21,17 @@ const TOURS_JSON = './tours.json';
 const MAP_OUTPUT_DIR = path.join(PLUGIN_REPO_DIR, 'static', 'maps');
 const MAP_WIDTH = parseInt(process.env.MAP_IMAGE_WIDTH || '800', 10);
 const MAP_HEIGHT = parseInt(process.env.MAP_IMAGE_HEIGHT || '400', 10);
-const MAP_PADDING = process.env.MAPBOX_PADDING || '80,80,80,80';
-const MAPBOX_STYLE = process.env.MAPBOX_STYLE || 'mapbox/outdoors-v11';
-const MAPBOX_LINE_COLOR = (process.env.MAPBOX_PATH_COLOR || '#0ea5e9').replace('#', '');
-const MAPBOX_LINE_WIDTH = parseInt(process.env.MAPBOX_PATH_WIDTH || '5', 10);
-const MAPBOX_LINE_OPACITY = process.env.MAPBOX_PATH_OPACITY || '1';
-const MAPBOX_ACCESS_TOKEN = process.env.MAPBOX_ACCESS_TOKEN;
-const MAX_POLYLINE_POINTS = parseInt(process.env.MAPBOX_MAX_POLYLINE_POINTS || '500', 10);
-const MAPBOX_EXTRA_QUERY = process.env.MAPBOX_EXTRA_QUERY || 'logo=false&attribution=false';
+const MAP_SCALE_FACTOR = parseInt(process.env.MAP_SCALE_FACTOR || '2', 10);
+const MAP_STYLE = process.env.GEOAPIFY_STYLE || 'osm-carto';
+const PATH_COLOR = (process.env.MAP_PATH_COLOR || '#0ea5e9').replace('#', '');
+const PATH_WIDTH = parseInt(process.env.MAP_PATH_WIDTH || '3', 10);
+const PATH_OPACITY = parseFloat(process.env.MAP_PATH_OPACITY || '0.9');
+const GEOAPIFY_API_KEY = process.env.GEOAPIFY_API_KEY;
+const MAX_TRACK_POINTS = parseInt(process.env.MAX_TRACK_POINTS || '2000', 10);
 
-if (!MAPBOX_ACCESS_TOKEN) {
-  console.error('Error: MAPBOX_ACCESS_TOKEN environment variable is required to generate static maps.');
+if (!GEOAPIFY_API_KEY) {
+  console.error('Error: GEOAPIFY_API_KEY environment variable is required to generate static maps.');
+  console.error('Get a free API key at https://www.geoapify.com/ (3000 requests/day free tier)');
   process.exit(1);
 }
 
@@ -62,64 +67,109 @@ function parseGpxFile(gpxPath) {
 }
 
 /**
- * Reduce track points so Mapbox URL remains within limits
+ * Simplify track points if needed to reduce file size
+ * Uses Douglas-Peucker-like simplification by sampling
  * @param {Array<{lat: number, lon: number}>} points
  * @returns {Array<{lat: number, lon: number}>}
  */
-function clampTrackPoints(points) {
-  if (points.length <= MAX_POLYLINE_POINTS) {
+function simplifyTrackPoints(points) {
+  if (points.length <= MAX_TRACK_POINTS) {
     return points;
   }
 
-  const step = Math.ceil(points.length / MAX_POLYLINE_POINTS);
-  const reduced = [];
+  const step = Math.ceil(points.length / MAX_TRACK_POINTS);
+  const simplified = [];
 
   for (let i = 0; i < points.length; i += step) {
-    reduced.push(points[i]);
+    simplified.push(points[i]);
   }
 
+  // Always include the last point
   const lastPoint = points[points.length - 1];
-  const reducedLast = reduced[reduced.length - 1];
-  if (lastPoint && (!reducedLast || reducedLast.lat !== lastPoint.lat || reducedLast.lon !== lastPoint.lon)) {
-    reduced.push(lastPoint);
+  const lastSimplified = simplified[simplified.length - 1];
+  if (lastPoint && (!lastSimplified || lastSimplified.lat !== lastPoint.lat || lastSimplified.lon !== lastPoint.lon)) {
+    simplified.push(lastPoint);
   }
 
-  return reduced;
+  return simplified;
 }
 
 /**
- * Build encoded polyline for Mapbox
+ * Build GeoJSON LineString from track points
  * @param {Array<{lat: number, lon: number}>} points
- * @returns {string|null}
+ * @returns {Object|null} GeoJSON Feature
  */
-function buildPolyline(points) {
+function buildGeoJsonFeature(points) {
   if (!points.length) {
     return null;
   }
 
-  const geoJson = {
+  return {
     type: 'Feature',
     geometry: {
       type: 'LineString',
-      coordinates: points.map((p) => [p.lon, p.lat]),
+      coordinates: points.map((p) => [p.lon, p.lat]), // GeoJSON uses [lon, lat] order
+    },
+    properties: {
+      stroke: `#${PATH_COLOR}`,
+      'stroke-width': PATH_WIDTH,
+      'stroke-opacity': PATH_OPACITY,
     },
   };
-
-  const encoded = polyline.fromGeoJSON(geoJson).replace(/\?/g, '%3F');
-  return encoded;
 }
 
 /**
- * Build the Mapbox Static Image API URL
- * @param {string} encodedPolyline
- * @returns {string}
+ * Generate static map using Geoapify API
+ * @param {Object} geoJsonFeature - GeoJSON Feature with LineString
+ * @returns {Promise<Buffer>} - Image buffer
  */
-function buildMapboxUrl(encodedPolyline) {
-  const safeWidth = Math.max(1, MAPBOX_LINE_WIDTH);
-  const stroke = `path-${safeWidth}+${MAPBOX_LINE_COLOR}-${MAPBOX_LINE_OPACITY}`;
-  const baseUrl = `https://api.mapbox.com/styles/v1/${MAPBOX_STYLE}/static/${stroke}(${encodedPolyline})/auto/${MAP_WIDTH}x${MAP_HEIGHT}?padding=${MAP_PADDING}`;
-  const extraQuery = MAPBOX_EXTRA_QUERY ? `&${MAPBOX_EXTRA_QUERY}` : '';
-  return `${baseUrl}${extraQuery}&access_token=${MAPBOX_ACCESS_TOKEN}`;
+async function fetchStaticMap(geoJsonFeature) {
+  const requestBody = JSON.stringify({
+    style: MAP_STYLE,
+    width: MAP_WIDTH,
+    height: MAP_HEIGHT,
+    scaleFactor: MAP_SCALE_FACTOR,
+    area: geoJsonFeature,
+  });
+
+  const url = `https://maps.geoapify.com/v1/staticmap?apiKey=${GEOAPIFY_API_KEY}`;
+
+  return new Promise((resolve, reject) => {
+    const urlObj = new URL(url);
+    const options = {
+      hostname: urlObj.hostname,
+      path: urlObj.pathname + urlObj.search,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(requestBody),
+      },
+    };
+
+    const req = https.request(options, (response) => {
+      const { statusCode } = response;
+
+      if (!statusCode || statusCode >= 400) {
+        response.resume();
+        let errorBody = '';
+        response.on('data', (chunk) => {
+          errorBody += chunk;
+        });
+        response.on('end', () => {
+          reject(new Error(`Geoapify API responded with ${statusCode}: ${errorBody}`));
+        });
+        return;
+      }
+
+      const chunks = [];
+      response.on('data', (chunk) => chunks.push(chunk));
+      response.on('end', () => resolve(Buffer.concat(chunks)));
+    });
+
+    req.on('error', reject);
+    req.write(requestBody);
+    req.end();
+  });
 }
 
 /**
@@ -130,61 +180,35 @@ function buildMapboxUrl(encodedPolyline) {
 async function generateMapImage(tour, gpxFilePath) {
   console.log(`Generating map for tour: ${tour.id}`);
 
-  const trackPoints = clampTrackPoints(parseGpxFile(gpxFilePath));
+  const trackPoints = parseGpxFile(gpxFilePath);
 
   if (trackPoints.length === 0) {
-    console.warn(`No valid track points found in ${gpxFilePath}`);
+    console.warn(`  ⚠ No valid track points found in ${gpxFilePath}`);
     return;
   }
 
-  const encodedPolyline = buildPolyline(trackPoints);
+  console.log(`  📍 Parsed ${trackPoints.length} track points`);
 
-  if (!encodedPolyline) {
-    console.warn(`Could not encode polyline for ${tour.id}`);
-    return;
+  const simplifiedPoints = simplifyTrackPoints(trackPoints);
+  if (simplifiedPoints.length < trackPoints.length) {
+    console.log(`  ⚡ Simplified to ${simplifiedPoints.length} points`);
   }
 
-  const mapboxUrl = buildMapboxUrl(encodedPolyline);
+  const geoJsonFeature = buildGeoJsonFeature(simplifiedPoints);
+
+  if (!geoJsonFeature) {
+    console.warn(`  ⚠ Could not create GeoJSON for ${tour.id}`);
+    return;
+  }
 
   try {
-    const buffer = await downloadBuffer(mapboxUrl);
+    const buffer = await fetchStaticMap(geoJsonFeature);
     const outputPath = path.join(MAP_OUTPUT_DIR, `${tour.id}.png`);
     fs.writeFileSync(outputPath, buffer);
-    console.log(`✓ Map saved: ${outputPath}`);
+    console.log(`  ✓ Map saved: ${outputPath}`);
   } catch (error) {
-    console.error(`Error generating map for ${tour.id}:`, error.message);
+    console.error(`  ✗ Error generating map for ${tour.id}:`, error.message);
   }
-}
-
-/**
- * Simple HTTPS download helper that follows redirects
- * @param {string} url
- * @returns {Promise<Buffer>}
- */
-function downloadBuffer(url) {
-  return new Promise((resolve, reject) => {
-    https
-      .get(url, (response) => {
-        const { statusCode, headers } = response;
-
-        if (statusCode && statusCode >= 300 && statusCode < 400 && headers.location) {
-          response.resume();
-          resolve(downloadBuffer(headers.location));
-          return;
-        }
-
-        if (!statusCode || statusCode >= 400) {
-          response.resume();
-          reject(new Error(`Mapbox API responded with ${statusCode || 'unknown status'}`));
-          return;
-        }
-
-        const chunks = [];
-        response.on('data', (chunk) => chunks.push(chunk));
-        response.on('end', () => resolve(Buffer.concat(chunks)));
-      })
-      .on('error', reject);
-  });
 }
 
 /**
@@ -212,7 +236,7 @@ function resolveGpxPath(gpxPath) {
  * Main execution
  */
 async function main() {
-  console.log('🗺️  Generating static map images from GPX files...\n');
+  console.log('🗺️  Generating static map images from GPX files using Geoapify...\n');
 
   if (!fs.existsSync(MAP_OUTPUT_DIR)) {
     fs.mkdirSync(MAP_OUTPUT_DIR, { recursive: true });
@@ -265,7 +289,7 @@ async function main() {
     generated++;
   }
 
-  console.log(`\n✓ Generated ${generated} map images`);
+  console.log(`\n✅ Generated ${generated} map images`);
   console.log(`⊘ Skipped ${skipped} tours`);
 }
 

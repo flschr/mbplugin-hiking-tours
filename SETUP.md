@@ -54,13 +54,13 @@ ssh-keygen -t ed25519 -C "tours-actions" -f tours-key -N ""
 - Name: `PLUGIN_DEPLOY_KEY`
 - Value: Contents of `tours-key` (private key)
 
-#### Mapbox Access Token (Required)
+#### Geoapify API Key (Required)
 
-1. Create or log into your Mapbox account at [account.mapbox.com](https://account.mapbox.com/)
-2. Generate a new access token with **Styles: Read** access (Static Images API is included by default)
-3. Add the token to your backup repo secrets as `MAPBOX_ACCESS_TOKEN`
+1. Create a free account at [Geoapify](https://www.geoapify.com/) (3000 requests/day free tier)
+2. Go to your [Geoapify Dashboard](https://myprojects.geoapify.com/) and generate an API key
+3. Add the API key to your backup repo secrets as `GEOAPIFY_API_KEY`
 
-> The GitHub Action uses this token when `generate-map-images.js` calls the Mapbox Static Image API. Without it, static PNGs will not be created.
+> The GitHub Action uses this key when `generate-map-images.js` calls the Geoapify Static Map API. Without it, static PNGs will not be created. The free tier is generous enough for most personal blogs.
 
 ### 2.3 Edit Workflow Configuration
 
@@ -130,7 +130,7 @@ The views from the summit were incredible...
 - [ ] Tours page created at `/tours/`
 - [ ] Workflow files copied to backup repo
 - [ ] Secrets configured (PLUGIN_DEPLOY_KEY)
-- [ ] Secrets configured (MAPBOX_ACCESS_TOKEN)
+- [ ] Secrets configured (GEOAPIFY_API_KEY)
 - [ ] Workflow environment variables updated
 - [ ] Test workflow run completed successfully
 - [ ] First tour post published
@@ -143,8 +143,8 @@ The views from the summit were incredible...
 → Check that Leaflet libraries were downloaded (see 1.2)
 
 ### Static map workflow failing
-→ Ensure the `MAPBOX_ACCESS_TOKEN` secret is present in your backup repo
-→ Check the GitHub Action logs for Mapbox HTTP errors or quota issues
+→ Ensure the `GEOAPIFY_API_KEY` secret is present in your backup repo
+→ Check the GitHub Action logs for Geoapify API errors or quota issues (free tier: 3000 requests/day)
 
 ### Tours page shows "No tours yet"
 → Run workflow manually to generate tours.json

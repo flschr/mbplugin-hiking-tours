@@ -53,9 +53,44 @@
   {{- $typeLabel = "Run" -}}
 {{- end -}}
 
+{{- /* Geoapify Static Map Configuration */ -}}
+{{- $mapCenter := .Get "map_center" -}}
+{{- $mapZoom := .Get "map_zoom" | default "12" -}}
+{{- $geoapifyApiKey := "" -}}
+{{- with .Site.Params.geoapify_api_key -}}
+  {{- $candidate := trim (printf "%v" .) " " -}}
+  {{- if gt (len $candidate) 10 -}}
+    {{- $lowerKey := lower $candidate -}}
+    {{- $isPlaceholder := or (eq $lowerKey "<nil>") (eq $lowerKey "nil") (eq $lowerKey "null") (eq $lowerKey "undefined") (eq $lowerKey "") -}}
+    {{- if not $isPlaceholder -}}
+      {{- $geoapifyApiKey = $candidate -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $mapStyle := .Site.Params.tour_map_style | default "osm-carto" -}}
+{{- $mapWidth := .Site.Params.tour_map_width | default "768" -}}
+{{- $mapHeight := .Site.Params.tour_map_height | default "432" -}}
+
+{{- /* Generate Geoapify Static Map URL if API key and center are provided */ -}}
+{{- $geoapifyStaticMapUrl := "" -}}
+{{- if and $geoapifyApiKey $mapCenter -}}
+  {{- $centerParts := split $mapCenter "," -}}
+  {{- if eq (len $centerParts) 2 -}}
+    {{- $lat := trim (index $centerParts 0) " " -}}
+    {{- $lon := trim (index $centerParts 1) " " -}}
+    {{- $geoapifyStaticMapUrl = printf "https://maps.geoapify.com/v1/staticmap?style=%s&width=%s&height=%s&center=lonlat:%s,%s&zoom=%s&apiKey=%s" (urlquery $mapStyle) $mapWidth $mapHeight $lon $lat $mapZoom $geoapifyApiKey -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* Determine which map image to use */ -}}
 {{- $mapImage := .Get "map_image" -}}
 {{- if not $mapImage -}}
-  {{- $mapImage = printf "/maps/%s.png" $id -}}
+  {{- if $geoapifyStaticMapUrl -}}
+    {{- $mapImage = $geoapifyStaticMapUrl -}}
+  {{- else -}}
+    {{- $mapImage = printf "/maps/%s.png" $id -}}
+  {{- end -}}
 {{- end -}}
 {{- $hasMapImage := and $mapImage (ne $mapImage "") -}}
 {{- $shouldRenderDynamicMap := and $gpx (ne $gpx "") -}}
