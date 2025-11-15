@@ -128,13 +128,15 @@
       text-align: center;
     }
 
-    .tour-entry .tour-stat-card dt {
+    .tour-entry .tour-stat-card dt,
+    .tour-entry .tour-entry-meta .tour-entry-meta-label {
       margin: 0 0 0.35rem;
       font-size: 0.75rem;
       font-weight: 600;
       letter-spacing: 0.1em;
       text-transform: uppercase;
       color: #666;
+      display: inline-block;
     }
 
     .tour-entry .tour-stat-card dd {
@@ -182,13 +184,13 @@
   <header>
     <p class="tour-entry-meta">
       {{- if $typeLabel -}}
-      <span>{{ $typeLabel | htmlEscape }}</span>
+      <span class="tour-entry-meta-label">{{ $typeLabel | htmlEscape }}</span>
       {{- end -}}
       {{- if and $typeLabel $region -}}
       <span aria-hidden="true">·</span>
       {{- end -}}
       {{- if $region -}}
-      <span>{{ $region | htmlEscape }}</span>
+      <span class="tour-entry-meta-label">{{ $region | htmlEscape }}</span>
       {{- end -}}
       {{- if $gpx -}}
       <span aria-hidden="true">·</span>
