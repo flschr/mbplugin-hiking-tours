@@ -19,7 +19,7 @@
   --tour-muted-bg: #f4f7fb;
   --tour-pill-bg: rgba(255, 255, 255, 0.18);
   --tour-pill-color: #ecfeff;
-  --tour-peak-number-bg: #1d4ed8;
+  --tour-peak-number-bg: #1565c0;
   --tour-peak-number-color: #ffffff;
   --tour-peak-number-border: #ffffff;
   --tour-type-hike: #10b981;
@@ -506,7 +506,7 @@
 
 .tour-peak-chip--action.tour-peak-chip--active {
   background: #2563eb;
-  border-color: #1d4ed8;
+  border-color: #1565c0;
   color: #ffffff;
 }
 
@@ -525,8 +525,8 @@
 
 .tour-peak-chip--action.tour-peak-chip--active:hover,
 .tour-peak-chip--action.tour-peak-chip--active:focus-visible {
-  background: #1d4ed8;
-  border-color: #1d4ed8;
+  background: #1565c0;
+  border-color: #1565c0;
   color: #ffffff;
 }
 
@@ -863,7 +863,7 @@
     --tour-card-text: #e2e8f0;
     --tour-pill-bg: rgba(255, 255, 255, 0.15);
     --tour-pill-color: #f0fdf4;
-    --tour-peak-number-bg: #1d4ed8;
+    --tour-peak-number-bg: #1565c0;
     --tour-peak-number-color: #ffffff;
     --tour-peak-number-border: rgba(255, 255, 255, 0.95);
   }
