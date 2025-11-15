@@ -75,7 +75,12 @@
       {{- $peakDict := dict "label" $peakLabel -}}
       {{- $hasCoords := and $lat (ne $lat "") $lng (ne $lng "") -}}
       {{- if $hasCoords -}}
-        {{- $peakDict = merge $peakDict (dict "lat" $lat "lng" $lng) -}}
+        {{- $latFloat := float $lat -}}
+        {{- $lngFloat := float $lng -}}
+        {{- $coordsValid := and (ge $latFloat -90.0) (le $latFloat 90.0) (ge $lngFloat -180.0) (le $lngFloat 180.0) -}}
+        {{- if $coordsValid -}}
+          {{- $peakDict = merge $peakDict (dict "lat" $lat "lng" $lng) -}}
+        {{- end -}}
       {{- end -}}
       {{- $peaksList = $peaksList | append $peakDict -}}
     {{- end -}}
