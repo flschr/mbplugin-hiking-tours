@@ -352,7 +352,7 @@
       return;
     }
 
-    var chips = tourBox.querySelectorAll('.tour-peak-chip[data-peak-index]');
+    var chips = tourBox.querySelectorAll('.tour-peak-button[data-peak-index]');
     if (!chips.length) {
       return;
     }
@@ -364,7 +364,6 @@
 
     function updateChipStates() {
       chipList.forEach(function(chip) {
-        chip.classList.toggle('tour-peak-chip--active', chip === activeChip);
         chip.setAttribute('aria-pressed', chip === activeChip ? 'true' : 'false');
       });
     }

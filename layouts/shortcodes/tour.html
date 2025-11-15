@@ -182,8 +182,7 @@
         {{- if $gpx -}}
         <a href="{{ $gpx | htmlEscape }}"
            download
-           class="tour-card-meta-chip"
-           title="GPX herunterladen">GPX</a>
+           title="GPX herunterladen">GPX ↓</a>
         {{- end -}}
       </p>
       {{- end -}}
@@ -267,30 +266,24 @@
     {{- if $hasPeaks -}}
     <div class="tour-peaks">
       <p class="tour-section-label">Gipfelbuch</p>
-      <div class="tour-peaks-chips">
+      <div class="tour-peaks-list">
         {{- $peakMapIndex := 0 -}}
         {{- range $index, $peak := $peaksList -}}
           {{- $hasCoords := and (isset $peak "lat") (isset $peak "lng") $peak.lat $peak.lng (ne $peak.lat "") (ne $peak.lng "") -}}
           {{- if $hasCoords -}}
           <button type="button"
-                  class="tour-peak-chip tour-peak-chip--action"
+                  class="tour-peak-button"
                   aria-pressed="false"
                   data-peak-index="{{ $peakMapIndex }}"
                   data-peak-lat="{{ $peak.lat | htmlEscape }}"
                   data-peak-lng="{{ $peak.lng | htmlEscape }}"
-                  title="{{ printf "Gipfel %s auf der Karte zeigen" $peak.label | htmlEscape }}">
-            <span class="tour-peak-chip-number">{{ add $index 1 }}</span>
-            <span class="tour-peak-chip-label">{{ $peak.label | htmlEscape }}</span>
-          </button>
+                  title="{{ printf "Gipfel %s auf der Karte zeigen" $peak.label | htmlEscape }}">{{ add $index 1 }}. {{ $peak.label | htmlEscape }}</button>
           {{- $peakMapIndex = add $peakMapIndex 1 -}}
           {{- else -}}
           <button type="button"
-                  class="tour-peak-chip tour-peak-chip--static"
+                  class="tour-peak-button"
                   disabled
-                  aria-disabled="true">
-            <span class="tour-peak-chip-number">{{ add $index 1 }}</span>
-            <span class="tour-peak-chip-label">{{ $peak.label | htmlEscape }}</span>
-          </button>
+                  aria-disabled="true">{{ add $index 1 }}. {{ $peak.label | htmlEscape }}</button>
           {{- end -}}
         {{- end -}}
       </div>
