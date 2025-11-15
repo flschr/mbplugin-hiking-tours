@@ -81,16 +81,20 @@
   color: var(--tour-card-text);
 }
 
-.tour-card-meta {
+.tour-card-meta,
+.tour-stat-card .stat-label {
   margin: 0;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.tour-card-meta {
   display: inline-flex;
   gap: 0;
   align-items: baseline;
-  font-size: 0.65rem;
   font-weight: 400;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #9ca3af;
 }
 
 .tour-card-meta-type,
@@ -102,8 +106,8 @@
 
 .tour-card-meta-type,
 .tour-card-meta-region {
-  font-size: 0.75rem;
-  color: #6b7280;
+  font-size: inherit;
+  color: inherit;
 }
 
 .tour-card-meta-region {
@@ -454,11 +458,6 @@
 }
 
 .tour-stat-card .stat-label {
-  margin: 0;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #64748b;
   white-space: nowrap;
 }
 
