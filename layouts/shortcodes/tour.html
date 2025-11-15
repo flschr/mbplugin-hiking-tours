@@ -20,11 +20,15 @@
 {{- $bergfexUrl := .Get "bergfex_url" -}}
 {{- $peaksRaw := .Get "peaks" -}}
 
-{{- /* Detect feed / non-HTML outputs (RSS, JSON, Atom) */ -}}
+{{- /* Detect feed / non-HTML outputs (RSS, JSON, Atom). The shortcode execution
+     context in older Hugo versions does not expose .OutputFormat directly, so
+     we inspect the owning page instead. */ -}}
 {{- $outputFormatName := "" -}}
-{{- with .OutputFormat -}}
-  {{- with .Name -}}
-    {{- $outputFormatName = lower . -}}
+{{- with .Page -}}
+  {{- with .OutputFormat -}}
+    {{- with .Name -}}
+      {{- $outputFormatName = lower . -}}
+    {{- end -}}
   {{- end -}}
 {{- end -}}
 {{- $isFeedOutput := or (eq $outputFormatName "rss") (eq $outputFormatName "json") (eq $outputFormatName "atom") -}}
