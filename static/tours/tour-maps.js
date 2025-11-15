@@ -179,7 +179,7 @@
   }
 
   function createDirectionIcon(rotationDeg, color) {
-    var size = 26;
+    var size = 8;
     var stroke = '#dbeafe';
     var arrowColor = color || '#1d4ed8';
     var rotation = typeof rotationDeg === 'number' && isFinite(rotationDeg) ? rotationDeg : 0;
