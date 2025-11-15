@@ -1,160 +1,75 @@
 {{ define "main" }}
-{{- /*
-  Tours Archive Page - Lists all tours with filters and statistics
-
-  Reads from: site.Data.tours (data/tours.json)
-  Features: Year/type filters, live statistics, links to posts
-*/ -}}
-
-<link rel="stylesheet" href="{{ "tours/styles.css" | relURL }}" />
-
 <article class="tours-archive">
-  <header class="tours-header">
+  <header>
     <h1>{{ .Title | default "Tours" }}</h1>
     {{ with .Content }}
-      <div class="tours-description">
-        {{ . }}
-      </div>
+    <div>
+      {{ . }}
+    </div>
     {{ end }}
   </header>
 
   {{- if site.Data.tours -}}
-  <div class="tours-stats" id="tours-stats">
-    <div class="stat-card">
-      <span class="stat-value" id="stat-count">{{ len site.Data.tours }}</span>
-      <span class="stat-label">Tours</span>
-    </div>
-    <div class="stat-card">
-      <span class="stat-value" id="stat-distance">
-        {{- $totalKm := 0.0 -}}
-        {{- range site.Data.tours -}}
-          {{- $totalKm = add $totalKm .distance_km -}}
-        {{- end -}}
-        {{ lang.FormatNumber 1 $totalKm }}
-      </span>
-      <span class="stat-label">km</span>
-    </div>
-    <div class="stat-card">
-      <span class="stat-value" id="stat-elevation">
-        {{- $totalHm := 0 -}}
-        {{- range site.Data.tours -}}
-          {{- $totalHm = add $totalHm .elevation_m -}}
-        {{- end -}}
-        {{ $totalHm }}
-      </span>
-      <span class="stat-label">hm</span>
-    </div>
-  </div>
-
-  <div class="tours-filters">
-    <div class="filter-group">
-      <label for="filter-year">Year:</label>
-      <select id="filter-year" class="filter-select">
-        <option value="">All Years</option>
-        {{- $years := slice -}}
-        {{- range site.Data.tours -}}
-          {{- if .year -}}
-            {{- $years = $years | append .year -}}
-          {{- end -}}
-        {{- end -}}
-        {{- range sort (uniq $years) "value" "desc" -}}
-          <option value="{{ . }}">{{ . }}</option>
-        {{- end -}}
-      </select>
-    </div>
-
-    <div class="filter-group">
-      <label for="filter-type">Type:</label>
-      <select id="filter-type" class="filter-select">
-        <option value="">All Types</option>
-        {{- $types := slice -}}
-        {{- range site.Data.tours -}}
-          {{- if .type -}}
-            {{- $types = $types | append .type -}}
-          {{- end -}}
-        {{- end -}}
-        {{- range sort (uniq $types) -}}
-          <option value="{{ . }}">
-            {{- if eq . "hike" -}}Hike
-            {{- else if eq . "mtb" -}}MTB
-            {{- else if eq . "gravel" -}}Gravel
-            {{- else if eq . "run" -}}Run
-            {{- else -}}{{ . | title }}
-            {{- end -}}
-          </option>
-        {{- end -}}
-      </select>
-    </div>
-  </div>
-
-  <ul class="tours-list" id="tours-list">
+    {{- $count := len site.Data.tours -}}
+    {{- $totalKm := 0.0 -}}
+    {{- $totalHm := 0 -}}
     {{- range site.Data.tours -}}
-    <li class="tour-item"
-        data-year="{{ .year }}"
-        data-type="{{ .type }}"
-        data-distance="{{ .distance_km }}"
-        data-elevation="{{ .elevation_m }}">
-
-      <div class="tour-item-content">
-        <div class="tour-item-header">
-          {{- if .post_url -}}
-          <h3 class="tour-item-title">
-            <a href="{{ .post_url | htmlEscape }}">{{ .title | htmlEscape }}</a>
-          </h3>
-          {{- else -}}
-          <h3 class="tour-item-title">{{ .title | htmlEscape }}</h3>
-          {{- end -}}
-        </div>
-
-        <div class="tour-item-meta">
-          {{- $metaParts := slice -}}
-
-        {{- if .date -}}
-          {{- $parsedDate := time.AsTime .date -}}
-          {{- $formattedDate := $parsedDate.Format "02.01.2006" -}}
-          {{- $metaParts = $metaParts | append $formattedDate -}}
-        {{- end -}}
-
-        {{- if .region -}}
-          {{- $metaParts = $metaParts | append (.region | htmlEscape) -}}
-        {{- end -}}
-
-        {{- if .type -}}
-          {{- $typeLabel := .type -}}
-            {{- if eq .type "hike" -}}{{ $typeLabel = "Hike" -}}
-            {{- else if eq .type "mtb" -}}{{ $typeLabel = "MTB" -}}
-            {{- else if eq .type "gravel" -}}{{ $typeLabel = "Gravel" -}}
-            {{- else if eq .type "run" -}}{{ $typeLabel = "Run" -}}
-            {{- end -}}
-            {{- $metaParts = $metaParts | append $typeLabel -}}
-          {{- end -}}
-
-          {{- if .distance_km -}}
-            {{- $metaParts = $metaParts | append (printf "%.2f km" .distance_km) -}}
-          {{- end -}}
-
-          {{- if .elevation_m -}}
-            {{- $metaParts = $metaParts | append (printf "%d hm" .elevation_m) -}}
-          {{- end -}}
-
-          {{- if .duration_h -}}
-            {{- $metaParts = $metaParts | append (printf "%.1f h" .duration_h) -}}
-          {{- end -}}
-
-          {{ delimit $metaParts " · " }}
-        </div>
-      </div>
-    </li>
+      {{- if .distance_km -}}
+        {{- $totalKm = add $totalKm .distance_km -}}
+      {{- end -}}
+      {{- if .elevation_m -}}
+        {{- $totalHm = add $totalHm .elevation_m -}}
+      {{- end -}}
     {{- end -}}
-  </ul>
-
+    <p>
+      {{ $count }} Tour{{ if ne $count 1 }}s{{ end }} · {{ lang.FormatNumber 1 $totalKm }} km · {{ $totalHm }} hm
+    </p>
+    <ul>
+      {{- range site.Data.tours -}}
+      <li>
+        <h3>
+          {{- if .post_url -}}
+            <a href="{{ .post_url | htmlEscape }}">{{ .title | htmlEscape }}</a>
+          {{- else -}}
+            {{ .title | htmlEscape }}
+          {{- end -}}
+        </h3>
+        <p>
+          {{- $meta := slice -}}
+          {{- if .date -}}
+            {{- $parsedDate := time.AsTime .date -}}
+            {{- $meta = $meta | append ($parsedDate.Format "02.01.2006") -}}
+          {{- end -}}
+          {{- if .region -}}
+            {{- $meta = $meta | append (.region | htmlEscape) -}}
+          {{- end -}}
+          {{- if .type -}}
+            {{- $label := .type -}}
+            {{- if eq .type "hike" -}}{{ $label = "Hike" -}}{{ end -}}
+            {{- if eq .type "mtb" -}}{{ $label = "MTB" -}}{{ end -}}
+            {{- if eq .type "gravel" -}}{{ $label = "Gravel" -}}{{ end -}}
+            {{- if eq .type "run" -}}{{ $label = "Run" -}}{{ end -}}
+            {{- $meta = $meta | append $label -}}
+          {{- end -}}
+          {{- if .distance_km -}}
+            {{- $meta = $meta | append (printf "%.2f km" .distance_km) -}}
+          {{- end -}}
+          {{- if .elevation_m -}}
+            {{- $meta = $meta | append (printf "%d hm" .elevation_m) -}}
+          {{- end -}}
+          {{- if .duration_h -}}
+            {{- $meta = $meta | append (printf "%.1f h" .duration_h) -}}
+          {{- end -}}
+          {{- delimit $meta " · " -}}
+        </p>
+        {{- if .gpx -}}
+        <p><a href="{{ .gpx | htmlEscape }}">GPX</a></p>
+        {{- end -}}
+      </li>
+      {{- end -}}
+    </ul>
   {{- else -}}
-  <div class="tours-empty">
-    <p>No tours yet. Add your first tour using the <code>{{&lt; tour ... &gt;}}</code> shortcode in a blog post.</p>
-  </div>
+    <p>Noch keine Touren erfasst.</p>
   {{- end -}}
 </article>
-
-<script src="{{ "tours/archive.js" | relURL }}"></script>
-
 {{ end }}

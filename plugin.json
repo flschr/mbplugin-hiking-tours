@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "title": "fischr Tours",
-  "description": "A tours system for Micro.blog with GPX-powered interactive maps and filterable archive page",
+  "description": "Minimal tour shortcode + optional GPX maps for Micro.blog",
   "author": {
     "name": "fischr",
     "url": "https://fischr.org"
