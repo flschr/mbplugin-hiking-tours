@@ -343,6 +343,21 @@
       canvas.addEventListener(eventName, scheduleShow);
     });
 
+    function handleExternalInteraction(event) {
+      if (!event || !hero.contains(event.target)) {
+        scheduleShow();
+      }
+    }
+
+    document.addEventListener('pointerdown', handleExternalInteraction, true);
+    document.addEventListener('focusin', handleExternalInteraction, true);
+
+    function handleExternalScroll() {
+      scheduleShow();
+    }
+
+    window.addEventListener('scroll', handleExternalScroll, { passive: true, capture: true });
+
     canvas.__tourHideHeroMeta = hideMeta;
     canvas.__tourShowHeroMeta = showMeta;
 
