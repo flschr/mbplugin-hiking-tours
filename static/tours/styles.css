@@ -13,7 +13,7 @@
 :root {
   --tour-card-bg: #ffffff;
   --tour-card-border: #dce3ec;
-  --tour-card-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+  --tour-card-shadow: none;
   --tour-header-bg: #0f5f36;
   --tour-muted-bg: #f4f7fb;
   --tour-pill-bg: rgba(255, 255, 255, 0.18);
@@ -164,30 +164,21 @@
   gap: 0.35rem;
   padding: 0.45rem 0.9rem;
   border-radius: var(--tour-radius-pill);
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(15, 23, 42, 0.85);
   color: #f8fafc;
   border: 1px solid rgba(248, 250, 252, 0.35);
   font-size: 0.8rem;
   text-decoration: none;
   font-weight: 600;
   letter-spacing: 0.04em;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
 .map-action-btn:hover {
-  background: #0ea5e9;
+  background: var(--tour-header-bg);
+  color: #ecfdf5;
+  border-color: rgba(236, 253, 245, 0.45);
   transform: translateY(-1px);
-}
-
-.map-action-btn--bergfex {
-  background: #ffffff;
-  color: #0f172a;
-  border-color: rgba(15, 23, 42, 0.15);
-}
-
-.map-action-btn--bergfex:hover {
-  background: #f8fafc;
-  color: #0f172a;
 }
 
 .map-error {
@@ -298,8 +289,9 @@
 .tour-peak-chip {
   padding: 0.4rem 0.8rem;
   border-radius: var(--tour-radius-pill);
-  background: rgba(15, 118, 110, 0.12);
-  color: #0f766e;
+  background: var(--tour-header-bg);
+  color: #ecfdf5;
+  border: 1px solid rgba(236, 253, 245, 0.35);
   font-weight: 600;
   font-size: 0.85rem;
 }
@@ -583,7 +575,7 @@
   :root {
     --tour-card-bg: #0b1120;
     --tour-card-border: #1f2937;
-    --tour-card-shadow: 0 18px 45px rgba(0, 0, 0, 0.6);
+    --tour-card-shadow: none;
     --tour-header-bg: #174131;
     --tour-muted-bg: #111827;
     --tour-card-text: #e2e8f0;
@@ -620,8 +612,9 @@
   }
 
   .tour-peak-chip {
-    background: rgba(45, 212, 191, 0.25);
-    color: #a7f3d0;
+    background: var(--tour-header-bg);
+    color: #ecfdf5;
+    border-color: rgba(236, 253, 245, 0.25);
   }
 
   .map-action-btn {
@@ -630,11 +623,8 @@
   }
 
   .map-action-btn:hover {
-    background: rgba(15, 23, 42, 1);
-  }
-
-  .map-action-btn--bergfex {
-    border-color: rgba(255, 255, 255, 0.35);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+    background: var(--tour-header-bg);
+    color: #ecfdf5;
+    border-color: rgba(236, 253, 245, 0.35);
   }
 }
