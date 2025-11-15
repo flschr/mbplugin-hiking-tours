@@ -131,6 +131,12 @@
 
     .tour-entry > header h3 {
       margin-top: 0;
+      margin-bottom: 0.5rem;
+    }
+
+    .tour-entry h4 {
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
     }
 
     .tour-entry .tour-map {
@@ -233,7 +239,8 @@
     .tour-entry .gpx-download-link {
       display: block;
       text-align: right;
-      padding: 0 1.5rem 1.5rem;
+      padding: 0.25rem 0 0;
+      margin: 0;
     }
 
     .tour-entry .gpx-download-link a {
@@ -334,13 +341,18 @@
       <li>{{ .label | htmlEscape }}</li>
       {{- end -}}
     </ol>
+    {{- if $gpx -}}
+    <div class="gpx-download-link">
+      <a href="{{ $gpx | htmlEscape }}" download>Download GPX</a>
+    </div>
+    {{- end -}}
   </section>
-  {{- end -}}
-
-  {{- if $gpx -}}
-  <div class="gpx-download-link">
-    <a href="{{ $gpx | htmlEscape }}" download>Download GPX</a>
-  </div>
+  {{- else if $gpx -}}
+  <section>
+    <div class="gpx-download-link">
+      <a href="{{ $gpx | htmlEscape }}" download>Download GPX</a>
+    </div>
+  </section>
   {{- end -}}
 </section>
 {{- end -}}
