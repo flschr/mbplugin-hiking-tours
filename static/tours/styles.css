@@ -14,7 +14,7 @@
   --tour-card-bg: #ffffff;
   --tour-card-border: #dce3ec;
   --tour-card-shadow: none;
-  --tour-header-bg: #0f5f36;
+  --tour-header-bg: #2563eb;
   --tour-muted-bg: #f4f7fb;
   --tour-pill-bg: rgba(255, 255, 255, 0.18);
   --tour-pill-color: #ecfeff;
@@ -72,27 +72,28 @@
 .tour-card-region {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 0.75rem;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
 }
 
 .tour-region-meta-list {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
+  flex-direction: column;
+  gap: 0.2rem;
 }
 
 .tour-region-meta {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.35rem 0.75rem;
-  border-radius: var(--tour-radius-content);
-  background: var(--tour-muted-bg);
-  border: 1px solid rgba(148, 163, 184, 0.45);
-  color: #0f172a;
-  font-size: 0.8rem;
-  font-weight: 600;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #f1f5f9;
+  font-size: 0.85rem;
+  font-weight: 500;
   line-height: 1.2;
 }
 
@@ -232,10 +233,10 @@
   height: 28px;
   border-radius: 999px;
   background: var(--tour-header-bg);
-  color: #ecfdf5;
+  color: #ffffff;
   font-weight: 700;
   font-size: 0.85rem;
-  border: 2px solid rgba(236, 253, 245, 0.85);
+  border: 2px solid rgba(191, 219, 254, 0.9);
   box-shadow: 0 10px 25px rgba(15, 23, 42, 0.3);
 }
 
@@ -450,16 +451,12 @@
 .tour-peak-chip--action:focus-visible {
   background: #e2e8f0;
   border-color: rgba(15, 23, 42, 0.35);
+  color: #0f172a;
   outline: none;
 }
 
 .tour-peak-chip--static {
   cursor: default;
-}
-
-.tour-peak-chip--active {
-  background: #e2e8f0;
-  border-color: rgba(15, 23, 42, 0.35);
 }
 
 .tour-peak-chip-number {
@@ -469,9 +466,11 @@
   width: 1.55rem;
   height: 1.55rem;
   border-radius: 50%;
-  background: rgba(15, 23, 42, 0.35);
+  background: var(--tour-header-bg);
+  color: #ffffff;
   font-size: 0.8rem;
   font-weight: 700;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
 }
 
 .tour-peak-chip-label {
