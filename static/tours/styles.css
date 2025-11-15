@@ -81,17 +81,33 @@
 .tour-card-meta {
   margin: 0;
   display: inline-flex;
-  gap: 0.35rem;
+  gap: 0;
   align-items: baseline;
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-size: 0.65rem;
+  font-weight: 400;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #94a3b8;
+  color: #9ca3af;
+}
+
+.tour-card-meta-type,
+.tour-card-meta-region,
+.tour-card-meta-separator {
+  display: inline-flex;
+  align-items: baseline;
+}
+
+.tour-card-meta-region {
+  margin-left: 0.35rem;
+  color: inherit;
+}
+
+.tour-card-meta-region:first-child {
+  margin-left: 0;
 }
 
 .tour-card-meta-separator {
-  opacity: 0.65;
+  opacity: 0.6;
 }
 
 /* ========================================
