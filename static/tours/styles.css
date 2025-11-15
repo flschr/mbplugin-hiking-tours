@@ -154,11 +154,22 @@
 
 .tour-map-dynamic {
   width: 100%;
-  min-height: 220px;
-  aspect-ratio: 2.6 / 1;
+  height: 400px;
   border-radius: 0;
   overflow: hidden;
   background: #0f172a;
+}
+
+@media (max-width: 768px) {
+  .tour-map-dynamic {
+    height: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tour-map-dynamic {
+    height: 250px;
+  }
 }
 
 .tour-map-dynamic--visible {
