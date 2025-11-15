@@ -121,6 +121,25 @@
 {{- end -}}
 
 <div class="tour-box" id="tour-{{ $id | htmlEscape }}" data-tour-id="{{ $id | htmlEscape }}">
+  <div class="tour-card-header">
+    <div class="tour-card-heading">
+      {{- if $hasMeta -}}
+      <p class="tour-card-meta">
+        {{- if $typeLabel -}}
+        <span>{{ $typeLabel | htmlEscape }}</span>
+        {{- end -}}
+        {{- if and $typeLabel $region -}}
+        <span class="tour-card-meta-separator">,</span>
+        {{- end -}}
+        {{- if $region -}}
+        <span>{{ $region | htmlEscape }}</span>
+        {{- end -}}
+      </p>
+      {{- end -}}
+      <h3 class="tour-card-title">{{ $title | htmlEscape }}</h3>
+    </div>
+  </div>
+
   <div class="tour-card-hero">
     {{- if $shouldRenderMap -}}
     <div class="tour-card-map tour-card-map--full">
@@ -132,25 +151,6 @@
     {{- else -}}
     <div class="map-error map-error--full">Keine Karte verfügbar</div>
     {{- end -}}
-
-    <div class="tour-card-header">
-      <div class="tour-card-heading">
-        {{- if $hasMeta -}}
-        <p class="tour-card-meta">
-          {{- if $typeLabel -}}
-          <span>{{ $typeLabel | htmlEscape }}</span>
-          {{- end -}}
-          {{- if and $typeLabel $region -}}
-          <span class="tour-card-meta-separator">,</span>
-          {{- end -}}
-          {{- if $region -}}
-          <span>{{ $region | htmlEscape }}</span>
-          {{- end -}}
-        </p>
-        {{- end -}}
-        <h3 class="tour-card-title">{{ $title | htmlEscape }}</h3>
-      </div>
-    </div>
   </div>
 
   {{- if $coverImage -}}

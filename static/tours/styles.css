@@ -58,49 +58,24 @@
 }
 
 .tour-card-header {
-  position: absolute;
-  inset: 0 0 auto;
-  padding: clamp(1.25rem, 5vw, 2.25rem);
-  background: linear-gradient(180deg, rgba(2, 6, 23, 0.92) 0%, rgba(2, 6, 23, 0.45) 60%, rgba(2, 6, 23, 0) 100%);
-  color: #f8fafc;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  align-items: flex-start;
-  width: 100%;
-  pointer-events: none;
-  z-index: 5;
-  opacity: 1;
-  visibility: visible;
-  transition: opacity 0.25s ease, visibility 0.25s ease;
-}
-
-.tour-card-header::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(2, 6, 23, 0.95) 0%, rgba(2, 6, 23, 0.65) 45%, rgba(2, 6, 23, 0) 100%);
-  z-index: 0;
+  padding: clamp(1.3rem, 4vw, 1.85rem) var(--tour-card-padding-inline)
+    clamp(0.75rem, 3vw, 1.1rem);
+  background: var(--tour-card-bg);
+  border-bottom: 1px solid var(--tour-card-border);
 }
 
 .tour-card-heading {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
-  position: relative;
-  z-index: 1;
-}
-
-.tour-card-hero--meta-hidden .tour-card-header {
-  opacity: 0;
-  visibility: hidden;
+  gap: 0.4rem;
 }
 
 .tour-card-title {
   margin: 0;
-  font-size: 1.7rem;
+  font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: 0.02em;
+  color: var(--tour-card-text);
 }
 
 .tour-card-meta {
@@ -108,11 +83,11 @@
   display: inline-flex;
   gap: 0.35rem;
   align-items: baseline;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(248, 250, 252, 0.85);
+  color: #475569;
 }
 
 .tour-card-meta-separator {
@@ -864,6 +839,14 @@
 
   .tour-box {
     color: var(--tour-card-text);
+  }
+
+  .tour-card-header {
+    border-bottom-color: rgba(148, 163, 184, 0.35);
+  }
+
+  .tour-card-meta {
+    color: #cbd5f5;
   }
 
   .tour-card-visuals {
