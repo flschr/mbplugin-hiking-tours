@@ -167,6 +167,36 @@
         grid-template-columns: repeat(4, minmax(0, 1fr));
       }
     }
+
+    .tour-entry .gipfelbuch-list {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0;
+      counter-reset: peak-counter;
+    }
+
+    .tour-entry .gipfelbuch-list li {
+      counter-increment: peak-counter;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .tour-entry .gipfelbuch-list li::before {
+      content: counter(peak-counter);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      background: #ff8c42;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.875rem;
+      flex-shrink: 0;
+    }
   </style>
 {{- end -}}
 
@@ -254,7 +284,7 @@
   {{- if $hasPeaks -}}
   <section>
     <h4>Gipfelbuch</h4>
-    <ol>
+    <ol class="gipfelbuch-list">
       {{- range $peaksList -}}
       <li>{{ .label | htmlEscape }}</li>
       {{- end -}}
