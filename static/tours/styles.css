@@ -7,7 +7,7 @@
  */
 
 /* ========================================
-   Tour Shortcode (Single Tour Card)
+   CSS Custom Properties
    ======================================== */
 
 :root {
@@ -35,6 +35,10 @@
     --tour-card-padding-inline: 0;
   }
 }
+
+/* ========================================
+   Tour Shortcode · Card Layout
+   ======================================== */
 
 .tour-box {
   margin: 1.5rem 0;
@@ -104,6 +108,9 @@
   color: inherit;
 }
 
+/* ========================================
+   Tour Shortcode · Visuals & Map
+   ======================================== */
 
 .tour-card-visuals {
   display: grid;
@@ -156,6 +163,10 @@
   width: 100%;
 }
 
+.tour-card-map--dynamic {
+  background: #0f172a;
+}
+
 .tour-map-static {
   width: 100%;
   height: 100%;
@@ -174,6 +185,10 @@
   border-radius: 0;
   overflow: hidden;
   background: #0f172a;
+}
+
+.tour-map-dynamic--visible {
+  display: block;
 }
 
 .tour-map-dynamic.tour-map-guarded {
@@ -254,32 +269,6 @@
   border-top-color: rgba(15, 23, 42, 0.92);
 }
 
-@media (max-width: 768px) {
-  .tour-map-dynamic {
-    height: 300px;
-  }
-}
-
-@media (max-width: 480px) {
-  .tour-map-dynamic {
-    height: 250px;
-  }
-}
-
-.tour-map-dynamic--visible {
-  display: block;
-}
-
-@media (max-width: 640px) {
-  .tour-card-heading {
-    gap: 0.4rem;
-  }
-}
-
-.tour-card-map--dynamic {
-  background: #0f172a;
-}
-
 .tour-map-actions {
   display: inline-flex;
   flex-wrap: wrap;
@@ -324,13 +313,16 @@
   margin: 0;
 }
 
+/* ========================================
+   Tour Shortcode · Card Content
+   ======================================== */
+
 .tour-card-body {
   padding: 1.6rem var(--tour-card-padding-inline) 1.75rem;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
 }
-
 
 .tour-stats-grid {
   display: grid;
@@ -365,14 +357,14 @@
   text-align: center;
 }
 
-.stat-text {
+.tour-stat-card .stat-text {
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
   align-items: center;
 }
 
-.stat-label {
+.tour-stat-card .stat-label {
   margin: 0;
   font-size: 0.8rem;
   text-transform: uppercase;
@@ -381,7 +373,7 @@
   white-space: nowrap;
 }
 
-.stat-value {
+.tour-stat-card .stat-value {
   margin: 0;
   display: inline-flex;
   align-items: baseline;
@@ -392,12 +384,12 @@
   color: #0f172a;
 }
 
-.stat-number,
-.stat-unit {
+.tour-stat-card .stat-number,
+.tour-stat-card .stat-unit {
   white-space: nowrap;
 }
 
-.stat-unit {
+.tour-stat-card .stat-unit {
   font-size: 0.9rem;
   font-weight: 500;
   color: #475569;
@@ -502,27 +494,6 @@
   color: #f8fafc;
 }
 
-@media (max-width: 900px) {
-  .tour-card-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
-
-@media (max-width: 640px) {
-  .tour-card-header {
-    padding: 1.5rem;
-  }
-
-  .tour-card-body {
-    padding: 1.5rem;
-  }
-
-  .tour-stats-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
 /* ========================================
    Tours Archive Page
    ======================================== */
@@ -550,7 +521,6 @@
   line-height: 1.6;
 }
 
-/* Statistics Cards */
 .tours-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -568,7 +538,7 @@
   border: 1px solid #e0e0e0;
 }
 
-.stat-value {
+.stat-card .stat-value {
   display: block;
   font-size: 2rem;
   font-weight: 700;
@@ -576,7 +546,7 @@
   margin-bottom: 0.25rem;
 }
 
-.stat-label {
+.stat-card .stat-label {
   display: block;
   font-size: 0.85rem;
   color: #666;
@@ -584,7 +554,6 @@
   letter-spacing: 0.05em;
 }
 
-/* Filters */
 .tours-filters {
   display: flex;
   gap: 1.5rem;
@@ -620,7 +589,6 @@
   box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.1);
 }
 
-/* Tours List */
 .tours-list {
   list-style: none;
   padding: 0;
@@ -668,34 +636,12 @@
   line-height: 1.5;
 }
 
-/* Empty State */
 .tours-empty {
   padding: 3rem 2rem;
   text-align: center;
   background: #f9f9f9;
   border-radius: var(--tour-radius-card);
   color: #666;
-}
-
-@media (max-width: 640px) {
-  .tours-list {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.75rem;
-  }
-
-  .tour-item {
-    margin-bottom: 0;
-    padding: 0.7rem;
-  }
-
-  .tour-item-title {
-    font-size: 1rem;
-  }
-
-  .tour-item-meta {
-    font-size: 0.85rem;
-  }
 }
 
 .tours-empty code {
@@ -709,13 +655,22 @@
    Responsive Adjustments
    ======================================== */
 
+@media (max-width: 900px) {
+  .tour-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
 @media (max-width: 768px) {
-  /* Tour box responsive */
+  .tour-map-dynamic {
+    height: 300px;
+  }
+
   .tour-main {
     grid-template-columns: 1fr;
   }
 
-  /* Tours archive responsive */
   .tours-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.75rem;
@@ -744,7 +699,45 @@
   }
 }
 
+@media (max-width: 640px) {
+  .tour-card-heading {
+    gap: 0.4rem;
+  }
+
+  .tour-card-header,
+  .tour-card-body {
+    padding: 1.5rem;
+  }
+
+  .tour-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .tours-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .tour-item {
+    margin-bottom: 0;
+    padding: 0.7rem;
+  }
+
+  .tour-item-title {
+    font-size: 1rem;
+  }
+
+  .tour-item-meta {
+    font-size: 0.85rem;
+  }
+}
+
 @media (max-width: 480px) {
+  .tour-map-dynamic {
+    height: 250px;
+  }
+
   .tours-archive {
     padding: 1rem 0.5rem;
   }
@@ -765,10 +758,14 @@
     height: 250px;
   }
 
-  .stat-value {
+  .stat-card .stat-value {
     font-size: 1.5rem;
   }
 }
+
+/* ========================================
+   Color Scheme Adjustments
+   ======================================== */
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -800,13 +797,13 @@
     border-color: #334155;
   }
 
-  .stat-label,
-  .tour-section-label {
+  .tour-section-label,
+  .tour-stat-card .stat-label {
     color: #94a3b8;
   }
 
-  .stat-value,
-  .stat-unit {
+  .tour-stat-card .stat-value,
+  .tour-stat-card .stat-unit {
     color: #f8fafc;
   }
 
