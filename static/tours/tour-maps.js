@@ -115,6 +115,66 @@
     }, []);
   }
 
+  function attachPeakChipInteractions(map, canvas, peakMarkers) {
+    if (!map || !canvas || !Array.isArray(peakMarkers) || !peakMarkers.length) {
+      return;
+    }
+
+    var tourBox = canvas.closest ? canvas.closest('.tour-box') : null;
+    if (!tourBox) {
+      return;
+    }
+
+    var chips = tourBox.querySelectorAll('.tour-peak-chip[data-peak-index]');
+    if (!chips.length) {
+      return;
+    }
+
+    var chipList = Array.prototype.slice.call(chips);
+
+    function setActiveChip(activeChip) {
+      chipList.forEach(function(chip) {
+        chip.classList.toggle('tour-peak-chip--active', chip === activeChip);
+      });
+    }
+
+    function focusPeak(index, sourceChip) {
+      var idx = parseInt(index, 10);
+      if (isNaN(idx) || !peakMarkers[idx] || !peakMarkers[idx].getLatLng) {
+        return;
+      }
+
+      if (typeof canvas.__activateTourMap === 'function') {
+        canvas.__activateTourMap();
+      }
+
+      var latLng = peakMarkers[idx].getLatLng();
+      if (!latLng) {
+        return;
+      }
+
+      map.setView(latLng, MAX_ZOOM, { animate: true });
+      if (peakMarkers[idx].openTooltip) {
+        peakMarkers[idx].openTooltip();
+      }
+
+      setActiveChip(sourceChip);
+    }
+
+    chipList.forEach(function(chip) {
+      chip.addEventListener('click', function() {
+        focusPeak(chip.getAttribute('data-peak-index'), chip);
+      });
+
+      chip.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          focusPeak(chip.getAttribute('data-peak-index'), chip);
+        }
+      });
+    });
+  }
+
   function setupInteractionGuard(map, canvas) {
     if (!map || !canvas) {
       return;
@@ -160,6 +220,8 @@
       }
       canvas.classList.remove('tour-map-guarded');
     }
+
+    canvas.__activateTourMap = activateMap;
 
     guardButton.addEventListener('click', function(event) {
       event.preventDefault();
@@ -247,6 +309,10 @@
 
     if (peakData.length) {
       peakMarkers = createPeakMarkers(map, peakData);
+    }
+
+    if (peakMarkers.length) {
+      attachPeakChipInteractions(map, canvas, peakMarkers);
     }
 
     gpxLayer.on('loaded', function(evt) {

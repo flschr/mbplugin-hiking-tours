@@ -9,7 +9,6 @@
 
 {{- $id := .Get "id" -}}
 {{- $title := .Get "title" -}}
-{{- $date := .Get "date" -}}
 {{- $type := .Get "type" -}}
 {{- $region := .Get "region" -}}
 {{- $distanceKm := .Get "distance_km" -}}
@@ -34,12 +33,6 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha512-BwHfrr4c9kmRkLw6iXFdzcdWV/PGkVgiIyIWLLlTSXzWQzxuSg4DiQUCpauz/EWjgk5TYQqX/kvn9pG1NpYfqg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdn.jsdelivr.net/npm/leaflet-gpx@1.7.0/gpx.min.js" integrity="sha512-/yPV78iMZW2vseexUfxggYuVB4fzq40fsDVwz3tWOl9cb8MvCnmMCOjze1omsEj+APUuwZgnpcv5NR5q363JBA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="{{ "tours/tour-maps.js" | relURL }}" defer></script>
-{{- end -}}
-
-{{- $formattedDate := "" -}}
-{{- if $date -}}
-  {{- $parsedDate := time.AsTime $date -}}
-  {{- $formattedDate = $parsedDate.Format "02.01.2006" -}}
 {{- end -}}
 
 {{- $typeLabel := $type -}}
@@ -129,18 +122,9 @@
   <div class="tour-card-header">
     <div class="tour-card-heading">
       <h3 class="tour-card-title">{{ $title | htmlEscape }}</h3>
-      {{- $hasMeta := or $formattedDate (or $region $type) -}}
+      {{- $hasMeta := or $region $type -}}
       {{- if $hasMeta -}}
       <div class="tour-card-region">
-        {{- if $formattedDate -}}
-        <span class="tour-region-meta">
-          <svg class="tour-meta-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M7.5 3.75V2.25M16.5 3.75V2.25M6 7.5h12M5.25 6h13.5a1.5 1.5 0 0 1 1.5 1.5V19.5a1.5 1.5 0 0 1-1.5 1.5H5.25A1.5 1.5 0 0 1 3.75 19.5V7.5A1.5 1.5 0 0 1 5.25 6zM9 11.25h6v6h-6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-          <span>{{ $formattedDate }}</span>
-        </span>
-        {{- end -}}
-
         {{- if $region -}}
         <span class="tour-region-meta">
           <svg class="tour-meta-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -254,11 +238,26 @@
     <div class="tour-peaks">
       <p class="tour-section-label">Gipfelbuch</p>
       <div class="tour-peaks-chips">
+        {{- $peakMapIndex := 0 -}}
         {{- range $index, $peak := $peaksList -}}
-          <span class="tour-peak-chip">
+          {{- $hasCoords := and (isset $peak "lat") (isset $peak "lng") $peak.lat $peak.lng (ne $peak.lat "") (ne $peak.lng "") -}}
+          {{- if $hasCoords -}}
+          <button type="button"
+                  class="tour-peak-chip tour-peak-chip--action"
+                  data-peak-index="{{ $peakMapIndex }}"
+                  data-peak-lat="{{ $peak.lat | htmlEscape }}"
+                  data-peak-lng="{{ $peak.lng | htmlEscape }}"
+                  title="{{ printf "Gipfel %s auf der Karte zeigen" $peak.label | htmlEscape }}">
+            <span class="tour-peak-chip-number">{{ add $index 1 }}</span>
+            <span class="tour-peak-chip-label">{{ $peak.label | htmlEscape }}</span>
+          </button>
+          {{- $peakMapIndex = add $peakMapIndex 1 -}}
+          {{- else -}}
+          <span class="tour-peak-chip tour-peak-chip--static">
             <span class="tour-peak-chip-number">{{ add $index 1 }}</span>
             <span class="tour-peak-chip-label">{{ $peak.label | htmlEscape }}</span>
           </span>
+          {{- end -}}
         {{- end -}}
       </div>
     </div>
