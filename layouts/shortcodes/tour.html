@@ -31,8 +31,8 @@
 {{- if not (.Page.Scratch.Get "tour-map-assets-loaded") -}}
   {{- .Page.Scratch.Set "tour-map-assets-loaded" true -}}
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha512-Zcn6bjR/8RZbLEpLIeOwNtzREBAJnUKESxces60Mpoj+2okopSAcSUIUOseddDm0cxnGQzxIR7vJgsLZbdLE3w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha512-BwHfrr4c9kmRkLw6iXFdzcdWV/PGkVgiIyIWLLlTSXzWQzxuSg4DiQUCpauz/EWjgk5TYQqX/kvn9pG1NpYfqg==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/leaflet-gpx@1.7.0/gpx.min.js" integrity="sha512-ayM8YGtS+wGGyRyvE4s46HoPazTA/gkGEXUXMaLLq5yRvCNrI6VsgGAaHo9dZYkTfGZNVVRFlE0YyqS/fWznGQ==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha512-BwHfrr4c9kmRkLw6iXFdzcdWV/PGkVgiIyIWLLlTSXzWQzxuSg4DiQUCpauz/EWjgk5TYQqX/kvn9pG1NpYfqg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet-gpx@1.7.0/gpx.min.js" integrity="sha512-/yPV78iMZW2vseexUfxggYuVB4fzq40fsDVwz3tWOl9cb8MvCnmMCOjze1omsEj+APUuwZgnpcv5NR5q363JBA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="{{ "tours/tour-maps.js" | relURL }}" defer></script>
 {{- end -}}
 
