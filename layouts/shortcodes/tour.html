@@ -59,7 +59,7 @@
 {{- /* Map rendering: Use dynamic Leaflet map if GPX is provided */ -}}
 {{- $shouldRenderMap := and $gpx (ne $gpx "") -}}
 {{- $hasMeta := or $region $type -}}
-{{- $hasMapActions := or $gpx $bergfexUrl -}}
+{{- $hasMetaRow := or $hasMeta $gpx -}}
 
 {{- $peaksRawTrimmed := "" -}}
 {{- if $peaksRaw -}}
@@ -155,11 +155,9 @@
     {{- end -}}
   </ol>
   {{- end -}}
-  {{- if $hasMapActions -}}
+  {{- if $gpx -}}
   <p>
-    {{- if $gpx -}}<a href="{{ $gpx | htmlEscape }}">GPX</a>{{- end -}}
-    {{- if and $gpx $bergfexUrl -}} · {{- end -}}
-    {{- if $bergfexUrl -}}<a href="{{ $bergfexUrl | htmlEscape }}">Bergfex</a>{{- end -}}
+    <a href="{{ $gpx | htmlEscape }}">GPX</a>
   </p>
   {{- end -}}
 </div>
@@ -167,7 +165,7 @@
 <div class="tour-box" id="tour-{{ $id | htmlEscape }}" data-tour-id="{{ $id | htmlEscape }}">
   <div class="tour-card-header">
     <div class="tour-card-heading">
-      {{- if $hasMeta -}}
+      {{- if $hasMetaRow -}}
       <p class="tour-card-meta">
         {{- if $typeLabel -}}
         <span class="tour-card-meta-type">{{ $typeLabel | upper | htmlEscape }}</span>
@@ -177,6 +175,12 @@
         {{- end -}}
         {{- if $region -}}
         <span class="tour-card-meta-region">{{ $region | upper | htmlEscape }}</span>
+        {{- end -}}
+        {{- if $gpx -}}
+        <a href="{{ $gpx | htmlEscape }}"
+           download
+           class="tour-card-meta-chip"
+           title="GPX herunterladen">GPX</a>
         {{- end -}}
       </p>
       {{- end -}}
@@ -291,17 +295,6 @@
     {{- end -}}
 
   </div>
-  {{- if $hasMapActions -}}
-  <div class="tour-card-links-bar">
-    {{- if $gpx -}}
-    <a href="{{ $gpx | htmlEscape }}" download class="tour-card-link" title="GPX herunterladen">GPX</a>
-    {{- end -}}
-
-    {{- if $bergfexUrl -}}
-    <a href="{{ $bergfexUrl | htmlEscape }}" target="_blank" rel="noopener noreferrer" class="tour-card-link" title="Auf Bergfex ansehen">Bergfex</a>
-    {{- end -}}
-  </div>
-  {{- end -}}
 </div>
 </div>
 {{- end -}}
