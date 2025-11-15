@@ -121,46 +121,37 @@
 {{- end -}}
 
 <div class="tour-box" id="tour-{{ $id | htmlEscape }}" data-tour-id="{{ $id | htmlEscape }}">
-  <div class="tour-card-header">
-    <div class="tour-card-heading">
-      <h3 class="tour-card-title">{{ $title | htmlEscape }}</h3>
-      {{- if $hasMeta -}}
-      <div class="tour-card-region">
-        <div class="tour-region-meta-list">
-          {{- if $region -}}
-          <span class="tour-region-meta">
-            <svg class="tour-meta-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path d="M12 2.25c-3.18 0-5.75 2.52-5.75 5.63 0 4.34 5.75 11.12 5.75 11.12s5.75-6.78 5.75-11.12c0-3.11-2.57-5.63-5.75-5.63zm0 8.38a2.75 2.75 0 1 1 0-5.5 2.75 2.75 0 0 1 0 5.5z" fill="currentColor" />
-            </svg>
-            <span>{{ $region | htmlEscape }}</span>
-          </span>
-          {{- end -}}
+  <div class="tour-card-hero">
+    {{- if $shouldRenderMap -}}
+    <div class="tour-card-map tour-card-map--full">
+      <div class="tour-map-dynamic"
+           data-tour-map-canvas
+           data-gpx="{{ $gpx | htmlEscape }}"
+           {{- if $peaksDataJSON }} data-peaks='{{ $peaksDataJSON | htmlEscape }}'{{ end }}></div>
+    </div>
+    {{- else -}}
+    <div class="map-error map-error--full">Keine Karte verfügbar</div>
+    {{- end -}}
 
-          {{- if $type -}}
-          <span class="tour-region-meta">
-            <svg class="tour-meta-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-              <path d="M6 3v18M6 4.5h9l-2 4 2 4H6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-            <span>{{ $typeLabel | htmlEscape }}</span>
-          </span>
+    <div class="tour-card-header">
+      <div class="tour-card-heading">
+        {{- if $hasMeta -}}
+        <p class="tour-card-meta">
+          {{- if $typeLabel -}}
+          <span>{{ $typeLabel | htmlEscape }}</span>
           {{- end -}}
-        </div>
+          {{- if and $typeLabel $region -}}
+          <span class="tour-card-meta-separator">,</span>
+          {{- end -}}
+          {{- if $region -}}
+          <span>{{ $region | htmlEscape }}</span>
+          {{- end -}}
+        </p>
+        {{- end -}}
+        <h3 class="tour-card-title">{{ $title | htmlEscape }}</h3>
       </div>
-      {{- end -}}
     </div>
   </div>
-
-  {{- if $shouldRenderMap -}}
-  <div class="tour-card-map tour-card-map--full">
-    <div class="tour-map-dynamic"
-         data-tour-map-canvas
-         data-gpx="{{ $gpx | htmlEscape }}"
-         {{- if $peaksDataJSON }} data-peaks='{{ $peaksDataJSON | htmlEscape }}'{{ end }}></div>
-
-  </div>
-  {{- else -}}
-  <div class="map-error map-error--full">Keine Karte verfügbar</div>
-  {{- end -}}
 
   {{- if $coverImage -}}
   <div class="tour-card-visuals tour-card-visuals--compact">
