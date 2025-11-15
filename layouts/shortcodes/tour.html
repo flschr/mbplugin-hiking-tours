@@ -130,6 +130,15 @@
       margin-bottom: 0.125rem;
     }
 
+    .tour-entry .tour-entry-meta {
+      color: #666;
+      font-size: 0.85rem;
+    }
+
+    .tour-entry .tour-entry-meta span {
+      color: inherit;
+    }
+
     .tour-entry > header h3 {
       margin-top: 0;
       margin-bottom: 0.5rem;
@@ -257,6 +266,49 @@
 
     .tour-entry .gpx-download-link a:hover {
       color: #666;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .tour-entry {
+        border-color: #2b2f3a;
+        background-color: #11151d;
+      }
+
+      .tour-entry > header,
+      .tour-entry > section {
+        background-color: transparent;
+      }
+
+      .tour-entry .tour-entry-meta,
+      .tour-entry .tour-entry-meta span,
+      .tour-entry .tour-entry-meta .tour-entry-meta-label {
+        color: #c3cad5;
+      }
+
+      .tour-entry .tour-stat-card {
+        background: #1c2332;
+        border: 1px solid #2f3747;
+      }
+
+      .tour-entry .tour-stat-card dt {
+        color: #aeb6c4;
+      }
+
+      .tour-entry .tour-stat-card dd {
+        color: #f6f7fb;
+      }
+
+      .tour-entry .tour-stat-unit {
+        color: #9aa3b5;
+      }
+
+      .tour-entry .gpx-download-link a {
+        color: #b6becd;
+      }
+
+      .tour-entry .gpx-download-link a:hover {
+        color: #fff;
+      }
     }
   </style>
 {{- end -}}
