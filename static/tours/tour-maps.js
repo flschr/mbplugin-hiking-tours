@@ -547,7 +547,7 @@
   }
 
   function renderTourMap(canvas) {
-    if (!canvas || canvas.dataset.mapInitialized === 'true') {
+    if (!canvas || canvas.dataset.mapInitialized === 'true' || canvas.dataset.mapInitialized === 'error') {
       log('[Tours] Canvas already initialized or not found');
       return;
     }

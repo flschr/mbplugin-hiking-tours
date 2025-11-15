@@ -11,12 +11,12 @@
   'use strict';
 
   /**
-   * Formats a number with thousand separators
+   * Formats a number with thousand separators using browser locale
    * @param {number} num - Number to format
    * @returns {string} - Formatted number
    */
   function formatNumber(num) {
-    return num.toLocaleString('en-US', {
+    return num.toLocaleString(undefined, {
       minimumFractionDigits: 0,
       maximumFractionDigits: 2
     });
@@ -26,7 +26,7 @@
    * Updates statistics based on visible tour items
    */
   function updateStatistics() {
-    const visibleItems = document.querySelectorAll('.tour-item:not([style*="display: none"])');
+    const visibleItems = document.querySelectorAll('.tour-item:not(.tour-item--hidden)');
 
     let count = 0;
     let totalDistance = 0;
@@ -85,11 +85,11 @@
         show = false;
       }
 
-      // Show or hide item
+      // Show or hide item using CSS class
       if (show) {
-        item.style.display = '';
+        item.classList.remove('tour-item--hidden');
       } else {
-        item.style.display = 'none';
+        item.classList.add('tour-item--hidden');
       }
     });
 

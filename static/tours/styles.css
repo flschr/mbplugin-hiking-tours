@@ -53,10 +53,6 @@
     --chip-focus-ring,
     rgba(0, 148, 255, 0.08)
   );
-  --tour-type-hike: #10b981;
-  --tour-type-mtb: #ea580c;
-  --tour-type-gravel: var(--tour-accent);
-  --tour-type-run: #db2777;
   --tour-radius-card: 0.45rem;
   --tour-radius-content: 0.35rem;
   --tour-radius-pill: 1.5rem;
@@ -580,31 +576,6 @@
   white-space: nowrap;
 }
 
-.tour-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-}
-
-.tour-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0.65rem 1rem;
-  border-radius: var(--tour-radius-content);
-  border: 1px solid rgba(14, 165, 233, 0.4);
-  text-decoration: none;
-  color: #0f172a;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  transition: background 0.2s ease, color 0.2s ease;
-}
-
-.tour-link:hover {
-  background: #0ea5e9;
-  color: #f8fafc;
-}
-
 /* ========================================
    Tours Archive Page
    ======================================== */
@@ -715,6 +686,10 @@
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
+.tour-item--hidden {
+  display: none;
+}
+
 .tour-item:hover {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   border-color: #ccc;
@@ -776,10 +751,6 @@
 @media (max-width: 768px) {
   .tour-map-dynamic {
     height: 300px;
-  }
-
-  .tour-main {
-    grid-template-columns: 1fr;
   }
 
   .tours-stats {
@@ -859,14 +830,6 @@
 
   .tour-box {
     padding: 0;
-  }
-
-  .tour-title {
-    font-size: 1.25rem;
-  }
-
-  .tour-map {
-    height: 250px;
   }
 
   .stat-card .stat-value {

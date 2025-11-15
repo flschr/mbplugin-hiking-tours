@@ -49,7 +49,7 @@ jobs:
           fi
 
           # Count tours found
-          TOUR_COUNT=$(jq '.tours | length' tours.json)
+          TOUR_COUNT=$(jq '. | length' tours.json)
           echo "Found $TOUR_COUNT tours"
           echo "tour_count=$TOUR_COUNT" >> $GITHUB_OUTPUT
 

@@ -210,6 +210,12 @@ function validateTour(tour, filePath) {
   if (tour.region) normalized.region = tour.region.trim();
   if (tour.cover_image) normalized.cover_image = tour.cover_image.trim();
   if (tour.bergfex_url) normalized.bergfex_url = tour.bergfex_url.trim();
+  if (tour.peaks) {
+    const peaksTrimmed = tour.peaks.trim();
+    if (peaksTrimmed) {
+      normalized.peaks = peaksTrimmed;
+    }
+  }
 
   // Numeric fields with validation
   const distanceKm = parseFloat(tour.distance_km);
@@ -234,8 +240,10 @@ function validateTour(tour, filePath) {
     }
   }
 
-  if (tour.max_alt_m) {
-    const maxAlt = parseInt(tour.max_alt_m, 10);
+  // Accept both max_height (from shortcode) and max_alt_m (legacy)
+  const maxHeightValue = tour.max_height || tour.max_alt_m;
+  if (maxHeightValue) {
+    const maxAlt = parseInt(maxHeightValue, 10);
     if (!isNaN(maxAlt)) {
       normalized.max_alt_m = maxAlt;
     }
