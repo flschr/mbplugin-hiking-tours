@@ -22,11 +22,14 @@
   --tour-type-mtb: #ea580c;
   --tour-type-gravel: #2563eb;
   --tour-type-run: #db2777;
+  --tour-radius-card: 0.45rem;
+  --tour-radius-content: 0.35rem;
+  --tour-radius-pill: 1.5rem;
 }
 
 .tour-box {
   margin: 2rem 0;
-  border-radius: 1.25rem;
+  border-radius: var(--tour-radius-card);
   border: 1px solid var(--tour-card-border);
   background: var(--tour-card-bg);
   box-shadow: var(--tour-card-shadow);
@@ -98,7 +101,7 @@
 
 .tour-cover {
   margin: 0;
-  border-radius: 1rem;
+  border-radius: var(--tour-radius-content);
   overflow: hidden;
   background: #0f172a;
   box-shadow: 0 15px 35px rgba(15, 23, 42, 0.15);
@@ -123,7 +126,7 @@
 
 .tour-card-map {
   position: relative;
-  border-radius: 1rem;
+  border-radius: var(--tour-radius-content);
   overflow: hidden;
   background: #0f172a;
   min-height: 240px;
@@ -150,7 +153,7 @@
   align-items: center;
   gap: 0.35rem;
   padding: 0.45rem 0.9rem;
-  border-radius: 999px;
+  border-radius: var(--tour-radius-pill);
   background: rgba(15, 23, 42, 0.8);
   color: #f8fafc;
   font-size: 0.8rem;
@@ -166,7 +169,7 @@
 }
 
 .map-error {
-  border-radius: 1rem;
+  border-radius: var(--tour-radius-content);
   background: rgba(15, 23, 42, 0.05);
   padding: 2rem;
   text-align: center;
@@ -202,7 +205,7 @@
   padding: 0.75rem 0.5rem;
   min-height: 4rem;
   background: var(--tour-muted-bg);
-  border-radius: 0.9rem;
+  border-radius: var(--tour-radius-content);
   border: 1px solid rgba(148, 163, 184, 0.4);
   text-align: center;
 }
@@ -267,7 +270,7 @@
 
 .tour-peak-chip {
   padding: 0.4rem 0.8rem;
-  border-radius: 999px;
+  border-radius: var(--tour-radius-pill);
   background: rgba(15, 118, 110, 0.12);
   color: #0f766e;
   font-weight: 600;
@@ -285,7 +288,7 @@
   align-items: center;
   gap: 0.45rem;
   padding: 0.65rem 1rem;
-  border-radius: 0.85rem;
+  border-radius: var(--tour-radius-content);
   border: 1px solid rgba(14, 165, 233, 0.4);
   text-decoration: none;
   color: #0f172a;
@@ -360,7 +363,7 @@
   min-width: 120px;
   padding: 1.25rem;
   background: #f5f5f5;
-  border-radius: 8px;
+  border-radius: var(--tour-radius-card);
   text-align: center;
   border: 1px solid #e0e0e0;
 }
@@ -404,7 +407,7 @@
 .filter-select {
   padding: 0.5rem 0.75rem;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: var(--tour-radius-content);
   background: white;
   font-size: 0.95rem;
   cursor: pointer;
@@ -429,7 +432,7 @@
   margin-bottom: 0.75rem;
   background: white;
   border: 1px solid #e0e0e0;
-  border-radius: 6px;
+  border-radius: var(--tour-radius-content);
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
@@ -470,14 +473,14 @@
   padding: 3rem 2rem;
   text-align: center;
   background: #f9f9f9;
-  border-radius: 8px;
+  border-radius: var(--tour-radius-card);
   color: #666;
 }
 
 .tours-empty code {
   background: #e0e0e0;
   padding: 0.2em 0.5em;
-  border-radius: 3px;
+  border-radius: var(--tour-radius-content);
   font-size: 0.9em;
 }
 
