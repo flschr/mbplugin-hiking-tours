@@ -48,6 +48,8 @@
 
 {{- /* Map rendering: Use dynamic Leaflet map if GPX is provided */ -}}
 {{- $shouldRenderMap := and $gpx (ne $gpx "") -}}
+{{- $hasMeta := or $region $type -}}
+{{- $hasMapActions := or $gpx $bergfexUrl -}}
 
 {{- $peaksRawTrimmed := "" -}}
 {{- if $peaksRaw -}}
@@ -122,11 +124,8 @@
   <div class="tour-card-header">
     <div class="tour-card-heading">
       <h3 class="tour-card-title">{{ $title | htmlEscape }}</h3>
-      {{- $hasMeta := or $region $type -}}
-      {{- $hasMapActions := or $gpx $bergfexUrl -}}
-      {{- if or $hasMeta $hasMapActions -}}
+      {{- if $hasMeta -}}
       <div class="tour-card-region">
-        {{- if $hasMeta -}}
         <div class="tour-region-meta-list">
           {{- if $region -}}
           <span class="tour-region-meta">
@@ -146,23 +145,6 @@
           </span>
           {{- end -}}
         </div>
-        {{- end -}}
-
-        {{- if $hasMapActions -}}
-        <div class="tour-map-actions">
-          {{- if $gpx -}}
-          <a href="{{ $gpx | htmlEscape }}" download class="map-action-btn" title="GPX herunterladen">
-            <span>GPX</span>
-          </a>
-          {{- end -}}
-
-          {{- if $bergfexUrl -}}
-          <a href="{{ $bergfexUrl | htmlEscape }}" target="_blank" rel="noopener noreferrer" class="map-action-btn" title="Auf Bergfex ansehen">
-            <span>Bergfex</span>
-          </a>
-          {{- end -}}
-        </div>
-        {{- end -}}
       </div>
       {{- end -}}
     </div>
@@ -264,6 +246,24 @@
             <span class="tour-peak-chip-label">{{ $peak.label | htmlEscape }}</span>
           </span>
           {{- end -}}
+        {{- end -}}
+      </div>
+    </div>
+    {{- end -}}
+
+    {{- if $hasMapActions -}}
+    <div class="tour-card-footer">
+      <div class="tour-map-actions">
+        {{- if $gpx -}}
+        <a href="{{ $gpx | htmlEscape }}" download class="map-action-btn" title="GPX herunterladen">
+          <span>GPX</span>
+        </a>
+        {{- end -}}
+
+        {{- if $bergfexUrl -}}
+        <a href="{{ $bergfexUrl | htmlEscape }}" target="_blank" rel="noopener noreferrer" class="map-action-btn" title="Auf Bergfex ansehen">
+          <span>Bergfex</span>
+        </a>
         {{- end -}}
       </div>
     </div>
