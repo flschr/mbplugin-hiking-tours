@@ -19,14 +19,40 @@
   --tour-muted-bg: #f4f7fb;
   --tour-pill-bg: rgba(255, 255, 255, 0.18);
   --tour-pill-color: #ecfeff;
-  --tour-peak-number-bg: #1565c0;
-  --tour-peak-number-color: #ffffff;
-  --tour-peak-number-border: #ffffff;
-  --tour-peak-chip-bg: rgba(15, 23, 42, 0.02);
-  --tour-peak-chip-border: rgba(15, 23, 42, 0.08);
-  --tour-peak-chip-color: #0f172a;
-  --tour-peak-chip-bg-active: rgba(21, 101, 192, 0.15);
-  --tour-peak-chip-color-active: #0f172a;
+  --tour-peak-chip-radius: var(
+    --chip-radius,
+    var(--chip-border-radius, var(--rounded-full, var(--tour-radius-pill)))
+  );
+  --tour-peak-number-bg: var(--chip-pin-bg, var(--chip-accent, #1565c0));
+  --tour-peak-number-color: var(
+    --chip-pin-color,
+    var(--chip-accent-contrast, #ffffff)
+  );
+  --tour-peak-number-border: transparent;
+  --tour-peak-chip-bg: var(
+    --chip-bg,
+    var(--chip-background, rgba(15, 23, 42, 0.02))
+  );
+  --tour-peak-chip-border: var(
+    --chip-border,
+    var(--chip-border-color, rgba(15, 23, 42, 0.08))
+  );
+  --tour-peak-chip-color: var(
+    --chip-color,
+    var(--chip-text-color, #0f172a)
+  );
+  --tour-peak-chip-bg-active: var(
+    --chip-selected-bg,
+    var(--chip-active-bg, rgba(21, 101, 192, 0.15))
+  );
+  --tour-peak-chip-color-active: var(
+    --chip-selected-color,
+    var(--chip-active-color, #0f172a)
+  );
+  --tour-peak-chip-focus-ring: var(
+    --chip-focus-ring,
+    rgba(0, 148, 255, 0.08)
+  );
   --tour-type-hike: #10b981;
   --tour-type-mtb: #ea580c;
   --tour-type-gravel: var(--tour-accent);
@@ -513,7 +539,7 @@
   align-items: center;
   gap: 0.45rem;
   padding: 0.35rem 0.75rem;
-  border-radius: var(--tour-radius-content);
+  border-radius: var(--tour-peak-chip-radius);
   font-weight: 600;
   font-size: 0.85rem;
   font-family: inherit;
@@ -539,7 +565,7 @@
 .tour-peak-chip--action:focus-visible {
   outline: none;
   border-color: var(--tour-peak-number-bg);
-  box-shadow: 0 0 0 2px rgba(0, 148, 255, 0.08);
+  box-shadow: 0 0 0 2px var(--tour-peak-chip-focus-ring);
 }
 
 .tour-peak-chip--active {
@@ -877,14 +903,36 @@
     --tour-card-text: #e2e8f0;
     --tour-pill-bg: rgba(255, 255, 255, 0.15);
     --tour-pill-color: #f0fdf4;
-    --tour-peak-number-bg: #38bdf8;
-    --tour-peak-number-color: #0b1120;
-    --tour-peak-number-border: rgba(11, 17, 32, 0.85);
-    --tour-peak-chip-bg: rgba(15, 23, 42, 0.55);
-    --tour-peak-chip-border: rgba(148, 163, 184, 0.35);
-    --tour-peak-chip-color: #e2e8f0;
-    --tour-peak-chip-bg-active: rgba(56, 189, 248, 0.25);
-    --tour-peak-chip-color-active: #f8fafc;
+    --tour-peak-number-bg: var(--chip-pin-bg, var(--chip-accent, #38bdf8));
+    --tour-peak-number-color: var(
+      --chip-pin-color,
+      var(--chip-accent-contrast, #0b1120)
+    );
+    --tour-peak-number-border: transparent;
+    --tour-peak-chip-bg: var(
+      --chip-bg,
+      var(--chip-background, rgba(15, 23, 42, 0.55))
+    );
+    --tour-peak-chip-border: var(
+      --chip-border,
+      var(--chip-border-color, rgba(148, 163, 184, 0.35))
+    );
+    --tour-peak-chip-color: var(
+      --chip-color,
+      var(--chip-text-color, #e2e8f0)
+    );
+    --tour-peak-chip-bg-active: var(
+      --chip-selected-bg,
+      var(--chip-active-bg, rgba(56, 189, 248, 0.25))
+    );
+    --tour-peak-chip-color-active: var(
+      --chip-selected-color,
+      var(--chip-active-color, #f8fafc)
+    );
+    --tour-peak-chip-focus-ring: var(
+      --chip-focus-ring,
+      rgba(56, 189, 248, 0.25)
+    );
   }
 
   .tour-box {
@@ -936,8 +984,8 @@
   .tour-peak-chip--action:hover,
   .tour-peak-chip--action:focus-visible,
   .tour-peak-chip--active {
-    border-color: rgba(248, 250, 252, 0.55);
-    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25);
+    border-color: var(--tour-peak-number-bg);
+    box-shadow: 0 0 0 2px var(--tour-peak-chip-focus-ring);
   }
 
   .map-action-btn {
