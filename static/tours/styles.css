@@ -100,6 +100,12 @@
   align-items: baseline;
 }
 
+.tour-card-meta-type,
+.tour-card-meta-region {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
 .tour-card-meta-region {
   margin-left: 0.35rem;
   color: inherit;
