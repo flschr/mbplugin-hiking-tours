@@ -313,23 +313,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.4rem 0.85rem;
-  border-radius: 999px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  background-color: rgba(15, 23, 42, 0.02);
-  cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-}
-
-.tour-peak-button[aria-disabled="true"] {
-  cursor: not-allowed;
-  opacity: 0.65;
-}
-
-.tour-peak-button:hover,
-.tour-peak-button[aria-pressed="true"] {
-  background-color: rgba(15, 23, 42, 0.08);
-  border-color: rgba(15, 23, 42, 0.25);
+  text-decoration: none;
+  font: inherit;
 }
 
 .tour-peak-number {
@@ -527,17 +512,6 @@
 
   .tour-card-visuals {
     background: rgba(255, 255, 255, 0.02);
-  }
-
-  .tour-peak-button {
-    border-color: rgba(148, 163, 184, 0.4);
-    background-color: rgba(148, 163, 184, 0.08);
-  }
-
-  .tour-peak-button:hover,
-  .tour-peak-button[aria-pressed="true"] {
-    background-color: rgba(148, 163, 184, 0.2);
-    border-color: rgba(148, 163, 184, 0.8);
   }
 
   /* Dark mode: Invert pin button colors on hover and active */

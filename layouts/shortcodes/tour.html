@@ -272,7 +272,7 @@
           {{- $hasCoords := and (isset $peak "lat") (isset $peak "lng") $peak.lat $peak.lng (ne $peak.lat "") (ne $peak.lng "") -}}
           {{- if $hasCoords -}}
           <button type="button"
-                  class="tour-peak-button"
+                  class="button tour-peak-button"
                   aria-pressed="false"
                   data-peak-index="{{ $peakMapIndex }}"
                   data-peak-lat="{{ $peak.lat | htmlEscape }}"
@@ -281,7 +281,7 @@
           {{- $peakMapIndex = add $peakMapIndex 1 -}}
           {{- else -}}
           <button type="button"
-                  class="tour-peak-button"
+                  class="button tour-peak-button"
                   disabled
                   aria-disabled="true"><span class="tour-peak-number">{{ add $index 1 }}</span>{{ $peak.label | htmlEscape }}</button>
           {{- end -}}
