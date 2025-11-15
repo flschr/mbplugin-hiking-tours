@@ -111,6 +111,86 @@
     });
   }
 
+  function collectLatLngs(latLngs, target) {
+    target = target || [];
+    if (!latLngs) {
+      return target;
+    }
+    if (Array.isArray(latLngs)) {
+      latLngs.forEach(function(entry) {
+        if (Array.isArray(entry)) {
+          collectLatLngs(entry, target);
+        } else if (entry && typeof entry.lat === 'number' && typeof entry.lng === 'number') {
+          target.push(entry);
+        }
+      });
+    }
+    return target;
+  }
+
+  function createEndpointIcon(label) {
+    var size = 28;
+    var styles = [
+      'width: ' + size + 'px',
+      'height: ' + size + 'px',
+      'border-radius: ' + Math.round(size / 2) + 'px',
+      'background: #000',
+      'color: #fff',
+      'font-weight: 700',
+      'font-size: 14px',
+      'display: flex',
+      'align-items: center',
+      'justify-content: center',
+      'border: 2px solid #fff',
+      'box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35)'
+    ].join('; ');
+    return L.divIcon({
+      className: '',
+      iconSize: [size, size],
+      iconAnchor: [Math.round(size / 2), Math.round(size / 2)],
+      html: '<div style="' + styles + '">' + label + '</div>'
+    });
+  }
+
+  function addEndpointMarkers(layer, map) {
+    if (!window.L || !layer || !map) {
+      return;
+    }
+
+    var lines = collectTrackLines(layer);
+    if (!lines.length) {
+      return;
+    }
+
+    var startLatLng = null;
+    var endLatLng = null;
+    lines.forEach(function(line) {
+      if (!line || typeof line.getLatLngs !== 'function') {
+        return;
+      }
+      var flattened = collectLatLngs(line.getLatLngs(), []);
+      if (!flattened.length) {
+        return;
+      }
+      if (!startLatLng) {
+        startLatLng = flattened[0];
+      }
+      endLatLng = flattened[flattened.length - 1];
+    });
+
+    if (startLatLng) {
+      L.marker(startLatLng, {
+        icon: createEndpointIcon('A')
+      }).addTo(map);
+    }
+
+    if (endLatLng) {
+      L.marker(endLatLng, {
+        icon: createEndpointIcon('B')
+      }).addTo(map);
+    }
+  }
+
   function initMap(canvas) {
     if (!window.L || !canvas) {
       return;
@@ -154,6 +234,7 @@
     }).on('loaded', function(e) {
       map.fitBounds(e.target.getBounds(), { padding: [16, 16] });
       addTrackOutline(e.target, map, trackColor);
+      addEndpointMarkers(e.target, map);
     }).addTo(map);
 
     var baseIconSize = 28;
