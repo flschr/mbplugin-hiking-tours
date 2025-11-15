@@ -1,6 +1,42 @@
 (function() {
   'use strict';
 
+  // Configuration constants
+  var CONFIG = {
+    // Track styling
+    TRACK_COLOR: '#1d4ed8',
+    TRACK_WEIGHT: 4,
+    OUTLINE_COLOR: '#ffffff',
+    OUTLINE_WEIGHT_OFFSET: 4,
+    OUTLINE_OPACITY: 0.95,
+    TRACK_OPACITY: 0.9,
+
+    // Direction arrows
+    ARROW_SPACING_METERS: 400,
+    ARROW_SIZE: 14,
+    ARROW_STROKE_COLOR: '#dbeafe',
+    ARROW_PANE_ZINDEX: 450,
+    ARROW_ZINDEX_OFFSET: -200,
+
+    // Endpoint markers
+    ENDPOINT_SIZE: 28,
+    ENDPOINT_FONT_SIZE: 14,
+    ENDPOINT_BORDER_WIDTH: 3,
+
+    // Peak markers
+    PEAK_ICON_SIZE: 28,
+    PEAK_ICON_ANCHOR_X: 14,
+    PEAK_ICON_ANCHOR_Y: 24,
+    PEAK_POPUP_ANCHOR_X: 0,
+    PEAK_POPUP_ANCHOR_Y: -22,
+    PEAK_SCALE_MULTIPLE: 2,
+
+    // Map settings
+    MAP_MIN_HEIGHT: 320,
+    LAYER_READY_MAX_ATTEMPTS: 10,
+    LAYER_READY_FRAME_DELAY: 16
+  };
+
   function ready(fn) {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', fn);
@@ -65,7 +101,7 @@
       return;
     }
 
-    var schedule = window.requestAnimationFrame || function(cb) { return setTimeout(cb, 16); };
+    var schedule = window.requestAnimationFrame || function(cb) { return setTimeout(cb, CONFIG.LAYER_READY_FRAME_DELAY); };
     schedule(function() {
       bringLayerToBackWhenReady(layer, attemptsLeft - 1);
     });
@@ -89,18 +125,18 @@
       if (!latLngs || !latLngs.length) {
         return;
       }
-      var baseWeight = 4;
+      var baseWeight = CONFIG.TRACK_WEIGHT;
       if (line.options && line.options.weight) {
         baseWeight = line.options.weight;
       }
       var outline = L.polyline(latLngs, {
-        color: '#ffffff',
-        weight: baseWeight + 4,
-        opacity: 0.95,
+        color: CONFIG.OUTLINE_COLOR,
+        weight: baseWeight + CONFIG.OUTLINE_WEIGHT_OFFSET,
+        opacity: CONFIG.OUTLINE_OPACITY,
         lineJoin: 'round',
         lineCap: 'round'
       }).addTo(map);
-      bringLayerToBackWhenReady(outline, 10);
+      bringLayerToBackWhenReady(outline, CONFIG.LAYER_READY_MAX_ATTEMPTS);
       if (typeof line.setStyle === 'function') {
         line.setStyle({
           color: color,
@@ -113,6 +149,12 @@
 
   function zoomTrackToMax(map, bounds) {
     if (!map || !bounds) {
+      return;
+    }
+
+    // Validate bounds are valid before using
+    if (typeof bounds.isValid === 'function' && !bounds.isValid()) {
+      console.warn('[Tours] Invalid bounds, skipping zoom');
       return;
     }
 
@@ -179,9 +221,9 @@
   }
 
   function createDirectionIcon(rotationDeg, color) {
-    var size = 14;
-    var stroke = '#dbeafe';
-    var arrowColor = color || '#1d4ed8';
+    var size = CONFIG.ARROW_SIZE;
+    var stroke = CONFIG.ARROW_STROKE_COLOR;
+    var arrowColor = color || CONFIG.TRACK_COLOR;
     var rotation = typeof rotationDeg === 'number' && isFinite(rotationDeg) ? rotationDeg : 0;
     var svg = [
       '<svg viewBox="0 0 32 32" width="' + size + '" height="' + size + '" xmlns="http://www.w3.org/2000/svg" style="display:block">',
@@ -218,7 +260,7 @@
     if (!arrowPane) {
       arrowPane = map.createPane(arrowPaneName);
       if (arrowPane && arrowPane.style) {
-        arrowPane.style.zIndex = '450';
+        arrowPane.style.zIndex = String(CONFIG.ARROW_PANE_ZINDEX);
         arrowPane.style.pointerEvents = 'none';
       }
     }
@@ -235,7 +277,7 @@
       return;
     }
 
-    var spacing = 400; // meters between arrows
+    var spacing = CONFIG.ARROW_SPACING_METERS;
     var nextMarkerDistance = spacing / 2;
     var travelled = 0;
 
@@ -256,7 +298,7 @@
         L.marker([lat, lng], {
           interactive: false,
           pane: arrowPaneName,
-          zIndexOffset: -200,
+          zIndexOffset: CONFIG.ARROW_ZINDEX_OFFSET,
           icon: createDirectionIcon(bearing, color)
         }).addTo(map);
         nextMarkerDistance += spacing;
@@ -267,7 +309,7 @@
   }
 
   function createEndpointIcon(label) {
-    var size = 28;
+    var size = CONFIG.ENDPOINT_SIZE;
     var styles = [
       'width: ' + size + 'px',
       'height: ' + size + 'px',
@@ -275,11 +317,11 @@
       'background: #000',
       'color: #fff',
       'font-weight: 700',
-      'font-size: 14px',
+      'font-size: ' + CONFIG.ENDPOINT_FONT_SIZE + 'px',
       'display: flex',
       'align-items: center',
       'justify-content: center',
-      'border: 3px solid #fff',
+      'border: ' + CONFIG.ENDPOINT_BORDER_WIDTH + 'px solid #fff',
       'box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45)'
     ].join('; ');
     return L.divIcon({
@@ -334,10 +376,11 @@
       return;
     }
 
-    if (canvas._toursMapInitialized || canvas.getAttribute('data-map-initialized') === 'true') {
+    // Use single source of truth to prevent race conditions
+    if (canvas.getAttribute('data-map-initialized') === 'true') {
       return;
     }
-    canvas._toursMapInitialized = true;
+    // Set flag immediately to prevent double initialization
     canvas.setAttribute('data-map-initialized', 'true');
 
     var gpxUrl = canvas.getAttribute('data-gpx');
@@ -354,7 +397,7 @@
       attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    var trackColor = '#1d4ed8';
+    var trackColor = CONFIG.TRACK_COLOR;
     new L.GPX(gpxUrl, {
       async: true,
       marker_options: {
@@ -364,29 +407,29 @@
       },
       polyline_options: {
         color: trackColor,
-        weight: 4,
-        opacity: 0.9,
+        weight: CONFIG.TRACK_WEIGHT,
+        opacity: CONFIG.TRACK_OPACITY,
         lineJoin: 'round',
         lineCap: 'round'
       }
     }).on('loaded', function(e) {
-      zoomTrackToMax(map, e.target.getBounds());
+      var bounds = e.target.getBounds();
+      if (bounds) {
+        zoomTrackToMax(map, bounds);
+      }
       addTrackOutline(e.target, map, trackColor);
       addDirectionArrows(e.target, map, trackColor);
       addEndpointMarkers(e.target, map);
     }).addTo(map);
 
-    var baseIconSize = 28;
-    var baseAnchor = [14, 24];
-    var basePopupAnchor = [0, -22];
     function createPeakIcon(scale) {
-      var size = Math.round(baseIconSize * scale);
+      var size = Math.round(CONFIG.PEAK_ICON_SIZE * scale);
       return L.icon({
         iconUrl: '/tours/note.svg',
         iconRetinaUrl: '/tours/note.svg',
         iconSize: [size, size],
-        iconAnchor: [Math.round(baseAnchor[0] * scale), Math.round(baseAnchor[1] * scale)],
-        popupAnchor: [basePopupAnchor[0], Math.round(basePopupAnchor[1] * scale)]
+        iconAnchor: [Math.round(CONFIG.PEAK_ICON_ANCHOR_X * scale), Math.round(CONFIG.PEAK_ICON_ANCHOR_Y * scale)],
+        popupAnchor: [CONFIG.PEAK_POPUP_ANCHOR_X, Math.round(CONFIG.PEAK_POPUP_ANCHOR_Y * scale)]
       });
     }
 
@@ -398,9 +441,9 @@
     try {
       var decoded = peaksRaw;
       if (peaksRaw.indexOf('&') !== -1) {
-        var textarea = document.createElement('textarea');
-        textarea.innerHTML = peaksRaw;
-        decoded = textarea.value;
+        // Safer HTML entity decoding without innerHTML
+        var doc = new DOMParser().parseFromString(peaksRaw, 'text/html');
+        decoded = doc.documentElement.textContent;
       }
       var peaks = JSON.parse(decoded);
       var peakIndex = Object.create(null);
@@ -411,6 +454,11 @@
         var lat = parseFloat(peak.lat);
         var lng = parseFloat(peak.lng);
         if (!isFinite(lat) || !isFinite(lng)) {
+          return;
+        }
+        // Validate coordinate ranges
+        if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+          console.warn('[Tours] Invalid coordinates for peak:', peak.label, lat, lng);
           return;
         }
         var key = lat.toFixed(6) + ':' + lng.toFixed(6);
@@ -427,7 +475,7 @@
 
       Object.keys(peakIndex).forEach(function(key) {
         var info = peakIndex[key];
-        var iconScale = info.count > 1 ? 2 : 1;
+        var iconScale = info.count > 1 ? CONFIG.PEAK_SCALE_MULTIPLE : 1;
         var marker = L.marker([info.lat, info.lng], {
           icon: createPeakIcon(iconScale)
         });
