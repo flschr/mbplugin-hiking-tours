@@ -141,8 +141,8 @@
       'display: flex',
       'align-items: center',
       'justify-content: center',
-      'border: 2px solid #fff',
-      'box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35)'
+      'border: 3px solid #fff',
+      'box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45)'
     ].join('; ');
     return L.divIcon({
       className: '',
