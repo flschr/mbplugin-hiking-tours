@@ -128,6 +128,95 @@
     return target;
   }
 
+  function distanceBetween(a, b) {
+    if (!window.L || !a || !b) {
+      return 0;
+    }
+    try {
+      return L.latLng(a.lat, a.lng).distanceTo(L.latLng(b.lat, b.lng));
+    } catch (err) {
+      console.warn('[Tours] Failed to calculate distance between points', err);
+    }
+    return 0;
+  }
+
+  function bearingBetween(a, b) {
+    if (!a || !b) {
+      return 0;
+    }
+    var lat1 = a.lat * Math.PI / 180;
+    var lat2 = b.lat * Math.PI / 180;
+    var deltaLng = (b.lng - a.lng) * Math.PI / 180;
+    var y = Math.sin(deltaLng) * Math.cos(lat2);
+    var x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(deltaLng);
+    var bearing = Math.atan2(y, x) * 180 / Math.PI;
+    return (bearing + 360) % 360;
+  }
+
+  function createDirectionIcon(rotationDeg, color) {
+    var size = 18;
+    var svg = '<svg viewBox="0 0 24 24" width="' + size + '" height="' + size + '" ' +
+      'style="display:block;transform:rotate(' + rotationDeg + 'deg);">' +
+      '<path d="M12 3l6 9h-4v9h-4v-9H6z" fill="' + color + '" /></svg>';
+    return L.divIcon({
+      className: '',
+      html: svg,
+      iconSize: [size, size],
+      iconAnchor: [Math.round(size / 2), Math.round(size / 2)]
+    });
+  }
+
+  function addDirectionArrows(layer, map, color) {
+    if (!window.L || !layer || !map) {
+      return;
+    }
+
+    var lines = collectTrackLines(layer);
+    if (!lines.length) {
+      return;
+    }
+
+    var trackPoints = [];
+    lines.forEach(function(line) {
+      if (!line || typeof line.getLatLngs !== 'function') {
+        return;
+      }
+      collectLatLngs(line.getLatLngs(), trackPoints);
+    });
+
+    if (trackPoints.length < 2) {
+      return;
+    }
+
+    var spacing = 400; // meters between arrows
+    var nextMarkerDistance = spacing / 2;
+    var travelled = 0;
+
+    for (var i = 1; i < trackPoints.length; i += 1) {
+      var prev = trackPoints[i - 1];
+      var current = trackPoints[i];
+      var segmentDistance = distanceBetween(prev, current);
+      if (!segmentDistance) {
+        continue;
+      }
+
+      while (travelled + segmentDistance >= nextMarkerDistance) {
+        var distanceIntoSegment = nextMarkerDistance - travelled;
+        var ratio = distanceIntoSegment / segmentDistance;
+        var lat = prev.lat + (current.lat - prev.lat) * ratio;
+        var lng = prev.lng + (current.lng - prev.lng) * ratio;
+        var bearing = bearingBetween(prev, current);
+        L.marker([lat, lng], {
+          interactive: false,
+          icon: createDirectionIcon(bearing, color)
+        }).addTo(map);
+        nextMarkerDistance += spacing;
+      }
+
+      travelled += segmentDistance;
+    }
+  }
+
   function createEndpointIcon(label) {
     var size = 28;
     var styles = [
@@ -234,6 +323,7 @@
     }).on('loaded', function(e) {
       map.fitBounds(e.target.getBounds(), { padding: [16, 16] });
       addTrackOutline(e.target, map, trackColor);
+      addDirectionArrows(e.target, map, trackColor);
       addEndpointMarkers(e.target, map);
     }).addTo(map);
 
