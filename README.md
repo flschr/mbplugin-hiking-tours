@@ -78,11 +78,11 @@ The views were spectacular...
 - `max_height`: Maximum altitude in meters (integer)
 - `bergfex_url`: Link to Bergfex activity
 - `cover_image`: Path to cover image
-- `peaks`: Semicolon-separated list of peaks with heights (e.g., "Peak 1 (1234m);Peak 2 (5678m)"). Append optional coordinates via `|lat|lng` when you want the peak numbered on the map (e.g., `Hoher Fricken (1940m)|47.4769|11.1302`).
+- `peaks`: Semicolon-separated list of peaks with heights (e.g., "Peak 1 (1234m);Peak 2 (5678m)"). Append optional coordinates via `|lat|lng` or `:lat,lng:` style delimiters when you want the peak numbered on the map (e.g., `Hoher Fricken (1940m)|47.4769|11.1302` or `Hoher Fricken:47.4769,11.1302:(1940m)`).
 
 ### Peak markers on the map
 
-Add numbered chips to the shortcode via `peaks="..."`. Each entry can optionally include latitude/longitude coordinates separated by pipes (`|`).
+Add numbered chips to the shortcode via `peaks="..."`. Each entry can optionally include latitude/longitude coordinates separated by pipes (`|`) or in the compact `Name:lat,lng:(Height)` format.
 
 - Peaks **with coordinates** render a numbered marker on the Leaflet map (in chip order) and receive a tooltip with the name.
 - Peaks **without coordinates** still appear in the chip list but won't place a marker.
@@ -91,6 +91,12 @@ Example with coordinates:
 
 ```
 peaks="Hoher Fricken (1940m)|47.4769|11.1302;Karkopf (1738m)|47.4804|11.1449"
+```
+
+Alternative colon-separated style:
+
+```
+peaks="Jägerkamp:47.6736,11.9061:(1940m);Wildes Fräulein:47.6680,11.9036:(1738m)"
 ```
 
 ### GPX File Locations

@@ -68,14 +68,47 @@
   {{- range $value := split $peaksRaw ";" -}}
     {{- $peak := trim $value " \n\t" -}}
     {{- if $peak -}}
-      {{- $parts := split $peak "|" -}}
-      {{- $peakLabel := trim (index $parts 0) " \n\t" -}}
+      {{- $peakLabel := $peak -}}
       {{- $lat := "" -}}
       {{- $lng := "" -}}
-      {{- if ge (len $parts) 3 -}}
-        {{- $lat = trim (index $parts 1) " \n\t" -}}
-        {{- $lng = trim (index $parts 2) " \n\t" -}}
+
+      {{- if in $peak "|" -}}
+        {{- $parts := split $peak "|" -}}
+        {{- $peakLabel = trim (index $parts 0) " \n\t" -}}
+        {{- if ge (len $parts) 3 -}}
+          {{- $lat = trim (index $parts 1) " \n\t" -}}
+          {{- $lng = trim (index $parts 2) " \n\t" -}}
+        {{- end -}}
+      {{- else if in $peak ":" -}}
+        {{- $parts := split $peak ":" -}}
+        {{- $name := trim (index $parts 0) " \n\t" -}}
+        {{- $coordsPart := "" -}}
+        {{- if ge (len $parts) 2 -}}
+          {{- $coordsPart = trim (index $parts 1) " \n\t" -}}
+        {{- end -}}
+        {{- $metaParts := slice -}}
+        {{- if ge (len $parts) 3 -}}
+          {{- range $idx, $val := $parts -}}
+            {{- if ge $idx 2 -}}
+              {{- $metaParts = $metaParts | append (trim $val " \n\t") -}}
+            {{- end -}}
+          {{- end -}}
+        {{- end -}}
+        {{- $meta := delimit $metaParts ":" -}}
+        {{- if $meta -}}
+          {{- $peakLabel = trim (printf "%s %s" $name $meta) " \n\t" -}}
+        {{- else -}}
+          {{- $peakLabel = $name -}}
+        {{- end -}}
+        {{- $coordPieces := split $coordsPart "," -}}
+        {{- if ge (len $coordPieces) 2 -}}
+          {{- $lat = trim (index $coordPieces 0) " \n\t" -}}
+          {{- $lng = trim (index $coordPieces 1) " \n\t" -}}
+        {{- end -}}
+      {{- else -}}
+        {{- $peakLabel = trim $peak " \n\t" -}}
       {{- end -}}
+
       {{- $peakDict := dict "label" $peakLabel -}}
       {{- $hasCoords := and $lat (ne $lat "") $lng (ne $lng "") -}}
       {{- if $hasCoords -}}
