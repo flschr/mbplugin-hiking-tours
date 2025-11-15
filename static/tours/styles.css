@@ -1,84 +1,25 @@
 /**
  * Tour Plugin Styles
- *
- * Provides clean, responsive styling for:
- * - Tour shortcode cards with maps
- * - Tours archive page with filters and statistics
+ * Minimal tour-specific styles - relies on theme's main.css for buttons, forms, basic layouts
  */
 
 /* ========================================
-   CSS Custom Properties
+   Tour-Specific Variables
    ======================================== */
 
 :root {
   --tour-accent: #0094ff;
-  --tour-card-bg: #ffffff;
-  --tour-card-border: #dce3ec;
-  --tour-card-shadow: none;
-  --tour-header-bg: var(--tour-accent);
-  --tour-muted-bg: #f4f7fb;
-  --tour-pill-bg: rgba(255, 255, 255, 0.18);
-  --tour-pill-color: #ecfeff;
-  --tour-peak-chip-radius: var(
-    --chip-radius,
-    var(--chip-border-radius, var(--rounded-full, var(--tour-radius-pill)))
-  );
-  --tour-peak-number-bg: var(--chip-pin-bg, var(--chip-accent, #1565c0));
-  --tour-peak-number-color: var(
-    --chip-pin-color,
-    var(--chip-accent-contrast, #ffffff)
-  );
-  --tour-peak-number-border: transparent;
-  --tour-peak-chip-bg: var(
-    --chip-bg,
-    var(--chip-background, rgba(15, 23, 42, 0.02))
-  );
-  --tour-peak-chip-border: var(
-    --chip-border,
-    var(--chip-border-color, rgba(15, 23, 42, 0.08))
-  );
-  --tour-peak-chip-color: var(
-    --chip-color,
-    var(--chip-text-color, #0f172a)
-  );
-  --tour-peak-chip-bg-active: var(
-    --chip-selected-bg,
-    var(--chip-active-bg, rgba(21, 101, 192, 0.15))
-  );
-  --tour-peak-chip-color-active: var(
-    --chip-selected-color,
-    var(--chip-active-color, #0f172a)
-  );
-  --tour-peak-chip-focus-ring: var(
-    --chip-focus-ring,
-    rgba(0, 148, 255, 0.08)
-  );
-  --tour-radius-card: 0.45rem;
-  --tour-radius-content: 0.35rem;
-  --tour-radius-pill: 1.5rem;
-  --tour-card-text: #0f172a;
-  --tour-card-padding-inline: clamp(1rem, 5vw, 1.75rem);
-  --tour-mobile-gutter: 1rem;
-}
-
-@media (max-width: 640px) {
-  :root {
-    --tour-card-padding-inline: 0;
-  }
+  --tour-marker-bg: #1565c0;
+  --tour-marker-text: #fff;
 }
 
 /* ========================================
-   Tour Shortcode · Card Layout
+   Tour Card Layout
    ======================================== */
 
 .tour-box {
   margin: 1.5rem 0;
-  border-radius: var(--tour-radius-card);
-  border: 1px solid var(--tour-card-border);
-  background: var(--tour-card-bg);
-  box-shadow: var(--tour-card-shadow);
   overflow: hidden;
-  color: var(--tour-card-text);
 }
 
 .tour-card-hero {
@@ -88,10 +29,9 @@
 }
 
 .tour-card-header {
-  padding: clamp(1.3rem, 4vw, 1.85rem) var(--tour-card-padding-inline)
-    clamp(0.75rem, 3vw, 1.1rem);
-  background: var(--tour-card-bg);
-  border-bottom: 1px solid var(--tour-card-border);
+  padding: 1.5rem clamp(1rem, 5vw, 1.75rem) 1rem;
+  border-bottom: 1px solid currentColor;
+  opacity: 0.1;
 }
 
 .tour-card-heading {
@@ -104,127 +44,39 @@
   margin: 0;
   font-size: 1.5rem;
   font-weight: 700;
-  letter-spacing: 0.02em;
-  color: var(--tour-card-text);
-}
-
-.tour-card-meta,
-.tour-stat-card .stat-label {
-  margin: 0;
-  font-size: 0.8rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #64748b;
 }
 
 .tour-card-meta {
+  margin: 0;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  opacity: 0.7;
   display: inline-flex;
   flex-wrap: wrap;
   gap: 0.15rem 0.35rem;
   align-items: center;
-  font-weight: 400;
-}
-
-.tour-card-meta-type,
-.tour-card-meta-region,
-.tour-card-meta-separator {
-  display: inline-flex;
-  align-items: baseline;
-}
-
-.tour-card-meta-type,
-.tour-card-meta-region {
-  font-size: inherit;
-  color: inherit;
-}
-
-.tour-card-meta-region {
-  margin-left: 0;
 }
 
 .tour-card-meta-separator {
   opacity: 0.6;
 }
 
-.tour-card-meta-chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.1rem 0.45rem;
-  font-size: 0.7rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-weight: 600;
-  border-radius: var(--tour-radius-pill);
-  border: 1px solid rgba(15, 23, 42, 0.15);
-  background: rgba(15, 23, 42, 0.04);
-  color: #0f172a;
-  text-decoration: none;
-  transition: color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
-}
-
-.tour-card-meta-chip:hover,
-.tour-card-meta-chip:focus-visible {
-  color: var(--tour-accent);
-  background: rgba(0, 148, 255, 0.1);
-  box-shadow: 0 0 0 2px rgba(0, 148, 255, 0.15);
-}
-
 /* ========================================
-   Tour Shortcode · Visuals & Map
+   Map Container
    ======================================== */
 
 .tour-card-visuals {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
-  padding: 1rem var(--tour-card-padding-inline) 0;
-  background: var(--tour-muted-bg);
-}
-
-.tour-card-visuals--compact {
-  padding-top: 0.75rem;
-}
-
-.tour-cover {
-  margin: 0;
-  border-radius: var(--tour-radius-content);
-  overflow: hidden;
-  background: #0f172a;
-  box-shadow: 0 15px 35px rgba(15, 23, 42, 0.15);
-}
-
-.tour-cover img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.tour-cover figcaption {
-  margin: 0;
-  padding: 0.6rem 1rem;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  background: rgba(15, 23, 42, 0.85);
-  color: #f8fafc;
+  padding: 1rem clamp(1rem, 5vw, 1.75rem) 0;
+  background: rgba(0, 0, 0, 0.02);
 }
 
 .tour-card-map {
   position: relative;
-  border-radius: 0;
   overflow: hidden;
-  background: transparent;
   min-height: 200px;
-  box-shadow: none;
-}
-
-.tour-card-map--full {
-  display: block;
-  width: 100%;
-}
-
-.tour-card-map--dynamic {
   background: #0f172a;
 }
 
@@ -243,7 +95,6 @@
   width: 100%;
   height: 400px;
   position: relative;
-  border-radius: 0;
   overflow: hidden;
   background: #0f172a;
   z-index: 1;
@@ -257,6 +108,7 @@
   cursor: pointer;
 }
 
+/* Map interaction guard overlay */
 .tour-map-guard {
   position: absolute;
   inset: 0;
@@ -272,19 +124,9 @@
   font-size: 0.85rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
   cursor: pointer;
   z-index: 10;
-  transition: background 0.2s ease;
-  touch-action: pan-y pinch-zoom;
-}
-
-.tour-map-guard small {
-  text-transform: none;
-  letter-spacing: 0;
-  font-size: 0.75rem;
-  font-weight: 400;
-  opacity: 0.85;
+  transition: background 0.2s;
 }
 
 .tour-map-guard:hover,
@@ -292,6 +134,10 @@
   background: rgba(15, 23, 42, 0.78);
   outline: none;
 }
+
+/* ========================================
+   Leaflet Map Markers
+   ======================================== */
 
 .tour-hidden-marker {
   display: none !important;
@@ -308,44 +154,39 @@
   justify-content: center;
   width: 28px;
   height: 28px;
-  box-sizing: border-box;
-  border-radius: 999px;
-  background: var(--tour-peak-number-bg);
-  color: var(--tour-peak-number-color);
+  border-radius: 50%;
+  background: var(--tour-marker-bg);
+  color: var(--tour-marker-text);
   font-weight: 700;
   font-size: 0.85rem;
-  border: 2px solid var(--tour-peak-number-border);
-  box-shadow: none;
+  border: 2px solid transparent;
 }
 
+/* Cluster markers */
 .tour-cluster {
-  --tour-cluster-base: rgba(191, 219, 254, 0.92);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 999px;
+  border-radius: 50%;
   color: #0f172a;
   font-weight: 700;
-  letter-spacing: 0.03em;
   border: 2px solid rgba(248, 250, 252, 0.95);
   box-shadow: 0 18px 35px rgba(15, 23, 42, 0.25);
   cursor: pointer;
-  text-align: center;
   background: radial-gradient(
     circle at 50% 45%,
-    var(--tour-cluster-base) 0%,
+    rgba(191, 219, 254, 0.92) 0%,
     rgba(147, 197, 253, 0.85) 60%,
     rgba(191, 219, 254, 0.15) 100%
   );
   position: relative;
-  overflow: visible;
 }
 
 .tour-cluster::after {
   content: '';
   position: absolute;
   inset: -8px;
-  border-radius: 999px;
+  border-radius: 50%;
   background: radial-gradient(
     circle,
     rgba(191, 219, 254, 0.65) 0%,
@@ -356,46 +197,34 @@
 }
 
 .tour-cluster span {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: flex;
   width: 100%;
   height: 100%;
-  font-size: 0.85rem;
+  align-items: center;
+  justify-content: center;
 }
 
-.tour-cluster--xs {
-  --tour-cluster-base: rgba(219, 234, 254, 0.98);
-  font-size: 0.75rem;
-}
-
-.tour-cluster--sm {
-  --tour-cluster-base: rgba(191, 219, 254, 0.95);
-  font-size: 0.85rem;
-}
-
-.tour-cluster--md {
-  --tour-cluster-base: rgba(147, 197, 253, 0.9);
-  font-size: 0.9rem;
-}
-
-.tour-cluster--lg {
-  --tour-cluster-base: rgba(96, 165, 250, 0.9);
-  color: #0f172a;
-  font-size: 0.95rem;
-}
-
+/* Cluster size variations */
+.tour-cluster--xs { font-size: 0.75rem; }
+.tour-cluster--sm { font-size: 0.85rem; }
+.tour-cluster--md { font-size: 0.9rem; }
+.tour-cluster--lg { font-size: 0.95rem; }
 .tour-cluster--xl {
-  --tour-cluster-base: rgba(59, 130, 246, 0.95);
-  color: #e0f2fe;
   font-size: 1rem;
+  color: #e0f2fe;
+  background: radial-gradient(
+    circle at 50% 45%,
+    rgba(59, 130, 246, 0.95) 0%,
+    rgba(37, 99, 235, 0.85) 60%,
+    rgba(59, 130, 246, 0.15) 100%
+  );
 }
 
 .leaflet-tooltip.tour-peak-tooltip {
   background: rgba(15, 23, 42, 0.92);
   color: #ecfdf5;
   border: none;
-  border-radius: var(--tour-radius-pill);
+  border-radius: 1rem;
   font-weight: 600;
   padding: 0.35rem 0.6rem;
   box-shadow: 0 12px 25px rgba(15, 23, 42, 0.25);
@@ -405,26 +234,12 @@
   border-top-color: rgba(15, 23, 42, 0.92);
 }
 
-.map-error {
-  border-radius: var(--tour-radius-content);
-  background: rgba(15, 23, 42, 0.05);
-  padding: 2rem;
-  text-align: center;
-  font-size: 0.9rem;
-  color: #475569;
-}
-
-.map-error--full {
-  border-radius: 0;
-  margin: 0;
-}
-
 /* ========================================
-   Tour Shortcode · Card Content
+   Tour Card Content
    ======================================== */
 
 .tour-card-body {
-  padding: 1.6rem var(--tour-card-padding-inline) 1.75rem;
+  padding: 1.6rem clamp(1rem, 5vw, 1.75rem) 1.75rem;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -436,19 +251,6 @@
   gap: 0.6rem;
 }
 
-@media (orientation: portrait) and (max-width: 900px) {
-  .tour-stats-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.5rem;
-  }
-}
-
-@media (orientation: landscape) and (max-width: 900px), (min-width: 900px) {
-  .tour-stats-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
 .tour-stat-card {
   display: flex;
   flex-direction: column;
@@ -457,9 +259,6 @@
   gap: 0.4rem;
   padding: 0.65rem 0.45rem;
   min-height: 3.6rem;
-  background: var(--tour-muted-bg);
-  border-radius: var(--tour-radius-content);
-  border: 1px solid rgba(148, 163, 184, 0.4);
   text-align: center;
 }
 
@@ -471,6 +270,9 @@
 }
 
 .tour-stat-card .stat-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  opacity: 0.7;
   white-space: nowrap;
 }
 
@@ -482,7 +284,6 @@
   gap: 0.25rem;
   font-size: 1.2rem;
   font-weight: 700;
-  color: #0f172a;
 }
 
 .tour-stat-card .stat-number,
@@ -493,8 +294,12 @@
 .tour-stat-card .stat-unit {
   font-size: 0.9rem;
   font-weight: 500;
-  color: #475569;
+  opacity: 0.7;
 }
+
+/* ========================================
+   Peak Chips (Tour-specific component)
+   ======================================== */
 
 .tour-peaks {
   display: flex;
@@ -505,9 +310,8 @@
 .tour-section-label {
   margin: 0;
   font-size: 0.78rem;
-  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #64748b;
+  opacity: 0.7;
 }
 
 .tour-peaks-chips {
@@ -521,17 +325,14 @@
   align-items: center;
   gap: 0.45rem;
   padding: 0.35rem 0.75rem;
-  border-radius: var(--tour-peak-chip-radius);
+  border-radius: 1.5rem;
   font-weight: 600;
   font-size: 0.85rem;
-  font-family: inherit;
   line-height: 1.2;
   text-decoration: none;
-  border: 1px solid var(--tour-peak-chip-border);
-  background: var(--tour-peak-chip-bg);
-  color: var(--tour-peak-chip-color);
-  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease,
-    box-shadow 0.2s ease;
+  border: 1px solid;
+  opacity: 0.9;
+  transition: opacity 0.2s, box-shadow 0.2s;
 }
 
 .tour-peak-chip--action {
@@ -540,20 +341,20 @@
 
 .tour-peak-chip--static {
   pointer-events: none;
-  opacity: 0.75;
+  opacity: 0.6;
 }
 
 .tour-peak-chip--action:hover,
 .tour-peak-chip--action:focus-visible {
   outline: none;
-  border-color: var(--tour-peak-number-bg);
-  box-shadow: 0 0 0 2px var(--tour-peak-chip-focus-ring);
+  opacity: 1;
+  box-shadow: 0 0 0 2px var(--tour-accent);
 }
 
 .tour-peak-chip--active {
-  background: var(--tour-peak-chip-bg-active);
-  color: var(--tour-peak-chip-color-active);
-  border-color: var(--tour-peak-number-bg);
+  opacity: 1;
+  background: var(--tour-accent);
+  color: white;
 }
 
 .tour-peak-chip-number {
@@ -562,14 +363,11 @@
   justify-content: center;
   width: 1.55rem;
   height: 1.55rem;
-  box-sizing: border-box;
   border-radius: 50%;
-  background: var(--tour-peak-number-bg);
-  color: var(--tour-peak-number-color);
+  background: var(--tour-marker-bg);
+  color: var(--tour-marker-text);
   font-size: 0.8rem;
   font-weight: 700;
-  border: 2px solid var(--tour-peak-number-border);
-  box-shadow: none;
 }
 
 .tour-peak-chip-label {
@@ -589,18 +387,13 @@
 .tours-header {
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #e0e0e0;
+  border-bottom: 2px solid;
+  opacity: 0.2;
 }
 
 .tours-header h1 {
   margin: 0 0 0.5rem 0;
   font-size: 2rem;
-  font-weight: 700;
-}
-
-.tours-description {
-  color: #666;
-  line-height: 1.6;
 }
 
 .tours-stats {
@@ -611,29 +404,22 @@
 }
 
 .stat-card {
-  flex: 1;
-  min-width: 120px;
   padding: 1.25rem;
-  background: #f5f5f5;
-  border-radius: var(--tour-radius-card);
   text-align: center;
-  border: 1px solid #e0e0e0;
 }
 
 .stat-card .stat-value {
   display: block;
   font-size: 2rem;
   font-weight: 700;
-  color: #0066cc;
   margin-bottom: 0.25rem;
 }
 
 .stat-card .stat-label {
   display: block;
   font-size: 0.85rem;
-  color: #666;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  opacity: 0.7;
 }
 
 .tours-filters {
@@ -652,23 +438,6 @@
 .filter-group label {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #444;
-}
-
-.filter-select {
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: var(--tour-radius-content);
-  background: white;
-  font-size: 0.95rem;
-  cursor: pointer;
-  min-width: 150px;
-}
-
-.filter-select:focus {
-  outline: none;
-  border-color: #0066cc;
-  box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.1);
 }
 
 .tours-list {
@@ -680,19 +449,10 @@
 .tour-item {
   padding: 1rem;
   margin-bottom: 0.75rem;
-  background: white;
-  border: 1px solid #e0e0e0;
-  border-radius: var(--tour-radius-content);
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .tour-item--hidden {
   display: none;
-}
-
-.tour-item:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border-color: #ccc;
 }
 
 .tour-item-header {
@@ -706,47 +466,23 @@
 }
 
 .tour-item-title a {
-  color: #0066cc;
   text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-.tour-item-title a:hover {
-  color: #0052a3;
-  text-decoration: underline;
 }
 
 .tour-item-meta {
   font-size: 0.9rem;
-  color: #666;
+  opacity: 0.8;
   line-height: 1.5;
 }
 
 .tours-empty {
   padding: 3rem 2rem;
   text-align: center;
-  background: #f9f9f9;
-  border-radius: var(--tour-radius-card);
-  color: #666;
-}
-
-.tours-empty code {
-  background: #e0e0e0;
-  padding: 0.2em 0.5em;
-  border-radius: var(--tour-radius-content);
-  font-size: 0.9em;
 }
 
 /* ========================================
    Responsive Adjustments
    ======================================== */
-
-@media (max-width: 900px) {
-  .tour-card-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
 
 @media (max-width: 768px) {
   .tour-map-dynamic {
@@ -754,64 +490,37 @@
   }
 
   .tours-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.75rem;
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .tours-filters {
     flex-direction: column;
-    gap: 1rem;
   }
 
   .filter-group {
     width: 100%;
   }
-
-  .filter-select {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .tour-item {
-    padding: 0.75rem;
-  }
-
-  .tour-item-title {
-    font-size: 1.1rem;
-  }
 }
 
 @media (max-width: 640px) {
-  .tour-card-heading {
-    gap: 0.4rem;
-  }
-
   .tour-card-header,
   .tour-card-body {
-    padding: 1.5rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
   }
 
   .tour-stats-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .tours-list {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 0.75rem;
   }
 
   .tour-item {
     margin-bottom: 0;
-    padding: 0.7rem;
-  }
-
-  .tour-item-title {
-    font-size: 1rem;
-  }
-
-  .tour-item-meta {
-    font-size: 0.85rem;
   }
 }
 
@@ -820,121 +529,22 @@
     height: 250px;
   }
 
-  .tours-archive {
-    padding: 1rem 0.5rem;
-  }
-
   .tours-header h1 {
-    font-size: 1.5rem;
-  }
-
-  .tour-box {
-    padding: 0;
-  }
-
-  .stat-card .stat-value {
     font-size: 1.5rem;
   }
 }
 
 /* ========================================
-   Color Scheme Adjustments
+   Dark Mode
    ======================================== */
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --tour-accent: #0094ff;
-    --tour-card-bg: #0b1120;
-    --tour-card-border: #1f2937;
-    --tour-card-shadow: none;
-    --tour-header-bg: var(--tour-accent);
-    --tour-muted-bg: #111827;
-    --tour-card-text: #e2e8f0;
-    --tour-pill-bg: rgba(255, 255, 255, 0.15);
-    --tour-pill-color: #f0fdf4;
-    --tour-peak-number-bg: var(--chip-pin-bg, var(--chip-accent, #38bdf8));
-    --tour-peak-number-color: var(
-      --chip-pin-color,
-      var(--chip-accent-contrast, #0b1120)
-    );
-    --tour-peak-number-border: transparent;
-    --tour-peak-chip-bg: var(
-      --chip-bg,
-      var(--chip-background, rgba(15, 23, 42, 0.55))
-    );
-    --tour-peak-chip-border: var(
-      --chip-border,
-      var(--chip-border-color, rgba(148, 163, 184, 0.35))
-    );
-    --tour-peak-chip-color: var(
-      --chip-color,
-      var(--chip-text-color, #e2e8f0)
-    );
-    --tour-peak-chip-bg-active: var(
-      --chip-selected-bg,
-      var(--chip-active-bg, rgba(56, 189, 248, 0.25))
-    );
-    --tour-peak-chip-color-active: var(
-      --chip-selected-color,
-      var(--chip-active-color, #f8fafc)
-    );
-    --tour-peak-chip-focus-ring: var(
-      --chip-focus-ring,
-      rgba(56, 189, 248, 0.25)
-    );
-  }
-
-  .tour-box {
-    color: var(--tour-card-text);
-  }
-
-  .tour-card-header {
-    border-bottom-color: rgba(148, 163, 184, 0.35);
-  }
-
-  .tour-card-meta {
-    color: #cbd5f5;
+    --tour-marker-bg: #38bdf8;
+    --tour-marker-text: #0b1120;
   }
 
   .tour-card-visuals {
-    background: var(--tour-muted-bg);
+    background: rgba(255, 255, 255, 0.02);
   }
-
-  .tour-card-map,
-  .tour-cover {
-    box-shadow: 0 18px 35px rgba(0, 0, 0, 0.55);
-  }
-
-  .tour-stat-card {
-    background: rgba(15, 23, 42, 0.65);
-    border-color: #334155;
-  }
-
-  .tour-section-label,
-  .tour-stat-card .stat-label {
-    color: #94a3b8;
-  }
-
-  .tour-stat-card .stat-value,
-  .tour-stat-card .stat-unit {
-    color: #f8fafc;
-  }
-
-  .tour-peak-chip {
-    background: var(--tour-peak-chip-bg);
-    border-color: var(--tour-peak-chip-border);
-    color: var(--tour-peak-chip-color);
-  }
-
-  .tour-peak-chip--static {
-    opacity: 0.55;
-  }
-
-  .tour-peak-chip--action:hover,
-  .tour-peak-chip--action:focus-visible,
-  .tour-peak-chip--active {
-    border-color: var(--tour-peak-number-bg);
-    box-shadow: 0 0 0 2px var(--tour-peak-chip-focus-ring);
-  }
-
 }
