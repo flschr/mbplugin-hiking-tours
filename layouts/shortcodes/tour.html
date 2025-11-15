@@ -170,6 +170,103 @@
   </style>
 {{- end -}}
 
+{{- if and (not $isFeedOutput) (not ($.Page.Scratch.Get "tour-peak-path-styles")) -}}
+  {{- $.Page.Scratch.Set "tour-peak-path-styles" true -}}
+  <style>
+    .tour-entry .tour-peak-book {
+      margin-top: 2rem;
+    }
+
+    .tour-entry .tour-peak-book h4 {
+      margin-bottom: 0.75rem;
+    }
+
+    .tour-entry .tour-peak-list-wrapper {
+      position: relative;
+      padding: 0.25rem 0 0.75rem;
+    }
+
+    .tour-entry .tour-peak-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .tour-entry .tour-peak-chip {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.4rem 0.9rem;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.75), rgba(243, 249, 255, 0.9));
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+      color: #0f172a;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+    }
+
+    .tour-entry .tour-peak-chip::before {
+      content: "";
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0ea5e9, #22d3ee);
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.75);
+    }
+
+    .tour-entry .tour-peak-path {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: visible;
+    }
+
+    .tour-entry .tour-peak-path-line {
+      fill: none;
+      stroke: rgba(30, 64, 175, 0.4);
+      stroke-width: 3;
+      vector-effect: non-scaling-stroke;
+      stroke-linecap: round;
+      stroke-dashoffset: 0;
+      animation: tourPeakPathWave 8s ease-in-out infinite;
+    }
+
+    @keyframes tourPeakPathWave {
+      from {
+        stroke-dashoffset: var(--tour-peak-dash, 24);
+      }
+
+      to {
+        stroke-dashoffset: calc(var(--tour-peak-dash, 24) * -1);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .tour-entry .tour-peak-path-line {
+        animation: none;
+      }
+    }
+
+    @media (min-width: 640px) {
+      .tour-entry .tour-peak-list {
+        gap: 1rem;
+      }
+    }
+  </style>
+{{- end -}}
+
+{{- if and (not $isFeedOutput) $hasPeaks (not ($.Page.Scratch.Get "tour-peak-path-script")) -}}
+  {{- $.Page.Scratch.Set "tour-peak-path-script" true -}}
+  <script src="{{ "tours/peak-path.js" | relURL }}" defer></script>
+{{- end -}}
+
 {{- if $isFeedOutput -}}
 <div>
   <strong>{{ $title | htmlEscape }}</strong>
@@ -252,13 +349,16 @@
   </dl>
 
   {{- if $hasPeaks -}}
-  <section>
+  <section class="tour-peak-book" data-peak-path>
     <h4>Gipfelbuch</h4>
-    <ol>
-      {{- range $peaksList -}}
-      <li>{{ .label | htmlEscape }}</li>
-      {{- end -}}
-    </ol>
+    <div class="tour-peak-list-wrapper" data-peak-path-wrapper>
+      <ol class="tour-peak-list">
+        {{- range $peaksList -}}
+        <li class="tour-peak-chip" data-peak-chip>{{ .label | htmlEscape }}</li>
+        {{- end -}}
+      </ol>
+      <svg class="tour-peak-path" aria-hidden="true" focusable="false"></svg>
+    </div>
   </section>
   {{- end -}}
 </section>
