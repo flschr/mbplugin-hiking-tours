@@ -28,6 +28,7 @@
       attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
     }).addTo(map);
 
+    var trackColor = '#1d4ed8';
     new L.GPX(gpxUrl, {
       async: true,
       marker_options: {
@@ -36,21 +37,47 @@
         shadowUrl: null
       },
       polyline_options: {
-        color: '#1d4ed8',
+        color: trackColor,
         weight: 4,
-        opacity: 0.85
+        opacity: 0.9,
+        lineJoin: 'round',
+        lineCap: 'round'
       }
     }).on('loaded', function(e) {
       map.fitBounds(e.target.getBounds(), { padding: [16, 16] });
+    }).on('addline', function(e) {
+      var latLngs = e.line.getLatLngs();
+      var outlineWeight = (e.line.options.weight || 4) + 4;
+      var outline = L.polyline(latLngs, {
+        color: '#ffffff',
+        weight: outlineWeight,
+        opacity: 0.95,
+        lineJoin: 'round',
+        lineCap: 'round'
+      }).addTo(map);
+      if (outline.bringToBack) {
+        outline.bringToBack();
+      }
+      e.line.setStyle({
+        color: trackColor,
+        lineJoin: 'round',
+        lineCap: 'round'
+      });
     }).addTo(map);
 
-    var peakIcon = L.icon({
-      iconUrl: '/tours/note.svg',
-      iconRetinaUrl: '/tours/note.svg',
-      iconSize: [28, 28],
-      iconAnchor: [14, 24],
-      popupAnchor: [0, -22]
-    });
+    var baseIconSize = 28;
+    var baseAnchor = [14, 24];
+    var basePopupAnchor = [0, -22];
+    function createPeakIcon(scale) {
+      var size = Math.round(baseIconSize * scale);
+      return L.icon({
+        iconUrl: '/tours/note.svg',
+        iconRetinaUrl: '/tours/note.svg',
+        iconSize: [size, size],
+        iconAnchor: [Math.round(baseAnchor[0] * scale), Math.round(baseAnchor[1] * scale)],
+        popupAnchor: [basePopupAnchor[0], Math.round(basePopupAnchor[1] * scale)]
+      });
+    }
 
     var peaksRaw = canvas.getAttribute('data-peaks');
     if (!peaksRaw) {
@@ -89,8 +116,9 @@
 
       Object.keys(peakIndex).forEach(function(key) {
         var info = peakIndex[key];
+        var iconScale = info.count > 1 ? 2 : 1;
         var marker = L.marker([info.lat, info.lng], {
-          icon: peakIcon
+          icon: createPeakIcon(iconScale)
         });
         if (info.label) {
           marker.bindPopup(info.label);
