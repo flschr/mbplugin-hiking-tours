@@ -480,92 +480,6 @@
     });
   }
 
-  function setupHeroMetaVisibility(canvas) {
-    if (!canvas || typeof canvas.closest !== 'function') {
-      return;
-    }
-
-    var hero = canvas.closest('.tour-card-hero');
-    if (!hero) {
-      return;
-    }
-
-    var header = hero.querySelector('.tour-card-header');
-    if (!header) {
-      return;
-    }
-
-    var restoreTimeout = null;
-
-    function setMetaVisibility(visible) {
-      if (restoreTimeout) {
-        clearTimeout(restoreTimeout);
-        restoreTimeout = null;
-      }
-
-      if (visible) {
-        hero.classList.remove('tour-card-hero--meta-hidden');
-      } else {
-        hero.classList.add('tour-card-hero--meta-hidden');
-      }
-    }
-
-    function hideMeta() {
-      setMetaVisibility(false);
-    }
-
-    function showMeta() {
-      setMetaVisibility(true);
-    }
-
-    function scheduleShow() {
-      if (restoreTimeout) {
-        clearTimeout(restoreTimeout);
-      }
-      restoreTimeout = setTimeout(function() {
-        showMeta();
-      }, 120);
-    }
-
-    var interactionEvents = ['pointerdown', 'wheel', 'touchstart', 'keydown'];
-    interactionEvents.forEach(function(eventName) {
-      canvas.addEventListener(eventName, function(event) {
-        if (eventName === 'keydown' && event && event.target && !canvas.contains(event.target)) {
-          return;
-        }
-        hideMeta();
-      });
-    });
-
-    ['pointerleave', 'mouseleave', 'focusout'].forEach(function(eventName) {
-      canvas.addEventListener(eventName, showMeta);
-    });
-
-    ['touchend', 'touchcancel'].forEach(function(eventName) {
-      canvas.addEventListener(eventName, scheduleShow);
-    });
-
-    function handleExternalInteraction(event) {
-      if (!event || !hero.contains(event.target)) {
-        scheduleShow();
-      }
-    }
-
-    document.addEventListener('pointerdown', handleExternalInteraction, true);
-    document.addEventListener('focusin', handleExternalInteraction, true);
-
-    function handleExternalScroll() {
-      scheduleShow();
-    }
-
-    window.addEventListener('scroll', handleExternalScroll, { passive: true, capture: true });
-
-    canvas.__tourHideHeroMeta = hideMeta;
-    canvas.__tourShowHeroMeta = showMeta;
-
-    showMeta();
-  }
-
   function setupInteractionGuard(map, canvas) {
     if (!map || !canvas) {
       return;
@@ -611,9 +525,6 @@
       }
       canvas.classList.remove('tour-map-guarded');
 
-      if (typeof canvas.__tourHideHeroMeta === 'function') {
-        canvas.__tourHideHeroMeta();
-      }
     }
 
     canvas.__activateTourMap = activateMap;
@@ -677,7 +588,6 @@
       attributionControl: true
     });
 
-    setupHeroMetaVisibility(canvas);
     setupInteractionGuard(map, canvas);
 
     L.tileLayer(TILE_LAYER_URL, {
