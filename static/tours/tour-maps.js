@@ -93,8 +93,8 @@
     };
   }
 
-  function createPeakMarkers(map, peaks) {
-    if (!map || !Array.isArray(peaks) || !peaks.length) {
+  function createPeakMarkers(peaks) {
+    if (!Array.isArray(peaks) || !peaks.length) {
       return [];
     }
 
@@ -154,10 +154,192 @@
         });
       }
 
-      marker.addTo(map);
       markers.push(marker);
       return markers;
     }, []);
+  }
+
+  var CLUSTER_ZOOM_RADII = [
+    { maxZoom: 5, radius: 120 },
+    { maxZoom: 7, radius: 100 },
+    { maxZoom: 10, radius: 70 },
+    { maxZoom: 13, radius: 50 },
+    { maxZoom: 15, radius: 30 },
+    { maxZoom: Infinity, radius: 0 }
+  ];
+
+  var CLUSTER_ICON_LEVELS = [
+    { maxCount: 9, className: 'tour-cluster--xs', size: 30 },
+    { maxCount: 24, className: 'tour-cluster--sm', size: 36 },
+    { maxCount: 49, className: 'tour-cluster--md', size: 44 },
+    { maxCount: 99, className: 'tour-cluster--lg', size: 52 },
+    { maxCount: Infinity, className: 'tour-cluster--xl', size: 60 }
+  ];
+
+  function getClusterRadiusForZoom(zoom) {
+    var normalizedZoom = typeof zoom === 'number' && isFinite(zoom) ? zoom : 10;
+    for (var i = 0; i < CLUSTER_ZOOM_RADII.length; i++) {
+      if (normalizedZoom <= CLUSTER_ZOOM_RADII[i].maxZoom) {
+        return CLUSTER_ZOOM_RADII[i].radius;
+      }
+    }
+    return 40;
+  }
+
+  function getClusterIconConfig(count) {
+    var normalizedCount = Math.max(parseInt(count, 10) || 0, 1);
+    for (var i = 0; i < CLUSTER_ICON_LEVELS.length; i++) {
+      if (normalizedCount <= CLUSTER_ICON_LEVELS[i].maxCount) {
+        return CLUSTER_ICON_LEVELS[i];
+      }
+    }
+    return CLUSTER_ICON_LEVELS[CLUSTER_ICON_LEVELS.length - 1];
+  }
+
+  function createClusterIcon(count) {
+    var config = getClusterIconConfig(count);
+    var size = config.size || 36;
+    return L.divIcon({
+      html: '<span>' + count + '</span>',
+      className: 'tour-cluster ' + (config.className || ''),
+      iconSize: [size, size],
+      iconAnchor: [size / 2, size / 2]
+    });
+  }
+
+  function createClusteredPeakLayer(map, markers) {
+    if (!map || !Array.isArray(markers) || !markers.length) {
+      return null;
+    }
+
+    var layerGroup = L.layerGroup().addTo(map);
+    var ready = false;
+    var scheduled = false;
+
+    function buildClusters(zoom) {
+      var radius = getClusterRadiusForZoom(zoom);
+      var clusters = [];
+
+      markers.forEach(function(marker) {
+        if (!marker || !marker.getLatLng) {
+          return;
+        }
+
+        var latLng = marker.getLatLng();
+        if (!latLng) {
+          return;
+        }
+
+        var point = map.project(latLng, zoom);
+        var targetCluster = null;
+
+        for (var i = 0; i < clusters.length; i++) {
+          var candidate = clusters[i];
+          if (candidate.point.distanceTo(point) <= radius) {
+            targetCluster = candidate;
+            break;
+          }
+        }
+
+        if (targetCluster) {
+          var previousCount = targetCluster.count;
+          var newCount = previousCount + 1;
+          targetCluster.point = new L.Point(
+            (targetCluster.point.x * previousCount + point.x) / newCount,
+            (targetCluster.point.y * previousCount + point.y) / newCount
+          );
+          targetCluster.lat = (targetCluster.lat * previousCount + latLng.lat) / newCount;
+          targetCluster.lng = (targetCluster.lng * previousCount + latLng.lng) / newCount;
+          targetCluster.count = newCount;
+          targetCluster.markers.push(marker);
+        } else {
+          clusters.push({
+            point: point,
+            lat: latLng.lat,
+            lng: latLng.lng,
+            count: 1,
+            markers: [marker]
+          });
+        }
+      });
+
+      return clusters;
+    }
+
+    function renderClusters() {
+      scheduled = false;
+      if (!ready) {
+        return;
+      }
+
+      var zoom = map.getZoom();
+      if (typeof zoom !== 'number' || !isFinite(zoom)) {
+        return;
+      }
+
+      var clusters = buildClusters(zoom);
+      layerGroup.clearLayers();
+
+      clusters.forEach(function(cluster) {
+        if (cluster.count === 1) {
+          layerGroup.addLayer(cluster.markers[0]);
+          return;
+        }
+
+        var clusterMarker = L.marker([cluster.lat, cluster.lng], {
+          icon: createClusterIcon(cluster.count),
+          interactive: true,
+          keyboard: false,
+          bubblingMouseEvents: false
+        });
+
+        clusterMarker.on('click', function() {
+          var targetZoom = Math.min((map.getZoom() || 0) + 2, MAX_ZOOM);
+          map.setView(clusterMarker.getLatLng(), targetZoom, { animate: true });
+        });
+
+        clusterMarker.bindTooltip(cluster.count + ' Gipfel in diesem Bereich', {
+          direction: 'top',
+          offset: [0, -18],
+          className: 'tour-peak-tooltip'
+        });
+
+        layerGroup.addLayer(clusterMarker);
+      });
+    }
+
+    function scheduleRender() {
+      if (scheduled) {
+        return;
+      }
+      scheduled = true;
+
+      var scheduleFn = typeof window !== 'undefined' && window.requestAnimationFrame
+        ? window.requestAnimationFrame
+        : function(callback) { setTimeout(callback, 16); };
+
+      scheduleFn(function() {
+        renderClusters();
+      });
+    }
+
+    map.on('zoomend', scheduleRender);
+
+    return {
+      setReady: function(flag) {
+        ready = !!flag;
+        if (ready) {
+          renderClusters();
+        } else {
+          layerGroup.clearLayers();
+        }
+      },
+      refresh: function() {
+        if (ready) {
+          renderClusters();
+        }
+      }
+    };
   }
 
   function attachPeakChipInteractions(map, canvas, peakMarkers) {
@@ -199,6 +381,28 @@
           isProgrammaticMapChange = false;
         }, 0);
       }
+    }
+
+    function openMarkerTooltip(marker) {
+      if (!marker || typeof marker.openTooltip !== 'function') {
+        return;
+      }
+
+      if (marker._map) {
+        marker.openTooltip();
+        return;
+      }
+
+      var onceHandler = function() {
+        map.off('zoomend', onceHandler);
+        map.off('moveend', onceHandler);
+        if (marker._map) {
+          marker.openTooltip();
+        }
+      };
+
+      map.on('zoomend', onceHandler);
+      map.on('moveend', onceHandler);
     }
 
     canvas.__tourRunProgrammaticMapAction = runProgrammaticMapAction;
@@ -249,9 +453,7 @@
         map.setView(latLng, MAX_ZOOM, { animate: true });
       });
 
-      if (peakMarkers[idx].openTooltip) {
-        peakMarkers[idx].openTooltip();
-      }
+      openMarkerTooltip(peakMarkers[idx]);
     }
 
     function handleManualMapInteraction() {
@@ -434,6 +636,7 @@
 
     var peakData = parsePeaksData(canvas);
     var peakMarkers = [];
+    var peakClusterController = null;
     var hiddenMarkerIcon = L.divIcon({
       className: 'tour-hidden-marker',
       iconSize: [0, 0]
@@ -487,10 +690,19 @@
     });
 
     if (peakData.length) {
-      peakMarkers = createPeakMarkers(map, peakData);
+      peakMarkers = createPeakMarkers(peakData);
     }
 
     if (peakMarkers.length) {
+      peakClusterController = createClusteredPeakLayer(map, peakMarkers);
+      if (!peakClusterController) {
+        peakMarkers.forEach(function(marker) {
+          if (marker && marker.addTo) {
+            marker.addTo(map);
+          }
+        });
+      }
+
       attachPeakChipInteractions(map, canvas, peakMarkers);
     }
 
@@ -510,6 +722,10 @@
 
         log('[Tours] Fitting map to bounds');
         map.fitBounds(bounds, { padding: BOUNDS_PADDING });
+
+        if (peakClusterController && typeof peakClusterController.setReady === 'function') {
+          peakClusterController.setReady(true);
+        }
 
         var defaultBounds = L.latLngBounds(bounds.getSouthWest(), bounds.getNorthEast());
         map.__tourDefaultBounds = defaultBounds;

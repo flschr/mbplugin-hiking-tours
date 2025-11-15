@@ -265,6 +265,54 @@
   box-shadow: 0 10px 25px rgba(15, 23, 42, 0.3);
 }
 
+.tour-cluster {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  color: #0f172a;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  border: 2px solid rgba(248, 250, 252, 0.95);
+  box-shadow: 0 15px 35px rgba(15, 23, 42, 0.35);
+  cursor: pointer;
+  text-align: center;
+  background: linear-gradient(145deg, #e2e8f0, #cbd5f5);
+}
+
+.tour-cluster span {
+  display: block;
+  width: 100%;
+  font-size: 0.85rem;
+}
+
+.tour-cluster--xs {
+  background: linear-gradient(145deg, #bbf7d0, #86efac);
+  font-size: 0.75rem;
+}
+
+.tour-cluster--sm {
+  background: linear-gradient(145deg, #86efac, #4ade80);
+  font-size: 0.85rem;
+}
+
+.tour-cluster--md {
+  background: linear-gradient(145deg, #fde047, #facc15);
+  font-size: 0.9rem;
+}
+
+.tour-cluster--lg {
+  background: linear-gradient(145deg, #fdba74, #fb923c);
+  color: #1f2937;
+  font-size: 0.95rem;
+}
+
+.tour-cluster--xl {
+  background: linear-gradient(145deg, #f87171, #ef4444);
+  color: #fff1f2;
+  font-size: 1rem;
+}
+
 .leaflet-tooltip.tour-peak-tooltip {
   background: rgba(15, 23, 42, 0.92);
   color: #ecfdf5;
