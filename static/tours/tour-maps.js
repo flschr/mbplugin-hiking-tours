@@ -131,11 +131,47 @@
     }
 
     var chipList = Array.prototype.slice.call(chips);
+    var activeChip = null;
+    var activeMarkerIndex = null;
+    var isProgrammaticMapChange = false;
 
-    function setActiveChip(activeChip) {
+    function updateChipStates() {
       chipList.forEach(function(chip) {
         chip.classList.toggle('tour-peak-chip--active', chip === activeChip);
       });
+    }
+
+    function runProgrammaticMapAction(action) {
+      if (typeof action !== 'function') {
+        return;
+      }
+
+      isProgrammaticMapChange = true;
+      try {
+        action();
+      } finally {
+        setTimeout(function() {
+          isProgrammaticMapChange = false;
+        }, 0);
+      }
+    }
+
+    canvas.__tourRunProgrammaticMapAction = runProgrammaticMapAction;
+
+    function clearActiveChip(options) {
+      options = options || {};
+
+      if (activeMarkerIndex !== null && peakMarkers[activeMarkerIndex] && peakMarkers[activeMarkerIndex].closeTooltip) {
+        peakMarkers[activeMarkerIndex].closeTooltip();
+      }
+
+      activeChip = null;
+      activeMarkerIndex = null;
+      updateChipStates();
+
+      if (options.resetView && typeof canvas.__tourResetToDefaultView === 'function') {
+        canvas.__tourResetToDefaultView();
+      }
     }
 
     function focusPeak(index, sourceChip) {
@@ -143,6 +179,13 @@
       if (isNaN(idx) || !peakMarkers[idx] || !peakMarkers[idx].getLatLng) {
         return;
       }
+
+      if (sourceChip === activeChip) {
+        clearActiveChip({ resetView: true });
+        return;
+      }
+
+      clearActiveChip();
 
       if (typeof canvas.__activateTourMap === 'function') {
         canvas.__activateTourMap();
@@ -153,13 +196,28 @@
         return;
       }
 
-      map.setView(latLng, MAX_ZOOM, { animate: true });
+      activeChip = sourceChip;
+      activeMarkerIndex = idx;
+      updateChipStates();
+
+      runProgrammaticMapAction(function() {
+        map.setView(latLng, MAX_ZOOM, { animate: true });
+      });
+
       if (peakMarkers[idx].openTooltip) {
         peakMarkers[idx].openTooltip();
       }
-
-      setActiveChip(sourceChip);
     }
+
+    function handleManualMapInteraction() {
+      if (isProgrammaticMapChange) {
+        return;
+      }
+      clearActiveChip();
+    }
+
+    map.on('movestart', handleManualMapInteraction);
+    map.on('zoomstart', handleManualMapInteraction);
 
     chipList.forEach(function(chip) {
       chip.addEventListener('click', function() {
@@ -331,6 +389,22 @@
 
         log('[Tours] Fitting map to bounds');
         map.fitBounds(bounds, { padding: BOUNDS_PADDING });
+
+        var defaultBounds = L.latLngBounds(bounds.getSouthWest(), bounds.getNorthEast());
+        map.__tourDefaultBounds = defaultBounds;
+        canvas.__tourResetToDefaultView = function() {
+          var resetAction = function() {
+            if (map.__tourDefaultBounds && map.__tourDefaultBounds.isValid()) {
+              map.fitBounds(map.__tourDefaultBounds, { padding: BOUNDS_PADDING });
+            }
+          };
+
+          if (typeof canvas.__tourRunProgrammaticMapAction === 'function') {
+            canvas.__tourRunProgrammaticMapAction(resetAction);
+          } else {
+            resetAction();
+          }
+        };
 
         // Single invalidateSize after bounds are set
         requestAnimationFrame(function() {

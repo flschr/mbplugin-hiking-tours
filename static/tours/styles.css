@@ -439,12 +439,30 @@
   cursor: pointer;
 }
 
+.tour-peak-chip--action.tour-peak-chip--active {
+  background: #2563eb;
+  border-color: #1d4ed8;
+  color: #ffffff;
+}
+
+.tour-peak-chip--action.tour-peak-chip--active .tour-peak-chip-number {
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: none;
+}
+
 .tour-peak-chip--action:hover,
 .tour-peak-chip--action:focus-visible {
   background: #e2e8f0;
   border-color: rgba(15, 23, 42, 0.35);
   color: #0f172a;
   outline: none;
+}
+
+.tour-peak-chip--action.tour-peak-chip--active:hover,
+.tour-peak-chip--action.tour-peak-chip--active:focus-visible {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  color: #ffffff;
 }
 
 .tour-peak-chip--static {
