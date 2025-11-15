@@ -178,10 +178,14 @@
     <div class="tour-peaks">
       <p class="tour-section-label">Bestiegene Gipfel</p>
       <div class="tour-peaks-chips">
-        {{- range split $peaks ";" -}}
-          {{- $peak := trim . " " -}}
+        {{- $peakList := split $peaks ";" -}}
+        {{- range $index, $value := $peakList -}}
+          {{- $peak := trim $value " " -}}
           {{- if $peak -}}
-          <span class="tour-peak-chip">{{ $peak | htmlEscape }}</span>
+          <span class="tour-peak-chip">
+            <span class="tour-peak-chip-number">{{ add $index 1 }}</span>
+            <span class="tour-peak-chip-label">{{ $peak | htmlEscape }}</span>
+          </span>
           {{- end -}}
         {{- end -}}
       </div>

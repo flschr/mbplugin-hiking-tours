@@ -51,7 +51,7 @@
 .tour-card-heading {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.6rem;
 }
 
 .tour-card-title {
@@ -285,13 +285,32 @@
 }
 
 .tour-peak-chip {
-  padding: 0.4rem 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.8rem;
   border-radius: var(--tour-radius-pill);
   background: var(--tour-header-bg);
   color: #ecfdf5;
   border: 1px solid rgba(236, 253, 245, 0.35);
   font-weight: 600;
   font-size: 0.85rem;
+}
+
+.tour-peak-chip-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.55rem;
+  height: 1.55rem;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.35);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.tour-peak-chip-label {
+  white-space: nowrap;
 }
 
 .tour-links {
