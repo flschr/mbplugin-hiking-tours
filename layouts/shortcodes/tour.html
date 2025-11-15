@@ -20,15 +20,17 @@
 {{- $bergfexUrl := .Get "bergfex_url" -}}
 {{- $peaksRaw := .Get "peaks" -}}
 
-{{- /* Detect feed / non-HTML outputs (RSS, JSON, Atom). Use $ to access the
-     original shortcode context, which provides reliable access to page data. */ -}}
-{{- $outputFormatName := "" -}}
-{{- with $.Page.OutputFormat -}}
-  {{- with .Name -}}
-    {{- $outputFormatName = lower . -}}
+{{- /* Detect feed / non-HTML outputs (RSS, JSON, Atom). Check if the page has
+     non-HTML output formats configured. */ -}}
+{{- $isFeedOutput := false -}}
+{{- with $.Page.OutputFormats -}}
+  {{- range . -}}
+    {{- $formatName := lower .Name -}}
+    {{- if or (eq $formatName "rss") (eq $formatName "json") (eq $formatName "atom") -}}
+      {{- $isFeedOutput = true -}}
+    {{- end -}}
   {{- end -}}
 {{- end -}}
-{{- $isFeedOutput := or (eq $outputFormatName "rss") (eq $outputFormatName "json") (eq $outputFormatName "atom") -}}
 
 {{- /* Load assets only for regular HTML output */ -}}
 {{- if not $isFeedOutput -}}
