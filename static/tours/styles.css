@@ -14,7 +14,7 @@
   --tour-card-bg: #ffffff;
   --tour-card-border: #dce3ec;
   --tour-card-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
-  --tour-header-gradient: linear-gradient(135deg, #0f5f36, #2d8a48);
+  --tour-header-bg: #0f5f36;
   --tour-muted-bg: #f4f7fb;
   --tour-pill-bg: rgba(255, 255, 255, 0.18);
   --tour-pill-color: #ecfeff;
@@ -25,6 +25,7 @@
   --tour-radius-card: 0.45rem;
   --tour-radius-content: 0.35rem;
   --tour-radius-pill: 1.5rem;
+  --tour-card-text: #0f172a;
 }
 
 .tour-box {
@@ -34,12 +35,12 @@
   background: var(--tour-card-bg);
   box-shadow: var(--tour-card-shadow);
   overflow: hidden;
-  color: #0f172a;
+  color: var(--tour-card-text);
 }
 
 .tour-card-header {
   padding: 2rem;
-  background: var(--tour-header-gradient);
+  background: var(--tour-header-bg);
   color: #ecfdf5;
   display: flex;
   flex-direction: column;
@@ -156,6 +157,7 @@
   border-radius: var(--tour-radius-pill);
   background: rgba(15, 23, 42, 0.8);
   color: #f8fafc;
+  border: 1px solid rgba(248, 250, 252, 0.35);
   font-size: 0.8rem;
   text-decoration: none;
   font-weight: 600;
@@ -166,6 +168,17 @@
 .map-action-btn:hover {
   background: #0ea5e9;
   transform: translateY(-1px);
+}
+
+.map-action-btn--bergfex {
+  background: #ffffff;
+  color: #0f172a;
+  border-color: rgba(15, 23, 42, 0.15);
+}
+
+.map-action-btn--bergfex:hover {
+  background: #f8fafc;
+  color: #0f172a;
 }
 
 .map-error {
@@ -549,5 +562,65 @@
 
   .stat-value {
     font-size: 1.5rem;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --tour-card-bg: #0b1120;
+    --tour-card-border: #1f2937;
+    --tour-card-shadow: 0 18px 45px rgba(0, 0, 0, 0.6);
+    --tour-header-bg: #174131;
+    --tour-muted-bg: #111827;
+    --tour-card-text: #e2e8f0;
+    --tour-pill-bg: rgba(255, 255, 255, 0.15);
+    --tour-pill-color: #f0fdf4;
+  }
+
+  .tour-box {
+    color: var(--tour-card-text);
+  }
+
+  .tour-card-visuals {
+    background: var(--tour-muted-bg);
+  }
+
+  .tour-card-map,
+  .tour-cover {
+    box-shadow: 0 18px 35px rgba(0, 0, 0, 0.55);
+  }
+
+  .tour-stat-card {
+    background: rgba(15, 23, 42, 0.65);
+    border-color: #334155;
+  }
+
+  .stat-label,
+  .tour-section-label {
+    color: #94a3b8;
+  }
+
+  .stat-value,
+  .stat-unit {
+    color: #f8fafc;
+  }
+
+  .tour-peak-chip {
+    background: rgba(45, 212, 191, 0.25);
+    color: #a7f3d0;
+  }
+
+  .map-action-btn {
+    background: rgba(15, 23, 42, 0.85);
+    border-color: rgba(148, 163, 184, 0.5);
+  }
+
+  .map-action-btn:hover {
+    background: rgba(15, 23, 42, 1);
+  }
+
+  .map-action-btn--bergfex {
+    border-color: rgba(255, 255, 255, 0.35);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
   }
 }

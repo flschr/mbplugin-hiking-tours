@@ -109,18 +109,18 @@
         <div class="tour-item-meta">
           {{- $metaParts := slice -}}
 
-          {{- if .region -}}
-            {{- $metaParts = $metaParts | append (.region | htmlEscape) -}}
-          {{- end -}}
+        {{- if .date -}}
+          {{- $parsedDate := time.AsTime .date -}}
+          {{- $formattedDate := $parsedDate.Format "02.01.2006" -}}
+          {{- $metaParts = $metaParts | append $formattedDate -}}
+        {{- end -}}
 
-          {{- if .date -}}
-            {{- $parsedDate := time.AsTime .date -}}
-            {{- $formattedDate := $parsedDate.Format "02.01.2006" -}}
-            {{- $metaParts = $metaParts | append $formattedDate -}}
-          {{- end -}}
+        {{- if .region -}}
+          {{- $metaParts = $metaParts | append (.region | htmlEscape) -}}
+        {{- end -}}
 
-          {{- if .type -}}
-            {{- $typeLabel := .type -}}
+        {{- if .type -}}
+          {{- $typeLabel := .type -}}
             {{- if eq .type "hike" -}}{{ $typeLabel = "Hike" -}}
             {{- else if eq .type "mtb" -}}{{ $typeLabel = "MTB" -}}
             {{- else if eq .type "gravel" -}}{{ $typeLabel = "Gravel" -}}

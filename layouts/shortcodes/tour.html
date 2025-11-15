@@ -53,8 +53,21 @@
   <div class="tour-card-header">
     <div class="tour-card-heading">
       <h3 class="tour-card-title">{{ $title | htmlEscape }}</h3>
-      {{- if or $region (or $formattedDate $type) -}}
+      {{- $hasMeta := or $formattedDate (or $region $type) -}}
+      {{- if $hasMeta -}}
       <div class="tour-card-region">
+        {{- if $formattedDate -}}
+        <span class="tour-region-meta">
+          <svg class="tour-meta-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M7.5 3.75V2.25M16.5 3.75V2.25M6 7.5h12M5.25 6h13.5a1.5 1.5 0 0 1 1.5 1.5V19.5a1.5 1.5 0 0 1-1.5 1.5H5.25A1.5 1.5 0 0 1 3.75 19.5V7.5A1.5 1.5 0 0 1 5.25 6zM9 11.25h6v6h-6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <span>{{ $formattedDate }}</span>
+        </span>
+        {{- if or $region $type -}}
+        <span class="tour-meta-divider" aria-hidden="true">·</span>
+        {{- end -}}
+        {{- end -}}
+
         {{- if $region -}}
         <span class="tour-region-meta">
           <svg class="tour-meta-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -62,24 +75,12 @@
           </svg>
           <span>{{ $region | htmlEscape }}</span>
         </span>
-        {{- end -}}
-
-        {{- if $formattedDate -}}
-        {{- if $region -}}
+        {{- if $type -}}
         <span class="tour-meta-divider" aria-hidden="true">·</span>
         {{- end -}}
-        <span class="tour-region-meta">
-          <svg class="tour-meta-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M7.5 3.75V2.25M16.5 3.75V2.25M6 7.5h12M5.25 6h13.5a1.5 1.5 0 0 1 1.5 1.5V19.5a1.5 1.5 0 0 1-1.5 1.5H5.25A1.5 1.5 0 0 1 3.75 19.5V7.5A1.5 1.5 0 0 1 5.25 6zM9 11.25h6v6h-6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-          <span>{{ $formattedDate }}</span>
-        </span>
         {{- end -}}
 
         {{- if $type -}}
-        {{- if or $region $formattedDate -}}
-        <span class="tour-meta-divider" aria-hidden="true">·</span>
-        {{- end -}}
         <span class="tour-region-meta">
           <svg class="tour-meta-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M6 3v18M6 4.5h9l-2 4 2 4H6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
@@ -117,7 +118,7 @@
         {{- end -}}
 
         {{- if $bergfexUrl -}}
-        <a href="{{ $bergfexUrl | htmlEscape }}" target="_blank" rel="noopener noreferrer" class="map-action-btn" title="Auf Bergfex ansehen">
+        <a href="{{ $bergfexUrl | htmlEscape }}" target="_blank" rel="noopener noreferrer" class="map-action-btn map-action-btn--bergfex" title="Auf Bergfex ansehen">
           <span>Bergfex</span>
         </a>
         {{- end -}}
