@@ -315,6 +315,36 @@
   gap: 0.4rem;
   text-decoration: none;
   font: inherit;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.15);
+  padding: 0.35rem 0.85rem;
+  background: rgba(15, 23, 42, 0.02);
+  color: inherit;
+  transition: background-color 0.2s ease, color 0.2s ease,
+    border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tour-peak-button:focus-visible {
+  outline: 2px solid var(--tour-accent);
+  outline-offset: 2px;
+}
+
+.tour-peak-button:hover,
+.tour-peak-button:focus-visible,
+.tour-peak-button[aria-pressed="true"] {
+  background: var(--tour-accent);
+  color: #fff;
+  border-color: var(--tour-accent);
+  box-shadow: 0 10px 25px rgba(0, 148, 255, 0.25);
+}
+
+.tour-peak-button[aria-disabled="true"],
+.tour-peak-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: rgba(15, 23, 42, 0.04);
+  border-color: rgba(15, 23, 42, 0.12);
+  color: inherit;
 }
 
 .tour-peak-number {
@@ -510,11 +540,31 @@
     --tour-marker-text: #0b1120;
   }
 
+  .tour-peak-button {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.04);
+  }
+
   .tour-card-visuals {
     background: rgba(255, 255, 255, 0.02);
   }
 
   /* Dark mode: Invert pin button colors on hover and active */
+  .tour-peak-button:hover,
+  .tour-peak-button:focus-visible,
+  .tour-peak-button[aria-pressed="true"] {
+    background: #38bdf8;
+    color: #0b1120;
+    border-color: #38bdf8;
+    box-shadow: 0 12px 28px rgba(56, 189, 248, 0.35);
+  }
+
+  .tour-peak-button[aria-disabled="true"],
+  .tour-peak-button:disabled {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+
   .tour-peak-button:hover .tour-peak-number,
   .tour-peak-button[aria-pressed="true"] .tour-peak-number {
     background: #0b1120;
