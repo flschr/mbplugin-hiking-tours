@@ -126,13 +126,13 @@
       {{- if $hasMeta -}}
       <p class="tour-card-meta">
         {{- if $typeLabel -}}
-        <span>{{ $typeLabel | htmlEscape }}</span>
+        <span class="tour-card-meta-type">{{ $typeLabel | upper | htmlEscape }}</span>
         {{- end -}}
         {{- if and $typeLabel $region -}}
         <span class="tour-card-meta-separator">,</span>
         {{- end -}}
         {{- if $region -}}
-        <span>{{ $region | htmlEscape }}</span>
+        <span class="tour-card-meta-region">{{ $region | upper | htmlEscape }}</span>
         {{- end -}}
       </p>
       {{- end -}}
