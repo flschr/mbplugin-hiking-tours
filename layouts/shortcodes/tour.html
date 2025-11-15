@@ -63,9 +63,6 @@
           </svg>
           <span>{{ $formattedDate }}</span>
         </span>
-        {{- if or $region $type -}}
-        <span class="tour-meta-divider" aria-hidden="true">·</span>
-        {{- end -}}
         {{- end -}}
 
         {{- if $region -}}
@@ -75,9 +72,6 @@
           </svg>
           <span>{{ $region | htmlEscape }}</span>
         </span>
-        {{- if $type -}}
-        <span class="tour-meta-divider" aria-hidden="true">·</span>
-        {{- end -}}
         {{- end -}}
 
         {{- if $type -}}

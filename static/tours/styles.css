@@ -66,22 +66,20 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.9rem;
-  color: rgba(236, 253, 245, 0.9);
 }
 
 .tour-region-meta {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  line-height: 1.2;
-}
-
-.tour-meta-divider {
-  color: rgba(236, 253, 245, 0.65);
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--tour-radius-pill);
+  background: var(--tour-pill-bg);
+  border: 1px solid rgba(236, 253, 245, 0.3);
+  color: rgba(236, 253, 245, 0.95);
+  font-size: 0.85rem;
   font-weight: 600;
-  font-size: 1rem;
-  line-height: 1;
+  line-height: 1.2;
 }
 
 .tour-meta-icon {
