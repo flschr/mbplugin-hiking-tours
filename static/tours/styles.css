@@ -510,52 +510,15 @@
   gap: 0.45rem;
   padding: 0.35rem 0.75rem;
   border-radius: var(--tour-radius-content);
-  background: var(--tour-muted-bg);
-  color: #0f172a;
-  border: 1px solid rgba(148, 163, 184, 0.45);
   font-weight: 600;
   font-size: 0.85rem;
   font-family: inherit;
   line-height: 1.2;
-  cursor: default;
   text-decoration: none;
-  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
-  appearance: none;
-  background-clip: padding-box;
-}
-
-.tour-peak-chip--action {
-  cursor: pointer;
-}
-
-.tour-peak-chip--action.tour-peak-chip--active {
-  background: #2563eb;
-  border-color: #1565c0;
-  color: #ffffff;
-}
-
-.tour-peak-chip--action.tour-peak-chip--active .tour-peak-chip-number {
-  background: rgba(255, 255, 255, 0.2);
-  box-shadow: none;
-}
-
-.tour-peak-chip--action:hover,
-.tour-peak-chip--action:focus-visible {
-  background: #e2e8f0;
-  border-color: rgba(15, 23, 42, 0.35);
-  color: #0f172a;
-  outline: none;
-}
-
-.tour-peak-chip--action.tour-peak-chip--active:hover,
-.tour-peak-chip--action.tour-peak-chip--active:focus-visible {
-  background: #1565c0;
-  border-color: #1565c0;
-  color: #ffffff;
 }
 
 .tour-peak-chip--static {
-  cursor: default;
+  pointer-events: none;
 }
 
 .tour-peak-chip-number {
@@ -878,7 +841,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --tour-accent: #174131;
+    --tour-accent: #0094ff;
     --tour-card-bg: #0b1120;
     --tour-card-border: #1f2937;
     --tour-card-shadow: none;
@@ -926,12 +889,6 @@
   .tour-stat-card .stat-value,
   .tour-stat-card .stat-unit {
     color: #f8fafc;
-  }
-
-  .tour-peak-chip {
-    background: var(--tour-header-bg);
-    color: #ecfdf5;
-    border-color: rgba(236, 253, 245, 0.25);
   }
 
   .map-action-btn {

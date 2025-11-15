@@ -365,6 +365,7 @@
     function updateChipStates() {
       chipList.forEach(function(chip) {
         chip.classList.toggle('tour-peak-chip--active', chip === activeChip);
+        chip.setAttribute('aria-pressed', chip === activeChip ? 'true' : 'false');
       });
     }
 

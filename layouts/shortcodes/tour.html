@@ -223,6 +223,7 @@
           {{- if $hasCoords -}}
           <button type="button"
                   class="tour-peak-chip tour-peak-chip--action"
+                  aria-pressed="false"
                   data-peak-index="{{ $peakMapIndex }}"
                   data-peak-lat="{{ $peak.lat | htmlEscape }}"
                   data-peak-lng="{{ $peak.lng | htmlEscape }}"
@@ -232,10 +233,13 @@
           </button>
           {{- $peakMapIndex = add $peakMapIndex 1 -}}
           {{- else -}}
-          <span class="tour-peak-chip tour-peak-chip--static">
+          <button type="button"
+                  class="tour-peak-chip tour-peak-chip--static"
+                  disabled
+                  aria-disabled="true">
             <span class="tour-peak-chip-number">{{ add $index 1 }}</span>
             <span class="tour-peak-chip-label">{{ $peak.label | htmlEscape }}</span>
-          </span>
+          </button>
           {{- end -}}
         {{- end -}}
       </div>
