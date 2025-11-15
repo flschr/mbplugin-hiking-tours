@@ -27,6 +27,15 @@
   <link rel="stylesheet" href="{{ "tours/styles.css" | relURL }}" />
 {{- end -}}
 
+{{- /* Load map dependencies (Leaflet + fallback script) once */ -}}
+{{- if not (.Page.Scratch.Get "tour-map-assets-loaded") -}}
+  {{- .Page.Scratch.Set "tour-map-assets-loaded" true -}}
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha512-sA+4wI1z88LHg0CQ7YvyZr++VXjjhMVekjwXeRtigQ2nXrjXFdV7c40YQUhCEV4nWw2BNbWhv1M8M9O4n9g3g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha512-bxkBkayh3CC0MsGFbFDax3XIozzBn8wtPFQyu1HFDaRao7IhiHBpjz2uVH54camzatoorktr1cGIs3bN5wQ1xQ==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet-gpx@1.7.0/gpx.min.js" integrity="sha512-ayM8YGtS+wGGyRyvE4s46HoPazTA/gkGEXUXMaLLq5yRvCNrI6VsgGAaHo9dZYkTfGZNVVRFlE0YyqS/fWznGQ==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+  <script src="{{ "tours/tour-maps.js" | relURL }}" defer></script>
+{{- end -}}
+
 {{- $formattedDate := "" -}}
 {{- if $date -}}
   {{- $parsedDate := time.AsTime $date -}}
@@ -49,6 +58,7 @@
   {{- $mapImage = printf "/maps/%s.png" $id -}}
 {{- end -}}
 {{- $hasMapImage := and $mapImage (ne $mapImage "") -}}
+{{- $shouldRenderDynamicMap := and $gpx (ne $gpx "") -}}
 
 {{- $peaksRawTrimmed := "" -}}
 {{- if $peaksRaw -}}
@@ -94,12 +104,22 @@
     </div>
   </div>
 
-  {{- if $hasMapImage -}}
+  {{- if or $hasMapImage $shouldRenderDynamicMap -}}
   <div class="tour-card-map tour-card-map--full">
+    {{- if $hasMapImage -}}
     <img src="{{ $mapImage | htmlEscape }}"
          alt="Map of {{ $title | htmlEscape }}"
          class="tour-map-static"
-         loading="lazy" />
+         loading="lazy"
+         data-tour-map-image
+         {{- if $shouldRenderDynamicMap -}}
+         data-fallback-map="true"
+         {{- end -}} />
+    {{- end -}}
+
+    {{- if $shouldRenderDynamicMap -}}
+    <div class="tour-map-dynamic" data-tour-map-canvas data-gpx="{{ $gpx | htmlEscape }}" {{ if $hasMapImage }}hidden{{ end }}></div>
+    {{- end -}}
 
     {{- if or $gpx $bergfexUrl -}}
     <div class="tour-map-actions">

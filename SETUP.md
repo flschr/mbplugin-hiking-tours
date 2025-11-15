@@ -10,20 +10,9 @@ This guide walks you through setting up the fischr Tours plugin for Micro.blog.
 2. Add repository: `https://github.com/flschr/mbplugin-fischr-tours`
 3. Click **Install**
 
-### 1.2 Download Leaflet Libraries
+### 1.2 Leaflet Libraries
 
-⚠️ **IMPORTANT**: The plugin requires Leaflet libraries for maps to work.
-
-From your local clone of this repo, run:
-
-```bash
-cd static/tours
-curl -o leaflet.css https://unpkg.com/leaflet@1.9.4/dist/leaflet.css
-curl -o leaflet.js https://unpkg.com/leaflet@1.9.4/dist/leaflet.js
-curl -o leaflet-gpx.js https://cdn.jsdelivr.net/npm/leaflet-gpx@1.7.0/gpx.min.js
-```
-
-Commit and push these files to the plugin repo.
+Leaflet and the GPX helper are now loaded directly from trusted CDNs by the shortcode. No manual downloads are required.
 
 ### 1.3 Create Tours Page
 
@@ -64,6 +53,14 @@ ssh-keygen -t ed25519 -C "tours-actions" -f tours-key -N ""
 **Add to backup repo** (Settings → Secrets → Actions):
 - Name: `PLUGIN_DEPLOY_KEY`
 - Value: Contents of `tours-key` (private key)
+
+#### Mapbox Access Token (Required)
+
+1. Create or log into your Mapbox account at [account.mapbox.com](https://account.mapbox.com/)
+2. Generate a new access token with **Styles: Read** access (Static Images API is included by default)
+3. Add the token to your backup repo secrets as `MAPBOX_ACCESS_TOKEN`
+
+> The GitHub Action uses this token when `generate-map-images.js` calls the Mapbox Static Image API. Without it, static PNGs will not be created.
 
 ### 2.3 Edit Workflow Configuration
 
@@ -133,6 +130,7 @@ The views from the summit were incredible...
 - [ ] Tours page created at `/tours/`
 - [ ] Workflow files copied to backup repo
 - [ ] Secrets configured (PLUGIN_DEPLOY_KEY)
+- [ ] Secrets configured (MAPBOX_ACCESS_TOKEN)
 - [ ] Workflow environment variables updated
 - [ ] Test workflow run completed successfully
 - [ ] First tour post published
@@ -143,6 +141,10 @@ The views from the summit were incredible...
 
 ### Maps not showing
 → Check that Leaflet libraries were downloaded (see 1.2)
+
+### Static map workflow failing
+→ Ensure the `MAPBOX_ACCESS_TOKEN` secret is present in your backup repo
+→ Check the GitHub Action logs for Mapbox HTTP errors or quota issues
 
 ### Tours page shows "No tours yet"
 → Run workflow manually to generate tours.json

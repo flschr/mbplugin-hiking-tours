@@ -148,6 +148,27 @@
   object-fit: cover;
 }
 
+.tour-map-static--hidden {
+  display: none;
+}
+
+.tour-map-dynamic {
+  width: 100%;
+  min-height: 220px;
+  aspect-ratio: 2.6 / 1;
+  border-radius: 0;
+  overflow: hidden;
+  background: #0f172a;
+}
+
+.tour-map-dynamic--visible {
+  display: block;
+}
+
+.tour-card-map--dynamic {
+  background: #0f172a;
+}
+
 .tour-map-actions {
   position: absolute;
   bottom: 1rem;

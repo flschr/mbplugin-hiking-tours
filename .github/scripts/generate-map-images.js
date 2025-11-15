@@ -1,27 +1,34 @@
 #!/usr/bin/env node
 
 /**
- * Generate Static Map Images from GPX Files
- *
- * This script:
- * 1. Finds all GPX files referenced in tours.json
- * 2. Generates static map images (PNG) with the GPX track rendered
- * 3. Saves images to static/maps/ directory in the plugin repo
- *
- * Uses staticmaps package to generate images without external API keys.
+ * Generate Static Map Images from GPX Files using Mapbox Static Image API
  */
 
 const fs = require('fs');
 const path = require('path');
+const https = require('https');
 const { DOMParser } = require('xmldom');
-const StaticMaps = require('staticmaps');
+const polyline = require('@mapbox/polyline');
 
 // Configuration
 const PLUGIN_REPO_DIR = process.env.PLUGIN_REPO_DIR || './mbplugin-fischr-tours';
 const TOURS_JSON = './tours.json';
 const MAP_OUTPUT_DIR = path.join(PLUGIN_REPO_DIR, 'static', 'maps');
-const MAP_WIDTH = 800;
-const MAP_HEIGHT = 400;
+const MAP_WIDTH = parseInt(process.env.MAP_IMAGE_WIDTH || '800', 10);
+const MAP_HEIGHT = parseInt(process.env.MAP_IMAGE_HEIGHT || '400', 10);
+const MAP_PADDING = process.env.MAPBOX_PADDING || '80,80,80,80';
+const MAPBOX_STYLE = process.env.MAPBOX_STYLE || 'mapbox/outdoors-v11';
+const MAPBOX_LINE_COLOR = (process.env.MAPBOX_PATH_COLOR || '#0ea5e9').replace('#', '');
+const MAPBOX_LINE_WIDTH = parseInt(process.env.MAPBOX_PATH_WIDTH || '5', 10);
+const MAPBOX_LINE_OPACITY = process.env.MAPBOX_PATH_OPACITY || '1';
+const MAPBOX_ACCESS_TOKEN = process.env.MAPBOX_ACCESS_TOKEN;
+const MAX_POLYLINE_POINTS = parseInt(process.env.MAPBOX_MAX_POLYLINE_POINTS || '500', 10);
+const MAPBOX_EXTRA_QUERY = process.env.MAPBOX_EXTRA_QUERY || 'logo=false&attribution=false';
+
+if (!MAPBOX_ACCESS_TOKEN) {
+  console.error('Error: MAPBOX_ACCESS_TOKEN environment variable is required to generate static maps.');
+  process.exit(1);
+}
 
 /**
  * Parse GPX file and extract track points
@@ -42,7 +49,7 @@ function parseGpxFile(gpxPath) {
       const lat = parseFloat(point.getAttribute('lat'));
       const lon = parseFloat(point.getAttribute('lon'));
 
-      if (!isNaN(lat) && !isNaN(lon)) {
+      if (!Number.isNaN(lat) && !Number.isNaN(lon)) {
         trackPoints.push({ lat, lon });
       }
     }
@@ -55,6 +62,67 @@ function parseGpxFile(gpxPath) {
 }
 
 /**
+ * Reduce track points so Mapbox URL remains within limits
+ * @param {Array<{lat: number, lon: number}>} points
+ * @returns {Array<{lat: number, lon: number}>}
+ */
+function clampTrackPoints(points) {
+  if (points.length <= MAX_POLYLINE_POINTS) {
+    return points;
+  }
+
+  const step = Math.ceil(points.length / MAX_POLYLINE_POINTS);
+  const reduced = [];
+
+  for (let i = 0; i < points.length; i += step) {
+    reduced.push(points[i]);
+  }
+
+  const lastPoint = points[points.length - 1];
+  const reducedLast = reduced[reduced.length - 1];
+  if (lastPoint && (!reducedLast || reducedLast.lat !== lastPoint.lat || reducedLast.lon !== lastPoint.lon)) {
+    reduced.push(lastPoint);
+  }
+
+  return reduced;
+}
+
+/**
+ * Build encoded polyline for Mapbox
+ * @param {Array<{lat: number, lon: number}>} points
+ * @returns {string|null}
+ */
+function buildPolyline(points) {
+  if (!points.length) {
+    return null;
+  }
+
+  const geoJson = {
+    type: 'Feature',
+    geometry: {
+      type: 'LineString',
+      coordinates: points.map((p) => [p.lon, p.lat]),
+    },
+  };
+
+  const encoded = polyline.fromGeoJSON(geoJson).replace(/\?/g, '%3F');
+  return encoded;
+}
+
+/**
+ * Build the Mapbox Static Image API URL
+ * @param {string} encodedPolyline
+ * @returns {string}
+ */
+function buildMapboxUrl(encodedPolyline) {
+  const safeWidth = Math.max(1, MAPBOX_LINE_WIDTH);
+  const stroke = `path-${safeWidth}+${MAPBOX_LINE_COLOR}-${MAPBOX_LINE_OPACITY}`;
+  const baseUrl = `https://api.mapbox.com/styles/v1/${MAPBOX_STYLE}/static/${stroke}(${encodedPolyline})/auto/${MAP_WIDTH}x${MAP_HEIGHT}?padding=${MAP_PADDING}`;
+  const extraQuery = MAPBOX_EXTRA_QUERY ? `&${MAPBOX_EXTRA_QUERY}` : '';
+  return `${baseUrl}${extraQuery}&access_token=${MAPBOX_ACCESS_TOKEN}`;
+}
+
+/**
  * Generate static map image for a tour
  * @param {Object} tour - Tour object from tours.json
  * @param {string} gpxFilePath - Full path to GPX file
@@ -62,48 +130,61 @@ function parseGpxFile(gpxPath) {
 async function generateMapImage(tour, gpxFilePath) {
   console.log(`Generating map for tour: ${tour.id}`);
 
-  // Parse GPX
-  const trackPoints = parseGpxFile(gpxFilePath);
+  const trackPoints = clampTrackPoints(parseGpxFile(gpxFilePath));
 
   if (trackPoints.length === 0) {
     console.warn(`No valid track points found in ${gpxFilePath}`);
     return;
   }
 
-  // Sample points to avoid too many (keep every 5th point for performance)
-  const sampledPoints = trackPoints.filter((_, index) => index % 5 === 0);
+  const encodedPolyline = buildPolyline(trackPoints);
 
-  // Create map
-  const options = {
-    width: MAP_WIDTH,
-    height: MAP_HEIGHT,
-    paddingX: 20,
-    paddingY: 20,
-  };
+  if (!encodedPolyline) {
+    console.warn(`Could not encode polyline for ${tour.id}`);
+    return;
+  }
 
-  const map = new StaticMaps(options);
+  const mapboxUrl = buildMapboxUrl(encodedPolyline);
 
-  // Add polyline (track)
-  const line = {
-    coords: sampledPoints.map(p => [p.lon, p.lat]), // [lon, lat] format
-    color: '#0066cc',
-    width: 3,
-  };
-
-  map.addLine(line);
-
-  // Generate image
   try {
-    await map.render();
-
-    // Save image
+    const buffer = await downloadBuffer(mapboxUrl);
     const outputPath = path.join(MAP_OUTPUT_DIR, `${tour.id}.png`);
-    await map.image.save(outputPath);
-
+    fs.writeFileSync(outputPath, buffer);
     console.log(`✓ Map saved: ${outputPath}`);
   } catch (error) {
     console.error(`Error generating map for ${tour.id}:`, error.message);
   }
+}
+
+/**
+ * Simple HTTPS download helper that follows redirects
+ * @param {string} url
+ * @returns {Promise<Buffer>}
+ */
+function downloadBuffer(url) {
+  return new Promise((resolve, reject) => {
+    https
+      .get(url, (response) => {
+        const { statusCode, headers } = response;
+
+        if (statusCode && statusCode >= 300 && statusCode < 400 && headers.location) {
+          response.resume();
+          resolve(downloadBuffer(headers.location));
+          return;
+        }
+
+        if (!statusCode || statusCode >= 400) {
+          response.resume();
+          reject(new Error(`Mapbox API responded with ${statusCode || 'unknown status'}`));
+          return;
+        }
+
+        const chunks = [];
+        response.on('data', (chunk) => chunks.push(chunk));
+        response.on('end', () => resolve(Buffer.concat(chunks)));
+      })
+      .on('error', reject);
+  });
 }
 
 /**
@@ -112,9 +193,8 @@ async function generateMapImage(tour, gpxFilePath) {
  * @returns {string|null} - Resolved file path or null
  */
 function resolveGpxPath(gpxPath) {
-  // Try common locations
   const possiblePaths = [
-    gpxPath, // Absolute path
+    gpxPath,
     path.join(process.cwd(), gpxPath.replace(/^\//, '')),
     path.join('uploads', path.basename(gpxPath)),
   ];
@@ -134,13 +214,11 @@ function resolveGpxPath(gpxPath) {
 async function main() {
   console.log('🗺️  Generating static map images from GPX files...\n');
 
-  // Ensure output directory exists
   if (!fs.existsSync(MAP_OUTPUT_DIR)) {
     fs.mkdirSync(MAP_OUTPUT_DIR, { recursive: true });
     console.log(`Created directory: ${MAP_OUTPUT_DIR}\n`);
   }
 
-  // Read tours.json
   if (!fs.existsSync(TOURS_JSON)) {
     console.error(`Error: ${TOURS_JSON} not found`);
     console.log('Run parse-tours.js first to generate tours.json');
@@ -155,9 +233,6 @@ async function main() {
   } else if (Array.isArray(rawTours.tours)) {
     tours = rawTours.tours;
   } else if (rawTours && typeof rawTours === 'object') {
-    // Hugo allows JSON data files to be arbitrary objects. If someone
-    // stores tours keyed by ID, convert the values to an array so map
-    // generation continues to work.
     tours = Object.values(rawTours);
   }
 
@@ -168,7 +243,6 @@ async function main() {
 
   console.log(`Found ${tours.length} tours\n`);
 
-  // Generate map for each tour with GPX
   let generated = 0;
   let skipped = 0;
 
@@ -195,8 +269,7 @@ async function main() {
   console.log(`⊘ Skipped ${skipped} tours`);
 }
 
-// Run
-main().catch(error => {
+main().catch((error) => {
   console.error('Fatal error:', error);
   process.exit(1);
 });

@@ -4,9 +4,9 @@ A comprehensive tours system for Micro.blog/Hugo that adds GPX-powered tour trac
 
 ## Features
 
-- **Tour Shortcode**: Display tour info boxes with auto-generated static maps
+- **Tour Shortcode**: Display tour info boxes with auto-generated static maps (with GPX-based live fallback if no PNG exists)
 - **Tours Archive Page**: Central `/tours/` page with filters (year, type) and live statistics
-- **Automatic Map Generation**: GitHub Actions auto-generate static PNG maps from GPX files
+- **Automatic Map Generation**: GitHub Actions call the Mapbox Static Image API to create PNG maps from every GPX track
 - **Automated Data**: GitHub Action auto-generates tours.json from your blog posts
 - **GPX Download**: Direct download links for GPX files in tour boxes
 - **Responsive Design**: Mobile-friendly tour boxes and archive layout
@@ -92,6 +92,8 @@ GPX files can be stored in two locations:
 
 Tours are automatically collected from your blog posts, aggregated into `data/tours.json`, and static map images are generated from GPX files - all via GitHub Actions.
 
+> ℹ️ Map generation now relies on the Mapbox Static Image API. Create a Mapbox access token and add it to your backup repo as `MAPBOX_ACCESS_TOKEN` so the workflow can request the PNGs.
+
 ### Setup (in your Micro.blog backup repo)
 
 1. Copy `.github/workflows/build-tours.yml` to your backup repo
@@ -122,7 +124,15 @@ ssh-keygen -t ed25519 -C "github-actions-tours" -f tours-deploy-key
 
 Create a PAT with `repo` scope and add as `PLUGIN_PAT` secret.
 
-4. Configure environment variables in workflow:
+#### Mapbox Access Token (Required)
+
+1. Create or log into your Mapbox account at [account.mapbox.com](https://account.mapbox.com/)
+2. Generate a new access token with **Styles: Read** permission (Static Images API access is included)
+3. Add a repository secret named `MAPBOX_ACCESS_TOKEN` in your backup repo with that token value
+
+> The GitHub Action uses this token to request static PNG maps for each GPX track. Without it, map generation will fail.
+
+6. Configure environment variables in workflow:
 
 ```yaml
 env:
@@ -137,8 +147,24 @@ When triggered, the GitHub Action:
 1. Parses all tour shortcodes from your markdown posts
 2. Generates `tours.json` with aggregated tour data
 3. Finds all GPX files referenced in tours
-4. Generates static PNG map images for each GPX track
+4. Generates static PNG map images for each GPX track via the Mapbox Static Image API
 5. Commits both `tours.json` and map images to the plugin repo
+
+### Mapbox Rendering Options
+
+Customize how the generated PNGs look by setting environment variables before running `generate-map-images.js`:
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `MAP_IMAGE_WIDTH` / `MAP_IMAGE_HEIGHT` | `800` / `400` | Output PNG size |
+| `MAPBOX_STYLE` | `mapbox/outdoors-v11` | Mapbox style ID (`username/style-id`) |
+| `MAPBOX_PATH_COLOR` | `#0ea5e9` | Track color (hex without alpha) |
+| `MAPBOX_PATH_WIDTH` | `5` | Track stroke width |
+| `MAPBOX_PATH_OPACITY` | `1` | Track stroke opacity (0–1) |
+| `MAPBOX_PADDING` | `80,80,80,80` | Padding (top,right,bottom,left) passed to Static API |
+| `MAPBOX_MAX_POLYLINE_POINTS` | `500` | Maximum GPX points kept before encoding |
+
+All variables are optional—the defaults are tuned for typical tour previews.
 
 ### Manual Trigger
 
@@ -237,8 +263,8 @@ The plugin supports these tour types with emoji indicators:
 
 ### Map generation failing
 - Ensure GPX files are accessible in your backup repo
-- Check GitHub Action logs for errors
-- Verify `staticmaps` npm package installed correctly
+- Check GitHub Action logs for errors (especially Mapbox HTTP responses)
+- Verify the `MAPBOX_ACCESS_TOKEN` secret exists and has Static Images/Styles read access
 - Ensure GPX files are valid and contain track points
 
 ### Shortcode not rendering
@@ -256,8 +282,9 @@ MIT License - see LICENSE file
 
 ## Credits
 
-- [staticmaps](https://github.com/StephanGeorg/staticmaps) - Static map image generation
-- [OpenStreetMap](https://www.openstreetmap.org/) - Map tiles and data
+- [Mapbox Static Images API](https://docs.mapbox.com/api/maps/static-images/) - Static map rendering for PNG exports
+- [@mapbox/polyline](https://github.com/mapbox/polyline) - Encoding GPX tracks for the API
+- [OpenStreetMap](https://www.openstreetmap.org/) - Leaflet fallback tiles and data
 
 ---
 

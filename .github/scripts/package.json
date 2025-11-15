@@ -8,7 +8,7 @@
     "generate-maps": "node generate-map-images.js"
   },
   "dependencies": {
-    "staticmaps": "^1.14.0",
+    "@mapbox/polyline": "^1.1.1",
     "xmldom": "^0.6.0"
   }
 }
