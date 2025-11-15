@@ -179,13 +179,25 @@
   }
 
   function createDirectionIcon(rotationDeg, color) {
-    var size = 18;
-    var svg = '<svg viewBox="0 0 24 24" width="' + size + '" height="' + size + '" ' +
-      'style="display:block;transform:rotate(' + rotationDeg + 'deg);">' +
-      '<path d="M12 3l6 9h-4v9h-4v-9H6z" fill="' + color + '" /></svg>';
+    var size = 26;
+    var stroke = '#dbeafe';
+    var arrowColor = color || '#1d4ed8';
+    var rotation = typeof rotationDeg === 'number' && isFinite(rotationDeg) ? rotationDeg : 0;
+    var svg = [
+      '<svg viewBox="0 0 32 32" width="' + size + '" height="' + size + '" xmlns="http://www.w3.org/2000/svg" style="display:block">',
+      '<rect x="2" y="2" width="28" height="28" rx="6" ry="6" fill="#fff" stroke="' + stroke + '" stroke-width="2" />',
+      '<g transform="rotate(' + rotation + ', 16, 16)">',
+      '<path d="M16 6l7 10h-4.5v10h-5v-10H9z" fill="' + arrowColor + '" />',
+      '</g>',
+      '</svg>'
+    ].join('');
+    var wrapperStyles = [
+      'width:' + size + 'px',
+      'height:' + size + 'px'
+    ].join(';');
     return L.divIcon({
       className: '',
-      html: svg,
+      html: '<div style="' + wrapperStyles + '">' + svg + '</div>',
       iconSize: [size, size],
       iconAnchor: [Math.round(size / 2), Math.round(size / 2)]
     });
@@ -199,6 +211,16 @@
     var lines = collectTrackLines(layer);
     if (!lines.length) {
       return;
+    }
+
+    var arrowPaneName = 'tours-direction-arrow-pane';
+    var arrowPane = map.getPane(arrowPaneName);
+    if (!arrowPane) {
+      arrowPane = map.createPane(arrowPaneName);
+      if (arrowPane && arrowPane.style) {
+        arrowPane.style.zIndex = '450';
+        arrowPane.style.pointerEvents = 'none';
+      }
     }
 
     var trackPoints = [];
@@ -233,6 +255,8 @@
         var bearing = bearingBetween(prev, current);
         L.marker([lat, lng], {
           interactive: false,
+          pane: arrowPaneName,
+          zIndexOffset: -200,
           icon: createDirectionIcon(bearing, color)
         }).addTo(map);
         nextMarkerDistance += spacing;
