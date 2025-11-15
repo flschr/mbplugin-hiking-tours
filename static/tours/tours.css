@@ -1,0 +1,94 @@
+.tour-entry .gipfelbuch {
+  margin-top: 2rem;
+}
+
+.tour-entry .gipfelbuch h4 {
+  margin-bottom: 1rem;
+}
+
+.tour-entry .gipfelbuch-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 2rem;
+  padding: 0;
+  margin: 0;
+}
+
+.tour-entry .gipfelbuch-list > li {
+  flex: 1 1 0;
+  position: relative;
+  padding-top: 2.75rem;
+  text-align: center;
+}
+
+.tour-entry .gipfelbuch-list > li::before {
+  content: "";
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 50%;
+  background-color: currentColor;
+  transform: translateX(-50%);
+}
+
+.tour-entry .gipfelbuch-list > li::after {
+  content: "";
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  width: calc(100% - 0.85rem);
+  height: 2px;
+  background-color: currentColor;
+  transform: translateX(0.5rem);
+}
+
+.tour-entry .gipfelbuch-list > li:last-child::after {
+  content: none;
+}
+
+.tour-entry .gipfelbuch-step {
+  display: inline-block;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  background: var(--gipfelbuch-step-bg, currentColor);
+  color: var(--gipfelbuch-step-color, #fff);
+}
+
+.tour-entry .gipfelbuch-label {
+  display: block;
+  margin-top: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .tour-entry .gipfelbuch-list {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .tour-entry .gipfelbuch-list > li {
+    text-align: left;
+    padding: 0 0 0 2.5rem;
+  }
+
+  .tour-entry .gipfelbuch-list > li::before {
+    top: 0.5rem;
+    left: 0.75rem;
+    transform: none;
+  }
+
+  .tour-entry .gipfelbuch-list > li::after {
+    top: 0.9rem;
+    left: 0.75rem;
+    width: 2px;
+    height: calc(100% + 1rem);
+    transform: none;
+  }
+
+  .tour-entry .gipfelbuch-list > li:last-child::after {
+    content: none;
+  }
+}

@@ -74,6 +74,23 @@ Entries without coordinates still appear in the ordered "Gipfelbuch" list below 
 
 Peak markers on GPX maps reuse OpenStreetMap's stock note flag icon, so there is no custom asset to upload or maintain.
 
+### Timeline styling
+
+The ordered "Gipfelbuch" list renders as a responsive timeline with its own lightweight stylesheet (`static/tours/tours.css`). The shortcode automatically loads that CSS once per page whenever it is rendered, so the horizontal layout, the timeline dots (`::before`) and the connecting line (`::after`) work even on posts without additional theme tweaks. On small screens the ordered list falls back to a vertical layout to avoid awkward wrapping.
+
+Want to match the timeline to your theme? Add overrides for the exposed classes (`.gipfelbuch`, `.gipfelbuch-list`, `.gipfelbuch-step`, `.gipfelbuch-label`) to your Micro.blog theme stylesheet. Stylesheets that load after the plugin's asset win automatically, but you can also increase specificity if needed. Example:
+
+```css
+.tour-entry .gipfelbuch-step {
+  --gipfelbuch-step-bg: var(--link-color);
+}
+
+.tour-entry .gipfelbuch-list > li::before,
+.tour-entry .gipfelbuch-list > li::after {
+  background-color: var(--border-color);
+}
+```
+
 ### Tours archive
 
 `layouts/page/tours.html` renders the bundled `data/tours.json`. Edit that file manually or generate it automatically from your posts with the GitHub Action that lives in `backup-repo-example/.github/`. The archive keeps things simple: totals (count, km, hm) plus an unordered list with metadata pulled from every entry.

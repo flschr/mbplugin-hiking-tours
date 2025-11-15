@@ -118,6 +118,10 @@
   {{- if $gpx }} · <a href="{{ $gpx | htmlEscape }}">GPX</a>{{ end -}}
 </div>
 {{- else -}}
+  {{- if not ($.Page.Scratch.Get "tour-timeline-css-loaded") -}}
+    {{- $.Page.Scratch.Set "tour-timeline-css-loaded" true -}}
+    <link rel="stylesheet" href="{{ "tours/tours.css" | relURL }}">
+  {{- end -}}
 <section class="tour-entry" id="tour-{{ $id | htmlEscape }}">
   <header>
     <p class="tour-entry-meta">
@@ -178,11 +182,14 @@
   </dl>
 
   {{- if $hasPeaks -}}
-  <section>
+  <section class="gipfelbuch">
     <h4>Gipfelbuch</h4>
-    <ol>
-      {{- range $peaksList -}}
-      <li>{{ .label | htmlEscape }}</li>
+    <ol class="gipfelbuch-list">
+      {{- range $idx, $peak := $peaksList -}}
+      <li>
+        <span class="gipfelbuch-step" aria-hidden="true">{{ add $idx 1 }}</span>
+        <span class="gipfelbuch-label">{{ $peak.label | htmlEscape }}</span>
+      </li>
       {{- end -}}
     </ol>
   </section>
