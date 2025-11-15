@@ -35,6 +35,19 @@
       maxZoom: 18
     }).addTo(map);
 
+    // Force map to recalculate size after a short delay
+    setTimeout(function() {
+      map.invalidateSize();
+    }, 100);
+
+    // Check if leaflet-gpx is available
+    if (typeof L.GPX !== 'function') {
+      console.warn('[Tours] Leaflet GPX plugin not available');
+      // Set a default view if GPX is not available
+      map.setView([47.5, 11.5], 10);
+      return;
+    }
+
     var gpxLayer = new L.GPX(gpxUrl, {
       async: true,
       marker_options: {
@@ -54,6 +67,12 @@
       if (bounds && bounds.isValid()) {
         map.fitBounds(bounds, { padding: [15, 15] });
       }
+    });
+
+    gpxLayer.on('error', function(err) {
+      console.warn('[Tours] Error loading GPX:', err);
+      // Set a default view if GPX fails to load
+      map.setView([47.5, 11.5], 10);
     });
 
     gpxLayer.addTo(map);
