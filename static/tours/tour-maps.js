@@ -45,8 +45,8 @@
     }).addTo(map);
 
     var peakIcon = L.icon({
-      iconUrl: 'https://www.openstreetmap.org/assets/note.svg',
-      iconRetinaUrl: 'https://www.openstreetmap.org/assets/note.svg',
+      iconUrl: '/tours/note.svg',
+      iconRetinaUrl: '/tours/note.svg',
       iconSize: [28, 28],
       iconAnchor: [14, 24],
       popupAnchor: [0, -22]
