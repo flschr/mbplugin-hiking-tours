@@ -116,9 +116,32 @@
 {{- if and (not $isFeedOutput) (not ($.Page.Scratch.Get "tour-stats-styles")) -}}
   {{- $.Page.Scratch.Set "tour-stats-styles" true -}}
   <style>
+    .tour-entry {
+      border: 1px solid #e0e0e0;
+      padding: 0;
+    }
+
+    .tour-entry > header {
+      padding: 1.5rem 1.5rem 0;
+    }
+
+    .tour-entry > header .tour-entry-meta {
+      margin-bottom: 0.5rem;
+    }
+
+    .tour-entry > header h3 {
+      margin-top: 0;
+    }
+
+    .tour-entry .tour-map {
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      width: 100%;
+    }
+
     .tour-entry .tour-stats-grid {
       margin: 1.5rem auto 0;
-      padding: 0;
+      padding: 0 1.5rem 1.5rem;
       list-style: none;
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -171,6 +194,10 @@
       .tour-entry .tour-stats-grid {
         grid-template-columns: repeat(4, minmax(0, 1fr));
       }
+    }
+
+    .tour-entry > section {
+      padding: 0 1.5rem 1.5rem;
     }
 
     .tour-entry .gipfelbuch-list {
@@ -240,7 +267,7 @@
   </header>
 
   {{- if $shouldRenderMap -}}
-  <div class="tour-map" data-tour-map data-gpx="{{ $gpx | htmlEscape }}"{{ if $peaksDataJSON }} data-peaks='{{ $peaksDataJSON | safeHTMLAttr }}'{{ end }} style="min-height:320px; margin:1rem 0;"></div>
+  <div class="tour-map" data-tour-map data-gpx="{{ $gpx | htmlEscape }}"{{ if $peaksDataJSON }} data-peaks='{{ $peaksDataJSON | safeHTMLAttr }}'{{ end }} style="min-height:320px; margin:1.5rem 0;"></div>
   {{- else if $coverImage -}}
   <figure class="tour-image">
     <img src="{{ $coverImage | htmlEscape }}" alt="{{ $title | htmlEscape }}" loading="lazy" />
