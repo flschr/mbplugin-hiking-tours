@@ -147,8 +147,24 @@ async function main() {
     process.exit(1);
   }
 
-  const toursData = JSON.parse(fs.readFileSync(TOURS_JSON, 'utf-8'));
-  const tours = toursData.tours || [];
+  const rawTours = JSON.parse(fs.readFileSync(TOURS_JSON, 'utf-8'));
+  let tours = [];
+
+  if (Array.isArray(rawTours)) {
+    tours = rawTours;
+  } else if (Array.isArray(rawTours.tours)) {
+    tours = rawTours.tours;
+  } else if (rawTours && typeof rawTours === 'object') {
+    // Hugo allows JSON data files to be arbitrary objects. If someone
+    // stores tours keyed by ID, convert the values to an array so map
+    // generation continues to work.
+    tours = Object.values(rawTours);
+  }
+
+  if (!Array.isArray(tours)) {
+    console.error('Error: Could not determine tours array from tours.json');
+    process.exit(1);
+  }
 
   console.log(`Found ${tours.length} tours\n`);
 
