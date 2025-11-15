@@ -19,6 +19,9 @@
   --tour-muted-bg: #f4f7fb;
   --tour-pill-bg: rgba(255, 255, 255, 0.18);
   --tour-pill-color: #ecfeff;
+  --tour-peak-number-bg: #1d4ed8;
+  --tour-peak-number-color: #ffffff;
+  --tour-peak-number-border: #ffffff;
   --tour-type-hike: #10b981;
   --tour-type-mtb: #ea580c;
   --tour-type-gravel: var(--tour-accent);
@@ -249,13 +252,14 @@
   justify-content: center;
   width: 28px;
   height: 28px;
+  box-sizing: border-box;
   border-radius: 999px;
-  background: var(--tour-header-bg);
-  color: #ffffff;
+  background: var(--tour-peak-number-bg);
+  color: var(--tour-peak-number-color);
   font-weight: 700;
   font-size: 0.85rem;
-  border: 2px solid rgba(191, 219, 254, 0.9);
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.3);
+  border: 2px solid var(--tour-peak-number-border);
+  box-shadow: none;
 }
 
 .tour-cluster {
@@ -530,12 +534,14 @@
   justify-content: center;
   width: 1.55rem;
   height: 1.55rem;
+  box-sizing: border-box;
   border-radius: 50%;
-  background: var(--tour-header-bg);
-  color: #ffffff;
+  background: var(--tour-peak-number-bg);
+  color: var(--tour-peak-number-color);
   font-size: 0.8rem;
   font-weight: 700;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  border: 2px solid var(--tour-peak-number-border);
+  box-shadow: none;
 }
 
 .tour-peak-chip-label {
@@ -851,6 +857,9 @@
     --tour-card-text: #e2e8f0;
     --tour-pill-bg: rgba(255, 255, 255, 0.15);
     --tour-pill-color: #f0fdf4;
+    --tour-peak-number-bg: #1d4ed8;
+    --tour-peak-number-color: #ffffff;
+    --tour-peak-number-border: rgba(255, 255, 255, 0.95);
   }
 
   .tour-box {
