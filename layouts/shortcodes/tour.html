@@ -20,28 +20,25 @@
 {{- $bergfexUrl := .Get "bergfex_url" -}}
 {{- $peaksRaw := .Get "peaks" -}}
 
-{{- /* Detect feed / non-HTML outputs (RSS, JSON, Atom). The shortcode execution
-     context in older Hugo versions does not expose .OutputFormat directly, so
-     we inspect the owning page instead. */ -}}
+{{- /* Detect feed / non-HTML outputs (RSS, JSON, Atom). Use $ to access the
+     original shortcode context, which provides reliable access to page data. */ -}}
 {{- $outputFormatName := "" -}}
-{{- with .Page -}}
-  {{- with .OutputFormat -}}
-    {{- with .Name -}}
-      {{- $outputFormatName = lower . -}}
-    {{- end -}}
+{{- with $.Page.OutputFormat -}}
+  {{- with .Name -}}
+    {{- $outputFormatName = lower . -}}
   {{- end -}}
 {{- end -}}
 {{- $isFeedOutput := or (eq $outputFormatName "rss") (eq $outputFormatName "json") (eq $outputFormatName "atom") -}}
 
 {{- /* Load assets only for regular HTML output */ -}}
 {{- if not $isFeedOutput -}}
-  {{- if not (.Page.Scratch.Get "tour-assets-loaded") -}}
-    {{- .Page.Scratch.Set "tour-assets-loaded" true -}}
+  {{- if not ($.Page.Scratch.Get "tour-assets-loaded") -}}
+    {{- $.Page.Scratch.Set "tour-assets-loaded" true -}}
     <link rel="stylesheet" href="{{ "tours/styles.css" | relURL }}" />
   {{- end -}}
 
-  {{- if not (.Page.Scratch.Get "tour-map-assets-loaded") -}}
-    {{- .Page.Scratch.Set "tour-map-assets-loaded" true -}}
+  {{- if not ($.Page.Scratch.Get "tour-map-assets-loaded") -}}
+    {{- $.Page.Scratch.Set "tour-map-assets-loaded" true -}}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha512-Zcn6bjR/8RZbLEpLIeOwNtzREBAJnUKESxces60Mpoj+2okopSAcSUIUOseddDm0cxnGQzxIR7vJgsLZbdLE3w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha512-BwHfrr4c9kmRkLw6iXFdzcdWV/PGkVgiIyIWLLlTSXzWQzxuSg4DiQUCpauz/EWjgk5TYQqX/kvn9pG1NpYfqg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdn.jsdelivr.net/npm/leaflet-gpx@1.7.0/gpx.min.js" integrity="sha512-/yPV78iMZW2vseexUfxggYuVB4fzq40fsDVwz3tWOl9cb8MvCnmMCOjze1omsEj+APUuwZgnpcv5NR5q363JBA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
