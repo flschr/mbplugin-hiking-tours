@@ -111,6 +111,31 @@
     });
   }
 
+  function zoomTrackToMax(map, bounds) {
+    if (!map || !bounds) {
+      return;
+    }
+
+    // Ensure Leaflet knows the final canvas size before calculating the zoom level.
+    map.invalidateSize();
+
+    var targetZoom = map.getBoundsZoom(bounds, false);
+    if (typeof targetZoom !== 'number' || !isFinite(targetZoom)) {
+      return;
+    }
+
+    var minZoom = typeof map.getMinZoom === 'function' ? map.getMinZoom() : map.options.minZoom;
+    var maxZoom = typeof map.getMaxZoom === 'function' ? map.getMaxZoom() : map.options.maxZoom;
+    if (typeof minZoom === 'number' && isFinite(minZoom)) {
+      targetZoom = Math.max(targetZoom, minZoom);
+    }
+    if (typeof maxZoom === 'number' && isFinite(maxZoom)) {
+      targetZoom = Math.min(targetZoom, maxZoom);
+    }
+
+    map.setView(bounds.getCenter(), targetZoom);
+  }
+
   function collectLatLngs(latLngs, target) {
     target = target || [];
     if (!latLngs) {
@@ -232,7 +257,7 @@
         lineCap: 'round'
       }
     }).on('loaded', function(e) {
-      map.fitBounds(e.target.getBounds(), { padding: [16, 16] });
+      zoomTrackToMax(map, e.target.getBounds());
       addTrackOutline(e.target, map, trackColor);
       addEndpointMarkers(e.target, map);
     }).addTo(map);
