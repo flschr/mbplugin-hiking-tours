@@ -44,6 +44,26 @@
       map.fitBounds(e.target.getBounds(), { padding: [16, 16] });
     }).addTo(map);
 
+    var peakIcon = L.icon({
+      iconUrl: '/tours/peak-flag.svg',
+      iconSize: [28, 28],
+      iconAnchor: [14, 24],
+      popupAnchor: [0, -22],
+      className: 'tour-peak-icon'
+    });
+
+    var peakIconLarge = L.icon({
+      iconUrl: peakIcon.options.iconUrl,
+      iconSize: [36, 36],
+      iconAnchor: [18, 30],
+      popupAnchor: [0, -26],
+      className: peakIcon.options.className
+    });
+
+    function getPeakIcon(repeatCount) {
+      return repeatCount > 1 ? peakIconLarge : peakIcon;
+    }
+
     var peaksRaw = canvas.getAttribute('data-peaks');
     if (!peaksRaw) {
       return;
@@ -57,6 +77,7 @@
         decoded = textarea.value;
       }
       var peaks = JSON.parse(decoded);
+      var peakIndex = Object.create(null);
       peaks.forEach(function(peak) {
         if (!peak || !peak.lat || !peak.lng) {
           return;
@@ -66,9 +87,25 @@
         if (!isFinite(lat) || !isFinite(lng)) {
           return;
         }
-        var marker = L.marker([lat, lng]);
-        if (peak.label) {
-          marker.bindPopup(peak.label);
+        var key = lat.toFixed(6) + ':' + lng.toFixed(6);
+        if (!peakIndex[key]) {
+          peakIndex[key] = {
+            lat: lat,
+            lng: lng,
+            label: peak.label,
+            count: 0
+          };
+        }
+        peakIndex[key].count += 1;
+      });
+
+      Object.keys(peakIndex).forEach(function(key) {
+        var info = peakIndex[key];
+        var marker = L.marker([info.lat, info.lng], {
+          icon: getPeakIcon(info.count)
+        });
+        if (info.label) {
+          marker.bindPopup(info.label);
         }
         marker.addTo(map);
       });
