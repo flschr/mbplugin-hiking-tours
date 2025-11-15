@@ -129,6 +129,29 @@
       margin-bottom: 0.5rem;
     }
 
+    .tour-entry > header .tour-entry-meta .btn-gpx {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      margin-left: 0.5rem;
+      background-color: #f5f5f5;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #666;
+      text-decoration: none;
+      line-height: 1.2;
+      transition: all 0.2s ease;
+    }
+
+    .tour-entry > header .tour-entry-meta .btn-gpx:hover {
+      background-color: #e0e0e0;
+      border-color: #ccc;
+      color: #333;
+    }
+
     .tour-entry > header h3 {
       margin-top: 0;
     }
@@ -249,25 +272,20 @@
       <span class="tour-entry-meta-label">{{ $typeLabel | htmlEscape }}</span>
       {{- end -}}
       {{- if and $typeLabel $region -}}
-      <span aria-hidden="true">·</span>
+      <span aria-hidden="true">,</span>
       {{- end -}}
       {{- if $region -}}
       <span class="tour-entry-meta-label">{{ $region | htmlEscape }}</span>
       {{- end -}}
       {{- if $gpx -}}
-      <span aria-hidden="true">·</span>
-      <a href="{{ $gpx | htmlEscape }}" download>GPX</a>
-      {{- end -}}
-      {{- if $bergfexUrl -}}
-      <span aria-hidden="true">·</span>
-      <a href="{{ $bergfexUrl | htmlEscape }}">Bergfex</a>
+      <a href="{{ $gpx | htmlEscape }}" download class="btn-gpx">GPX</a>
       {{- end -}}
     </p>
     <h3>{{ $title | htmlEscape }}</h3>
   </header>
 
   {{- if $shouldRenderMap -}}
-  <div class="tour-map" data-tour-map data-gpx="{{ $gpx | htmlEscape }}"{{ if $peaksDataJSON }} data-peaks='{{ $peaksDataJSON | safeHTMLAttr }}'{{ end }} style="min-height:320px; margin:1.5rem 0;"></div>
+  <div class="tour-map" data-tour-map data-gpx="{{ $gpx | htmlEscape }}"{{ if $peaksDataJSON }} data-peaks='{{ $peaksDataJSON | safeHTMLAttr }}'{{ end }} style="min-height:320px; margin:0.5rem 0 1.5rem;"></div>
   {{- else if $coverImage -}}
   <figure class="tour-image">
     <img src="{{ $coverImage | htmlEscape }}" alt="{{ $title | htmlEscape }}" loading="lazy" />
