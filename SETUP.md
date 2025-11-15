@@ -158,6 +158,8 @@ The views from the summit were incredible...
 
 `peaks` accepts a semicolon-separated list (`Peak 1 (1234m);Peak 2 (5678m)`). Append coordinates with pipes (`Peak 1 (1234m)|47.45|11.12`) to place numbered markers on the Leaflet map. Entries without coordinates still show up in the ordered "Gipfelbuch" list but won't render a map pin.
 
+When coordinates are provided, the plugin uses OpenStreetMap's stock note flag marker, so there's no need to upload a custom icon.
+
 ### Tour Types
 
 - `hike`, `mtb`, `gravel`, `run`, `other`

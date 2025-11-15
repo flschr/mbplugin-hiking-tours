@@ -72,6 +72,8 @@ peaks="Hoher Fricken (1940m)|47.4769|11.1302;Karkopf (1738m)|47.4804|11.1449"
 
 Entries without coordinates still appear in the ordered "Gipfelbuch" list below the tour details.
 
+Peak markers on GPX maps reuse OpenStreetMap's stock note flag icon, so there is no custom asset to upload or maintain.
+
 ### Tours archive
 
 `layouts/page/tours.html` renders the bundled `data/tours.json`. Edit that file manually or generate it automatically from your posts with the GitHub Action that lives in `backup-repo-example/.github/`. The archive keeps things simple: totals (count, km, hm) plus an unordered list with metadata pulled from every entry.
