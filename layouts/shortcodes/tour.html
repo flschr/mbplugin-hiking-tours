@@ -216,7 +216,13 @@
     <h4>Gipfelbuch</h4>
     <ol class="gipfelbuch-list">
       {{- range $peaksList -}}
-      <li>{{ .label | htmlEscape }}</li>
+      <li>
+        {{- if and .lat .lng -}}
+        <span class="peak-name" data-peak-lat="{{ .lat }}" data-peak-lng="{{ .lng }}" data-peak-label="{{ .label | htmlEscape }}">{{ .label | htmlEscape }}</span>
+        {{- else -}}
+        {{ .label | htmlEscape }}
+        {{- end -}}
+      </li>
       {{- end -}}
     </ol>
     {{- if $gpx -}}
