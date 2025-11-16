@@ -44,7 +44,7 @@
     PEAK_POPUP_ANCHOR_Y: -22,
     PEAK_SCALE_MULTIPLE: 2,
     PEAK_TEXT_FONT_SIZE: 11,
-    PEAK_TEXT_Y: 12.8,
+    PEAK_TEXT_Y: 11, // Vertical center of badge for perfect digit alignment
     PEAK_TEXT_COLOR: '#f97316',
     PEAK_TEXT_STROKE: '#ffffff',
     PEAK_TEXT_STROKE_WIDTH: 2,
@@ -547,11 +547,11 @@
           textParts.push('<tspan opacity="0.5">|</tspan>');
         }
       }
-      textElement = '<text x="14" y="' + CONFIG.PEAK_TEXT_Y + '" text-anchor="middle" font-size="' + fontSize + '" font-family="-apple-system, BlinkMacSystemFont,\"Segoe UI\", sans-serif" font-weight="400" fill="' + CONFIG.PEAK_TEXT_COLOR + '" stroke="' + CONFIG.PEAK_TEXT_STROKE + '" stroke-width="' + CONFIG.PEAK_TEXT_STROKE_WIDTH + '" paint-order="stroke fill" dominant-baseline="middle"' + textLengthAttr + '>' + textParts.join('') + '</text>';
+      textElement = '<text x="14" y="' + CONFIG.PEAK_TEXT_Y + '" text-anchor="middle" font-size="' + fontSize + '" font-family="-apple-system, BlinkMacSystemFont,\"Segoe UI\", sans-serif" font-weight="400" fill="' + CONFIG.PEAK_TEXT_COLOR + '" stroke="' + CONFIG.PEAK_TEXT_STROKE + '" stroke-width="' + CONFIG.PEAK_TEXT_STROKE_WIDTH + '" paint-order="stroke fill" dominant-baseline="middle" alignment-baseline="middle"' + textLengthAttr + '>' + textParts.join('') + '</text>';
     } else {
       // Fallback for single number (legacy support)
       var numberText = numbers ? escapeHtml(numbers) : '';
-      textElement = '<text x="14" y="' + CONFIG.PEAK_TEXT_Y + '" text-anchor="middle" font-size="' + fontSize + '" font-family="-apple-system, BlinkMacSystemFont,\"Segoe UI\", sans-serif" font-weight="400" fill="' + CONFIG.PEAK_TEXT_COLOR + '" stroke="' + CONFIG.PEAK_TEXT_STROKE + '" stroke-width="' + CONFIG.PEAK_TEXT_STROKE_WIDTH + '" paint-order="stroke fill" dominant-baseline="middle">' + numberText + '</text>';
+      textElement = '<text x="14" y="' + CONFIG.PEAK_TEXT_Y + '" text-anchor="middle" font-size="' + fontSize + '" font-family="-apple-system, BlinkMacSystemFont,\"Segoe UI\", sans-serif" font-weight="400" fill="' + CONFIG.PEAK_TEXT_COLOR + '" stroke="' + CONFIG.PEAK_TEXT_STROKE + '" stroke-width="' + CONFIG.PEAK_TEXT_STROKE_WIDTH + '" paint-order="stroke fill" dominant-baseline="middle" alignment-baseline="middle">' + numberText + '</text>';
     }
 
     var anchor = [
