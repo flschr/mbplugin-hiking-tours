@@ -33,7 +33,7 @@ Add a tour widget to any blog post:
   elevation_m="897"
   duration_h="6.13"
   gpx="/uploads/2025/drei-gipfel.gpx"
-  peaks="Hoher Fricken (1940m)|47.4769|11.1302;Karkopf (1738m)"
+  peaks="Hoher Fricken (1940m):47.4769,11.1302;Karkopf (1738m)"
 >}}
 ```
 
@@ -60,10 +60,10 @@ Add a tour widget to any blog post:
 
 ### Peaks
 
-Provide peaks as a semicolon-separated string. Add coordinates either via `Name|lat|lng` or `Name:lat,lng:(meta)` to place a marker on the GPX map.
+Provide peaks as a semicolon-separated string. Add coordinates via `Name:lat,lng:(meta)` to place a marker on the GPX map.
 
 ```
-peaks="Hoher Fricken (1940m)|47.4769|11.1302;Karkopf (1738m)|47.4804|11.1449"
+peaks="Hoher Fricken (1940m):47.4769,11.1302;Karkopf (1738m):47.4804,11.1449"
 ```
 
 Entries without coordinates still appear in the ordered "Gipfelbuch" list below the tour details.
