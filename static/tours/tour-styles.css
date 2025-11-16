@@ -147,17 +147,6 @@
   align-items: center;
   gap: 1rem;
   margin-bottom: 0.75rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px dashed var(--tour-meta-color);
-  transition: border-color 0.2s ease;
-}
-
-.tour-entry .gipfelbuch-list li:last-child {
-  border-bottom: none;
-}
-
-.tour-entry .gipfelbuch-list li:hover {
-  border-bottom-color: var(--tour-peak-badge-bg);
 }
 
 .tour-entry .gipfelbuch-list li::before {
@@ -177,20 +166,13 @@
 
 .tour-entry .gipfelbuch-list .peak-name {
   cursor: pointer;
-  text-decoration: underline dotted;
-  text-decoration-color: rgba(102, 102, 102, 0.4);
+  text-decoration: underline dashed;
+  text-decoration-thickness: 1px;
   text-underline-offset: 0.25em;
   transition: all 0.2s ease;
 }
 
-@media (prefers-color-scheme: dark) {
-  .tour-entry .gipfelbuch-list .peak-name {
-    text-decoration-color: rgba(195, 202, 213, 0.4);
-  }
-}
-
 .tour-entry .gipfelbuch-list .peak-name:hover {
-  text-decoration-style: solid;
   text-decoration-color: var(--tour-peak-badge-bg);
   color: var(--tour-peak-badge-bg);
 }
