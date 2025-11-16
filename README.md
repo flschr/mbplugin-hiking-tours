@@ -1,26 +1,14 @@
-# fischr Tours Plugin for Micro.blog
+# fischr Tours Plugin
 
-A lightweight Micro.blog/Hugo plugin that adds an interactive tour widget to your blog posts. Drop a shortcode into your post, optionally add a GPX file, and the plugin renders a clean tour box with an interactive map, statistics, and peak lists.
-
-## Features
-
-- **Minimal tour shortcode** – semantic HTML with clean styling that adapts to your blog theme
-- **Optional GPX maps** – Interactive Leaflet maps with track visualization, direction arrows, and endpoint markers
-- **Peak lists** – Display peak lists with optional map markers when coordinates are provided
-- **Feed-friendly** – Simplified text output for RSS/JSON/Atom feeds
+A Micro.blog plugin for interactive tour widgets with maps, statistics, and peak lists.
 
 ## Installation
 
-1. Open your Micro.blog **Settings → Plugins**
-2. Add `https://github.com/flschr/mbplugin-fischr-tours` and click **Install**
-
-That's it! The plugin is ready to use.
+**Settings → Plugins** → `https://github.com/flschr/mbplugin-fischr-tours` → **Install**
 
 ## Usage
 
-### Tour shortcode
-
-Add a tour widget to any blog post:
+Add the shortcode to your blog post:
 
 ```markdown
 {{< tour
@@ -37,86 +25,43 @@ Add a tour widget to any blog post:
 >}}
 ```
 
-### Parameters
+**Upload GPX:** Posts → Uploads → Upload GPX file → Note the path
 
-| Required        | Description                                  |
-|-----------------|----------------------------------------------|
-| `id`            | Unique identifier (slug)                      |
-| `title`         | Tour title                                    |
-| `date`          | Date (`YYYY-MM-DD`)                           |
-| `type`          | `hike`, `mtb`, `gravel`, `run`, or custom     |
-| `distance_km`   | Distance in kilometers                       |
-| `elevation_m`   | Elevation gain in meters                      |
-| `gpx`           | Path/URL to the GPX file (optional map)       |
+## Parameters
 
-| Optional        | Description                                                |
-|-----------------|------------------------------------------------------------|
-| `region`        | Region label                                               |
-| `duration_h`    | Duration in hours                                          |
-| `max_height`    | Highest point in meters                                    |
-| `bergfex_url`   | Link to the tour on Bergfex                                |
-| `cover_image`   | Static fallback image when no GPX map is shown             |
-| `peaks`         | Semicolon-separated list (see below)                       |
+### Required
+- `id` – Unique identifier (slug)
+- `title` – Tour title
+- `date` – Date (YYYY-MM-DD)
+- `type` – Type: `hike`, `mtb`, `gravel`, `run`
+- `distance_km` – Distance in kilometers
+- `elevation_m` – Elevation gain in meters
+- `gpx` – Path to GPX file
+
+### Optional
+- `region` – Region name
+- `duration_h` – Duration in hours
+- `max_height` – Highest point in meters
+- `bergfex_url` – Link to Bergfex
+- `cover_image` – Fallback image without map
+- `peaks` – Peak list (see below)
 
 ### Peaks
 
-Provide peaks as a semicolon-separated string. Add coordinates via `Name:lat,lng:(meta)` to place a marker on the GPX map.
+Peaks as semicolon-separated list. Add coordinates (`Name:lat,lng`) to display markers on the map:
 
 ```
 peaks="Hoher Fricken (1940m):47.4769,11.1302;Karkopf (1738m):47.4804,11.1449"
 ```
 
-Entries without coordinates still appear in the ordered "Gipfelbuch" list below the tour details.
+## What you get
 
-Peak markers on GPX maps use custom drop icons with integrated numbers.
-
-### Uploading GPX files
-
-1. Go to **Posts** → **Uploads** in Micro.blog
-2. Upload your GPX file
-3. Note the path: `/uploads/YYYY/filename.gpx`
-4. Use this path in the `gpx` parameter
-
-**Note**: GPX files can have `.gpx` or `.xml` extensions - both work!
-
-## File structure
-
-```
-mbplugin-fischr-tours/
-├── plugin.json                # Plugin metadata
-├── layouts/shortcodes/
-│   └── tour.html              # Tour widget shortcode
-├── static/tours/
-│   ├── tour-maps.js           # Leaflet map initialization
-│   └── note.svg               # Base SVG used for peak marker icon
-└── README.md                  # Documentation
-```
-
-## Features
-
-### Interactive Maps
-
-When you provide a GPX file, the plugin renders an interactive Leaflet map with:
-
-- **Track visualization** – Blue track line with white outline
-- **Direction arrows** – Evenly spaced arrows showing direction of travel
-- **Start/End markers** – "A" and "B" markers showing route endpoints
-- **Peak markers** – Numbered drop markers for peaks with coordinates
-- **Responsive design** – Maps adapt to all screen sizes
-
-### Statistics Grid
-
-The widget displays key tour statistics in a clean grid layout:
-
-- Distance (km)
-- Elevation gain (m)
-- Duration (hours)
-- Highest point (m)
-
-### Peak List (Gipfelbuch)
-
-Named peaks appear in a numbered list with orange badges. When coordinates are provided, clicking a peak name opens a popup on the map showing the peak location.
+- Interactive Leaflet map with GPX track
+- Direction arrows and start/finish markers (A/B)
+- Numbered peak markers on the map
+- Statistics grid (distance, elevation, duration)
+- Feed-friendly output for RSS
 
 ## Support
 
-- Issues: https://github.com/flschr/mbplugin-fischr-tours/issues
+Issues: https://github.com/flschr/mbplugin-fischr-tours/issues
