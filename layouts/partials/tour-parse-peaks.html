@@ -16,11 +16,13 @@
 
 {{- $peaksRaw := .peaksRaw -}}
 {{- $peaksList := slice -}}
+{{- $peakNumber := 0 -}}
 
 {{- if $peaksRaw -}}
   {{- $peaksRawTrimmed := trim $peaksRaw " \n\t;" -}}
   {{- if ne $peaksRawTrimmed "" -}}
     {{- range $value := split $peaksRaw ";" -}}
+      {{- $peakNumber = add $peakNumber 1 -}}
       {{- $peak := trim $value " \n\t" -}}
       {{- if $peak -}}
         {{- $peakLabel := $peak -}}
@@ -74,7 +76,7 @@
         {{- end -}}
 
         {{- /* Build peak dictionary */ -}}
-        {{- $peakDict := dict "label" $peakLabel -}}
+        {{- $peakDict := dict "label" $peakLabel "number" $peakNumber -}}
         {{- $hasCoords := and $lat (ne $lat "") $lng (ne $lng "") -}}
         {{- if $hasCoords -}}
           {{- /* Validate coordinates with safe float conversion */ -}}

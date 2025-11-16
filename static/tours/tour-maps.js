@@ -475,16 +475,32 @@
   // ============================================================================
 
   /**
-   * Create peak icon
+   * Create peak icon with number
    */
-  function createPeakIcon(scale) {
+  function createPeakIcon(scale, number) {
     var size = Math.round(CONFIG.PEAK_ICON_SIZE * scale);
-    return L.icon({
-      iconUrl: '/tours/note.svg',
-      iconRetinaUrl: '/tours/note.svg',
+    var fontSize = Math.round(14 * scale);
+    var numberText = number ? String(number) : '';
+    var styles = [
+      'width: ' + size + 'px',
+      'height: ' + size + 'px',
+      'border-radius: ' + Math.round(size / 2) + 'px',
+      'background: #fff',
+      'color: #ea580c',
+      'font-weight: 700',
+      'font-size: ' + fontSize + 'px',
+      'display: flex',
+      'align-items: center',
+      'justify-content: center',
+      'border: ' + Math.round(3 * scale) + 'px solid #ea580c',
+      'box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45)'
+    ].join('; ');
+    return L.divIcon({
+      className: '',
       iconSize: [size, size],
-      iconAnchor: [Math.round(CONFIG.PEAK_ICON_ANCHOR_X * scale), Math.round(CONFIG.PEAK_ICON_ANCHOR_Y * scale)],
-      popupAnchor: [CONFIG.PEAK_POPUP_ANCHOR_X, Math.round(CONFIG.PEAK_POPUP_ANCHOR_Y * scale)]
+      iconAnchor: [Math.round(size / 2), Math.round(size / 2)],
+      popupAnchor: [0, Math.round(-size / 2)],
+      html: '<div style="' + styles + '">' + numberText + '</div>'
     });
   }
 
@@ -501,7 +517,7 @@
       var decoded = decodeHTMLEntities(peaksRaw);
       var peaks = JSON.parse(decoded);
 
-      // Deduplicate peaks by coordinates
+      // Deduplicate peaks by coordinates, keeping first number
       var peakIndex = Object.create(null);
       peaks.forEach(function(peak) {
         if (!peak || !peak.lat || !peak.lng) {
@@ -523,6 +539,7 @@
             lat: lat,
             lng: lng,
             label: peak.label,
+            number: peak.number || 0,
             count: 0
           };
         }
@@ -534,7 +551,7 @@
         var info = peakIndex[key];
         var iconScale = info.count > 1 ? CONFIG.PEAK_SCALE_MULTIPLE : 1;
         var marker = L.marker([info.lat, info.lng], {
-          icon: createPeakIcon(iconScale)
+          icon: createPeakIcon(iconScale, info.number)
         });
         if (info.label) {
           marker.bindPopup(info.label);
