@@ -96,55 +96,59 @@
   <link rel="stylesheet" href="{{ "tours/tour-styles.css" | relURL }}">
 {{- end -}}
 
-{{- /* Feed output (structured box with icons) */ -}}
+{{- /* Feed output (compact table) */ -}}
 {{- if $isFeedOutput -}}
-<div style="border: 1px solid #e0e0e0; padding: 1rem; border-radius: 5px; margin: 1rem 0;">
-  {{- if or $typeLabel $region -}}
-  <p style="color: #666; font-size: 0.85rem; margin: 0 0 0.5rem;">
-    {{- if $typeLabel -}}<strong>{{ $typeLabel | htmlEscape }}</strong>{{- end -}}
-    {{- if and $typeLabel $region }} · {{ end -}}
-    {{- if $region -}}{{ $region | htmlEscape }}{{- end -}}
-  </p>
-  {{- end -}}
-
-  <h3 style="margin: 0 0 1rem;">{{ $title | htmlEscape }}</h3>
-
-  {{- if or (gt $distanceKm 0) (gt $elevationM 0) (gt $durationH 0) (gt $maxHeight 0) -}}
-  <dl style="display: grid; grid-template-columns: auto 1fr; gap: 0.25rem 0.75rem; margin: 0 0 1rem;">
-    {{- if gt $distanceKm 0 -}}
-    <dt style="font-weight: normal;">📏 <strong>Distanz:</strong></dt>
-    <dd style="margin: 0;">{{ $distanceKm | htmlEscape }} km</dd>
-    {{- end -}}
-    {{- if gt $elevationM 0 -}}
-    <dt style="font-weight: normal;">⛰️ <strong>Aufstieg:</strong></dt>
-    <dd style="margin: 0;">{{ $elevationM | htmlEscape }} m</dd>
-    {{- end -}}
-    {{- if gt $maxHeight 0 -}}
-    <dt style="font-weight: normal;">📍 <strong>Max. Höhe:</strong></dt>
-    <dd style="margin: 0;">{{ $maxHeight | htmlEscape }} m</dd>
-    {{- end -}}
-    {{- if gt $durationH 0 -}}
-    <dt style="font-weight: normal;">⏱️ <strong>Dauer:</strong></dt>
-    <dd style="margin: 0;">{{ $durationH | htmlEscape }} h</dd>
-    {{- end -}}
-  </dl>
-  {{- end -}}
-
+<table style="width: 100%; border-collapse: collapse; margin: 0 0 1rem; font-size: 0.95rem;">
+  <tr>
+    <td style="padding: 0.35rem 0.5rem; border: 1px solid #e0e0e0; width: 42%; vertical-align: top;">
+      {{- if $title -}}
+      <div style="font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem;">{{ $title | htmlEscape }}</div>
+      {{- end -}}
+      {{- if or $typeLabel $region -}}
+      <div style="color: #666; font-size: 0.85rem; margin-bottom: 0.35rem;">
+        {{- if $typeLabel -}}<strong>{{ $typeLabel | htmlEscape }}</strong>{{- end -}}
+        {{- if and $typeLabel $region }} · {{ end -}}
+        {{- if $region -}}{{ $region | htmlEscape }}{{- end -}}
+      </div>
+      {{- end -}}
+      {{- if $gpx -}}
+      <div style="font-size: 0.85rem;">
+        <a href="{{ $gpx | htmlEscape }}">📥 GPX herunterladen</a>
+      </div>
+      {{- end -}}
+    </td>
+    <td style="padding: 0.35rem 0.5rem; border: 1px solid #e0e0e0; vertical-align: top;">
+      {{- if or (gt $distanceKm 0) (gt $elevationM 0) (gt $durationH 0) (gt $maxHeight 0) -}}
+      <ul style="list-style: none; padding: 0; margin: 0;">
+        {{- if gt $distanceKm 0 -}}
+        <li style="margin: 0.15rem 0;"><strong>Distanz:</strong> {{ $distanceKm | htmlEscape }} km</li>
+        {{- end -}}
+        {{- if gt $elevationM 0 -}}
+        <li style="margin: 0.15rem 0;"><strong>Aufstieg:</strong> {{ $elevationM | htmlEscape }} m</li>
+        {{- end -}}
+        {{- if gt $maxHeight 0 -}}
+        <li style="margin: 0.15rem 0;"><strong>Max. Höhe:</strong> {{ $maxHeight | htmlEscape }} m</li>
+        {{- end -}}
+        {{- if gt $durationH 0 -}}
+        <li style="margin: 0.15rem 0;"><strong>Dauer:</strong> {{ $durationH | htmlEscape }} h</li>
+        {{- end -}}
+      </ul>
+      {{- end -}}
+    </td>
+  </tr>
   {{- if $hasPeaks -}}
-  <h4 style="margin: 0.5rem 0 0.5rem; font-size: 0.95rem;">Gipfelbuch:</h4>
-  <ol style="margin: 0 0 1rem; padding-left: 1.5rem;">
-    {{- range $peaksList -}}
-    <li style="margin-bottom: 0.25rem;">{{ .label | htmlEscape }}</li>
-    {{- end -}}
-  </ol>
+  <tr>
+    <td colspan="2" style="padding: 0.35rem 0.5rem; border: 1px solid #e0e0e0; border-top: none; vertical-align: top;">
+      <strong>Gipfelbuch:</strong>
+      <ol style="margin: 0.25rem 0 0; padding-left: 1.25rem;">
+        {{- range $peaksList -}}
+        <li style="margin: 0.15rem 0;">{{ .label | htmlEscape }}</li>
+        {{- end -}}
+      </ol>
+    </td>
+  </tr>
   {{- end -}}
-
-  {{- if $gpx -}}
-  <p style="margin: 0;">
-    <a href="{{ $gpx | htmlEscape }}">📥 GPX herunterladen</a>
-  </p>
-  {{- end -}}
-</div>
+</table>
 {{- else -}}
 {{- /* Regular HTML output */ -}}
 <section class="tour-entry" id="tour-{{ $id | htmlEscape }}">
