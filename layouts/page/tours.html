@@ -9,11 +9,11 @@
     {{ end }}
   </header>
 
-  {{- if site.Data.tours -}}
-    {{- $count := len site.Data.tours -}}
+  {{- if .Site.Data.tours -}}
+    {{- $count := len .Site.Data.tours -}}
     {{- $totalKm := 0.0 -}}
     {{- $totalHm := 0 -}}
-    {{- range site.Data.tours -}}
+    {{- range .Site.Data.tours -}}
       {{- if .distance_km -}}
         {{- $totalKm = add $totalKm .distance_km -}}
       {{- end -}}
@@ -22,10 +22,10 @@
       {{- end -}}
     {{- end -}}
     <p>
-      {{ $count }} Tour{{ if ne $count 1 }}s{{ end }} · {{ lang.FormatNumber 1 $totalKm }} km · {{ $totalHm }} hm
+      {{ $count }} Tour{{ if ne $count 1 }}s{{ end }} · {{ printf "%.1f" $totalKm }} km · {{ $totalHm }} hm
     </p>
     <ul>
-      {{- range site.Data.tours -}}
+      {{- range .Site.Data.tours -}}
       <li>
         <h3>
           {{- if .post_url -}}
