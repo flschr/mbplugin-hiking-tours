@@ -1,7 +1,19 @@
+/**
+ * Tour Maps - Optimized GPX map renderer for Micro.blog Tours Plugin
+ *
+ * Features:
+ * - Lazy loading with Intersection Observer
+ * - Direction arrows along track
+ * - Peak markers with deduplication
+ * - Optimized performance for long tracks
+ */
 (function() {
   'use strict';
 
-  // Configuration constants
+  // ============================================================================
+  // CONFIGURATION
+  // ============================================================================
+
   var CONFIG = {
     // Track styling
     TRACK_COLOR: '#1d4ed8',
@@ -17,6 +29,7 @@
     ARROW_STROKE_COLOR: '#dbeafe',
     ARROW_PANE_ZINDEX: 450,
     ARROW_ZINDEX_OFFSET: -200,
+    ARROW_SAMPLE_RATE: 5, // Only process every Nth point for performance
 
     // Endpoint markers
     ENDPOINT_SIZE: 28,
@@ -34,9 +47,19 @@
     // Map settings
     MAP_MIN_HEIGHT: 320,
     LAYER_READY_MAX_ATTEMPTS: 10,
-    LAYER_READY_FRAME_DELAY: 16
+    LAYER_READY_FRAME_DELAY: 16,
+
+    // Lazy loading
+    LAZY_LOAD_MARGIN: '100px' // Load maps 100px before they enter viewport
   };
 
+  // ============================================================================
+  // UTILITIES
+  // ============================================================================
+
+  /**
+   * DOM ready helper
+   */
   function ready(fn) {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', fn);
@@ -45,6 +68,78 @@
     }
   }
 
+  /**
+   * Improved HTML entity decoder using textarea (safer than DOMParser)
+   */
+  function decodeHTMLEntities(html) {
+    if (!html || html.indexOf('&') === -1) {
+      return html;
+    }
+    var textarea = document.createElement('textarea');
+    textarea.innerHTML = html;
+    var decoded = textarea.value;
+    textarea = null; // Cleanup
+    return decoded;
+  }
+
+  /**
+   * Calculate distance between two lat/lng points
+   */
+  function distanceBetween(a, b) {
+    if (!window.L || !a || !b) {
+      return 0;
+    }
+    try {
+      return L.latLng(a.lat, a.lng).distanceTo(L.latLng(b.lat, b.lng));
+    } catch (err) {
+      console.warn('[Tours] Failed to calculate distance between points', err);
+      return 0;
+    }
+  }
+
+  /**
+   * Calculate bearing between two points
+   */
+  function bearingBetween(a, b) {
+    if (!a || !b) {
+      return 0;
+    }
+    var lat1 = a.lat * Math.PI / 180;
+    var lat2 = b.lat * Math.PI / 180;
+    var deltaLng = (b.lng - a.lng) * Math.PI / 180;
+    var y = Math.sin(deltaLng) * Math.cos(lat2);
+    var x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(deltaLng);
+    var bearing = Math.atan2(y, x) * 180 / Math.PI;
+    return (bearing + 360) % 360;
+  }
+
+  /**
+   * Recursively collect all LatLng points from nested arrays
+   */
+  function collectLatLngs(latLngs, target) {
+    target = target || [];
+    if (!latLngs) {
+      return target;
+    }
+    if (Array.isArray(latLngs)) {
+      latLngs.forEach(function(entry) {
+        if (Array.isArray(entry)) {
+          collectLatLngs(entry, target);
+        } else if (entry && typeof entry.lat === 'number' && typeof entry.lng === 'number') {
+          target.push(entry);
+        }
+      });
+    }
+    return target;
+  }
+
+  // ============================================================================
+  // TRACK MANIPULATION
+  // ============================================================================
+
+  /**
+   * Collect all polyline layers from a GPX layer
+   */
   function collectTrackLines(layer) {
     var collected = [];
     if (!layer) {
@@ -83,6 +178,9 @@
     return collected;
   }
 
+  /**
+   * Bring layer to back once it's rendered in DOM
+   */
   function bringLayerToBackWhenReady(layer, attemptsLeft) {
     if (!layer || typeof layer.bringToBack !== 'function') {
       return;
@@ -101,12 +199,17 @@
       return;
     }
 
-    var schedule = window.requestAnimationFrame || function(cb) { return setTimeout(cb, CONFIG.LAYER_READY_FRAME_DELAY); };
+    var schedule = window.requestAnimationFrame || function(cb) {
+      return setTimeout(cb, CONFIG.LAYER_READY_FRAME_DELAY);
+    };
     schedule(function() {
       bringLayerToBackWhenReady(layer, attemptsLeft - 1);
     });
   }
 
+  /**
+   * Add white outline behind track for better visibility
+   */
   function addTrackOutline(layer, map, color) {
     if (!window.L || !layer || !map) {
       return;
@@ -147,18 +250,21 @@
     });
   }
 
+  /**
+   * Zoom map to fit track bounds
+   */
   function zoomTrackToMax(map, bounds) {
     if (!map || !bounds) {
       return;
     }
 
-    // Validate bounds are valid before using
+    // Validate bounds
     if (typeof bounds.isValid === 'function' && !bounds.isValid()) {
       console.warn('[Tours] Invalid bounds, skipping zoom');
       return;
     }
 
-    // Ensure Leaflet knows the final canvas size before calculating the zoom level.
+    // Ensure Leaflet knows the final canvas size before calculating zoom
     map.invalidateSize();
 
     var targetZoom = map.getBoundsZoom(bounds, false);
@@ -178,48 +284,13 @@
     map.setView(bounds.getCenter(), targetZoom);
   }
 
-  function collectLatLngs(latLngs, target) {
-    target = target || [];
-    if (!latLngs) {
-      return target;
-    }
-    if (Array.isArray(latLngs)) {
-      latLngs.forEach(function(entry) {
-        if (Array.isArray(entry)) {
-          collectLatLngs(entry, target);
-        } else if (entry && typeof entry.lat === 'number' && typeof entry.lng === 'number') {
-          target.push(entry);
-        }
-      });
-    }
-    return target;
-  }
+  // ============================================================================
+  // DIRECTION ARROWS
+  // ============================================================================
 
-  function distanceBetween(a, b) {
-    if (!window.L || !a || !b) {
-      return 0;
-    }
-    try {
-      return L.latLng(a.lat, a.lng).distanceTo(L.latLng(b.lat, b.lng));
-    } catch (err) {
-      console.warn('[Tours] Failed to calculate distance between points', err);
-    }
-    return 0;
-  }
-
-  function bearingBetween(a, b) {
-    if (!a || !b) {
-      return 0;
-    }
-    var lat1 = a.lat * Math.PI / 180;
-    var lat2 = b.lat * Math.PI / 180;
-    var deltaLng = (b.lng - a.lng) * Math.PI / 180;
-    var y = Math.sin(deltaLng) * Math.cos(lat2);
-    var x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(deltaLng);
-    var bearing = Math.atan2(y, x) * 180 / Math.PI;
-    return (bearing + 360) % 360;
-  }
-
+  /**
+   * Create directional arrow icon
+   */
   function createDirectionIcon(rotationDeg, color) {
     var size = CONFIG.ARROW_SIZE;
     var stroke = CONFIG.ARROW_STROKE_COLOR;
@@ -245,6 +316,9 @@
     });
   }
 
+  /**
+   * Add direction arrows along the track (optimized with sampling)
+   */
   function addDirectionArrows(layer, map, color) {
     if (!window.L || !layer || !map) {
       return;
@@ -265,16 +339,31 @@
       }
     }
 
-    var trackPoints = [];
+    var allTrackPoints = [];
     lines.forEach(function(line) {
       if (!line || typeof line.getLatLngs !== 'function') {
         return;
       }
-      collectLatLngs(line.getLatLngs(), trackPoints);
+      collectLatLngs(line.getLatLngs(), allTrackPoints);
     });
 
-    if (trackPoints.length < 2) {
+    if (allTrackPoints.length < 2) {
       return;
+    }
+
+    // Optimize for long tracks: sample points
+    var trackPoints = [];
+    var sampleRate = CONFIG.ARROW_SAMPLE_RATE;
+    if (allTrackPoints.length > 1000) {
+      // For very long tracks, sample more aggressively
+      sampleRate = Math.max(sampleRate, Math.floor(allTrackPoints.length / 200));
+    }
+    for (var i = 0; i < allTrackPoints.length; i += sampleRate) {
+      trackPoints.push(allTrackPoints[i]);
+    }
+    // Always include the last point
+    if (trackPoints[trackPoints.length - 1] !== allTrackPoints[allTrackPoints.length - 1]) {
+      trackPoints.push(allTrackPoints[allTrackPoints.length - 1]);
     }
 
     var spacing = CONFIG.ARROW_SPACING_METERS;
@@ -308,6 +397,13 @@
     }
   }
 
+  // ============================================================================
+  // ENDPOINT MARKERS
+  // ============================================================================
+
+  /**
+   * Create endpoint icon (A or B)
+   */
   function createEndpointIcon(label) {
     var size = CONFIG.ENDPOINT_SIZE;
     var styles = [
@@ -332,6 +428,9 @@
     });
   }
 
+  /**
+   * Add start (A) and end (B) markers
+   */
   function addEndpointMarkers(layer, map) {
     if (!window.L || !layer || !map) {
       return;
@@ -371,17 +470,104 @@
     }
   }
 
+  // ============================================================================
+  // PEAK MARKERS
+  // ============================================================================
+
+  /**
+   * Create peak icon
+   */
+  function createPeakIcon(scale) {
+    var size = Math.round(CONFIG.PEAK_ICON_SIZE * scale);
+    return L.icon({
+      iconUrl: '/tours/note.svg',
+      iconRetinaUrl: '/tours/note.svg',
+      iconSize: [size, size],
+      iconAnchor: [Math.round(CONFIG.PEAK_ICON_ANCHOR_X * scale), Math.round(CONFIG.PEAK_ICON_ANCHOR_Y * scale)],
+      popupAnchor: [CONFIG.PEAK_POPUP_ANCHOR_X, Math.round(CONFIG.PEAK_POPUP_ANCHOR_Y * scale)]
+    });
+  }
+
+  /**
+   * Add peak markers to map
+   */
+  function addPeakMarkers(canvas, map) {
+    var peaksRaw = canvas.getAttribute('data-peaks');
+    if (!peaksRaw) {
+      return;
+    }
+
+    try {
+      var decoded = decodeHTMLEntities(peaksRaw);
+      var peaks = JSON.parse(decoded);
+
+      // Deduplicate peaks by coordinates
+      var peakIndex = Object.create(null);
+      peaks.forEach(function(peak) {
+        if (!peak || !peak.lat || !peak.lng) {
+          return;
+        }
+        var lat = parseFloat(peak.lat);
+        var lng = parseFloat(peak.lng);
+        if (!isFinite(lat) || !isFinite(lng)) {
+          return;
+        }
+        // Validate coordinate ranges
+        if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+          console.warn('[Tours] Invalid coordinates for peak:', peak.label, lat, lng);
+          return;
+        }
+        var key = lat.toFixed(6) + ':' + lng.toFixed(6);
+        if (!peakIndex[key]) {
+          peakIndex[key] = {
+            lat: lat,
+            lng: lng,
+            label: peak.label,
+            count: 0
+          };
+        }
+        peakIndex[key].count += 1;
+      });
+
+      // Add markers
+      Object.keys(peakIndex).forEach(function(key) {
+        var info = peakIndex[key];
+        var iconScale = info.count > 1 ? CONFIG.PEAK_SCALE_MULTIPLE : 1;
+        var marker = L.marker([info.lat, info.lng], {
+          icon: createPeakIcon(iconScale)
+        });
+        if (info.label) {
+          marker.bindPopup(info.label);
+        }
+        marker.addTo(map);
+      });
+    } catch (err) {
+      console.error('[Tours] Failed to parse peak data', err);
+    }
+  }
+
+  // ============================================================================
+  // MAP INITIALIZATION
+  // ============================================================================
+
+  /**
+   * WeakMap to track initialized maps (prevents race conditions)
+   */
+  var initializedMaps = new WeakMap();
+
+  /**
+   * Initialize a single map
+   */
   function initMap(canvas) {
     if (!window.L || !canvas) {
       return;
     }
 
-    // Use single source of truth to prevent race conditions
-    if (canvas.getAttribute('data-map-initialized') === 'true') {
+    // Use WeakMap to prevent race conditions and double initialization
+    if (initializedMaps.has(canvas)) {
       return;
     }
-    // Set flag immediately to prevent double initialization
-    canvas.setAttribute('data-map-initialized', 'true');
+    initializedMaps.set(canvas, true);
 
     var gpxUrl = canvas.getAttribute('data-gpx');
     if (!gpxUrl) {
@@ -420,80 +606,51 @@
       addTrackOutline(e.target, map, trackColor);
       addDirectionArrows(e.target, map, trackColor);
       addEndpointMarkers(e.target, map);
+      addPeakMarkers(canvas, map);
     }).addTo(map);
-
-    function createPeakIcon(scale) {
-      var size = Math.round(CONFIG.PEAK_ICON_SIZE * scale);
-      return L.icon({
-        iconUrl: '/tours/note.svg',
-        iconRetinaUrl: '/tours/note.svg',
-        iconSize: [size, size],
-        iconAnchor: [Math.round(CONFIG.PEAK_ICON_ANCHOR_X * scale), Math.round(CONFIG.PEAK_ICON_ANCHOR_Y * scale)],
-        popupAnchor: [CONFIG.PEAK_POPUP_ANCHOR_X, Math.round(CONFIG.PEAK_POPUP_ANCHOR_Y * scale)]
-      });
-    }
-
-    var peaksRaw = canvas.getAttribute('data-peaks');
-    if (!peaksRaw) {
-      return;
-    }
-
-    try {
-      var decoded = peaksRaw;
-      if (peaksRaw.indexOf('&') !== -1) {
-        // Safer HTML entity decoding without innerHTML
-        var doc = new DOMParser().parseFromString(peaksRaw, 'text/html');
-        decoded = doc.documentElement.textContent;
-      }
-      var peaks = JSON.parse(decoded);
-      var peakIndex = Object.create(null);
-      peaks.forEach(function(peak) {
-        if (!peak || !peak.lat || !peak.lng) {
-          return;
-        }
-        var lat = parseFloat(peak.lat);
-        var lng = parseFloat(peak.lng);
-        if (!isFinite(lat) || !isFinite(lng)) {
-          return;
-        }
-        // Validate coordinate ranges
-        if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
-          console.warn('[Tours] Invalid coordinates for peak:', peak.label, lat, lng);
-          return;
-        }
-        var key = lat.toFixed(6) + ':' + lng.toFixed(6);
-        if (!peakIndex[key]) {
-          peakIndex[key] = {
-            lat: lat,
-            lng: lng,
-            label: peak.label,
-            count: 0
-          };
-        }
-        peakIndex[key].count += 1;
-      });
-
-      Object.keys(peakIndex).forEach(function(key) {
-        var info = peakIndex[key];
-        var iconScale = info.count > 1 ? CONFIG.PEAK_SCALE_MULTIPLE : 1;
-        var marker = L.marker([info.lat, info.lng], {
-          icon: createPeakIcon(iconScale)
-        });
-        if (info.label) {
-          marker.bindPopup(info.label);
-        }
-        marker.addTo(map);
-      });
-    } catch (err) {
-      console.error('[Tours] Failed to parse peak data', err);
-    }
   }
 
-  ready(function() {
+  // ============================================================================
+  // LAZY LOADING WITH INTERSECTION OBSERVER
+  // ============================================================================
+
+  /**
+   * Initialize maps with lazy loading
+   */
+  function initMapsWithLazyLoading() {
     var canvases = document.querySelectorAll('[data-tour-map]');
     if (!canvases.length) {
       return;
     }
-    canvases.forEach(initMap);
-  });
+
+    // Check if Intersection Observer is supported
+    if (!('IntersectionObserver' in window)) {
+      // Fallback: initialize all maps immediately
+      canvases.forEach(initMap);
+      return;
+    }
+
+    // Use Intersection Observer for lazy loading
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting && !initializedMaps.has(entry.target)) {
+          initMap(entry.target);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      rootMargin: CONFIG.LAZY_LOAD_MARGIN
+    });
+
+    canvases.forEach(function(canvas) {
+      observer.observe(canvas);
+    });
+  }
+
+  // ============================================================================
+  // INITIALIZATION
+  // ============================================================================
+
+  ready(initMapsWithLazyLoading);
+
 })();

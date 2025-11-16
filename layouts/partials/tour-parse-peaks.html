@@ -1,0 +1,118 @@
+{{- /*
+  Parses peak data from the "peaks" parameter into a structured list.
+
+  Input: .peaksRaw (string) - semicolon-separated peak entries
+
+  Supported formats:
+  1. "Peak Name|lat|lng"
+  2. "Peak Name:lat,lng:optional:metadata"
+  3. "Peak Name" (without coordinates)
+
+  Returns: dict with:
+    - peaksList: array of peak dicts with "label", "lat" (optional), "lng" (optional)
+    - peaksWithCoords: filtered array containing only peaks with valid coordinates
+    - peaksDataJSON: JSON string for peaks with coordinates (empty if none)
+*/ -}}
+
+{{- $peaksRaw := .peaksRaw -}}
+{{- $peaksList := slice -}}
+
+{{- if $peaksRaw -}}
+  {{- $peaksRawTrimmed := trim $peaksRaw " \n\t;" -}}
+  {{- if ne $peaksRawTrimmed "" -}}
+    {{- range $value := split $peaksRaw ";" -}}
+      {{- $peak := trim $value " \n\t" -}}
+      {{- if $peak -}}
+        {{- $peakLabel := $peak -}}
+        {{- $lat := "" -}}
+        {{- $lng := "" -}}
+
+        {{- /* Format 1: Peak|lat|lng */ -}}
+        {{- if in $peak "|" -}}
+          {{- $parts := split $peak "|" -}}
+          {{- $peakLabel = trim (index $parts 0) " \n\t" -}}
+          {{- if ge (len $parts) 3 -}}
+            {{- $lat = trim (index $parts 1) " \n\t" -}}
+            {{- $lng = trim (index $parts 2) " \n\t" -}}
+          {{- end -}}
+
+        {{- /* Format 2: Peak:lat,lng:metadata */ -}}
+        {{- else if in $peak ":" -}}
+          {{- $parts := split $peak ":" -}}
+          {{- $name := trim (index $parts 0) " \n\t" -}}
+          {{- $coordsPart := "" -}}
+          {{- if ge (len $parts) 2 -}}
+            {{- $coordsPart = trim (index $parts 1) " \n\t" -}}
+          {{- end -}}
+
+          {{- /* Handle optional metadata (parts after second colon) */ -}}
+          {{- $metaParts := slice -}}
+          {{- if ge (len $parts) 3 -}}
+            {{- range $idx, $val := $parts -}}
+              {{- if ge $idx 2 -}}
+                {{- $metaParts = $metaParts | append (trim $val " \n\t") -}}
+              {{- end -}}
+            {{- end -}}
+          {{- end -}}
+          {{- $meta := delimit $metaParts ":" -}}
+          {{- if $meta -}}
+            {{- $peakLabel = trim (printf "%s %s" $name $meta) " \n\t" -}}
+          {{- else -}}
+            {{- $peakLabel = $name -}}
+          {{- end -}}
+
+          {{- /* Parse coordinates from "lat,lng" */ -}}
+          {{- $coordPieces := split $coordsPart "," -}}
+          {{- if ge (len $coordPieces) 2 -}}
+            {{- $lat = trim (index $coordPieces 0) " \n\t" -}}
+            {{- $lng = trim (index $coordPieces 1) " \n\t" -}}
+          {{- end -}}
+
+        {{- /* Format 3: Just the name */ -}}
+        {{- else -}}
+          {{- $peakLabel = trim $peak " \n\t" -}}
+        {{- end -}}
+
+        {{- /* Build peak dictionary */ -}}
+        {{- $peakDict := dict "label" $peakLabel -}}
+        {{- $hasCoords := and $lat (ne $lat "") $lng (ne $lng "") -}}
+        {{- if $hasCoords -}}
+          {{- /* Validate coordinates with safe float conversion */ -}}
+          {{- $latFloat := 0.0 -}}
+          {{- $lngFloat := 0.0 -}}
+          {{- $coordsValid := false -}}
+          {{- /* Try to convert to float - Hugo's float function returns 0 on error */ -}}
+          {{- with $lat -}}
+            {{- $latFloat = float . -}}
+          {{- end -}}
+          {{- with $lng -}}
+            {{- $lngFloat = float . -}}
+          {{- end -}}
+          {{- /* Validate ranges: lat [-90, 90], lng [-180, 180] */ -}}
+          {{- if and (ge $latFloat -90.0) (le $latFloat 90.0) (ge $lngFloat -180.0) (le $lngFloat 180.0) -}}
+            {{- /* Additional check: make sure it's not just 0,0 from conversion error */ -}}
+            {{- if or (ne $latFloat 0.0) (ne $lngFloat 0.0) (and (eq $lat "0") (eq $lng "0")) -}}
+              {{- $coordsValid = true -}}
+            {{- end -}}
+          {{- end -}}
+          {{- if $coordsValid -}}
+            {{- $peakDict = merge $peakDict (dict "lat" $lat "lng" $lng) -}}
+          {{- end -}}
+        {{- end -}}
+        {{- $peaksList = $peaksList | append $peakDict -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* Filter peaks with coordinates */ -}}
+{{- $peaksWithCoords := where $peaksList "lat" "ne" nil -}}
+
+{{- /* Generate JSON for peaks with coordinates */ -}}
+{{- $peaksDataJSON := "" -}}
+{{- if gt (len $peaksWithCoords) 0 -}}
+  {{- $peaksDataJSON = $peaksList | jsonify -}}
+{{- end -}}
+
+{{- /* Return result as context dict */ -}}
+{{- return (dict "peaksList" $peaksList "peaksWithCoords" $peaksWithCoords "peaksDataJSON" $peaksDataJSON) -}}

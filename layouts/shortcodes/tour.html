@@ -1,17 +1,47 @@
-{{- /* Minimal tour shortcode */ -}}
+{{- /* Minimal tour shortcode with improved validation and structure */ -}}
 {{- $id := .Get "id" -}}
 {{- $title := .Get "title" -}}
 {{- $type := .Get "type" -}}
 {{- $region := .Get "region" -}}
-{{- $distanceKm := .Get "distance_km" -}}
-{{- $elevationM := .Get "elevation_m" -}}
-{{- $durationH := .Get "duration_h" -}}
-{{- $maxHeight := .Get "max_height" -}}
 {{- $gpx := .Get "gpx" -}}
 {{- $coverImage := .Get "cover_image" -}}
 {{- $bergfexUrl := .Get "bergfex_url" -}}
 {{- $peaksRaw := .Get "peaks" -}}
 
+{{- /* Validate and parse numeric parameters with safe conversion */ -}}
+{{- $distanceKm := 0.0 -}}
+{{- with .Get "distance_km" -}}
+  {{- $parsed := float . -}}
+  {{- if and $parsed (gt $parsed 0) -}}
+    {{- $distanceKm = $parsed -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $elevationM := 0.0 -}}
+{{- with .Get "elevation_m" -}}
+  {{- $parsed := float . -}}
+  {{- if and $parsed (gt $parsed 0) -}}
+    {{- $elevationM = $parsed -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $durationH := 0.0 -}}
+{{- with .Get "duration_h" -}}
+  {{- $parsed := float . -}}
+  {{- if and $parsed (gt $parsed 0) -}}
+    {{- $durationH = $parsed -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $maxHeight := 0.0 -}}
+{{- with .Get "max_height" -}}
+  {{- $parsed := float . -}}
+  {{- if and $parsed (gt $parsed 0) -}}
+    {{- $maxHeight = $parsed -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* Detect feed output formats */ -}}
 {{- $isFeedOutput := false -}}
 {{- with $.Page.OutputFormats -}}
   {{- range . -}}
@@ -22,76 +52,17 @@
   {{- end -}}
 {{- end -}}
 
-{{- $shouldRenderMap := and $gpx (ne $gpx "") -}}
-{{- $peaksRawTrimmed := "" -}}
-{{- if $peaksRaw -}}
-  {{- $peaksRawTrimmed = trim $peaksRaw " \n\t;" -}}
-{{- end -}}
-{{- $hasPeaks := and $peaksRaw (ne $peaksRawTrimmed "") -}}
-{{- $peaksList := slice -}}
-{{- if $hasPeaks -}}
-  {{- range $value := split $peaksRaw ";" -}}
-    {{- $peak := trim $value " \n\t" -}}
-    {{- if $peak -}}
-      {{- $peakLabel := $peak -}}
-      {{- $lat := "" -}}
-      {{- $lng := "" -}}
-      {{- if in $peak "|" -}}
-        {{- $parts := split $peak "|" -}}
-        {{- $peakLabel = trim (index $parts 0) " \n\t" -}}
-        {{- if ge (len $parts) 3 -}}
-          {{- $lat = trim (index $parts 1) " \n\t" -}}
-          {{- $lng = trim (index $parts 2) " \n\t" -}}
-        {{- end -}}
-      {{- else if in $peak ":" -}}
-        {{- $parts := split $peak ":" -}}
-        {{- $name := trim (index $parts 0) " \n\t" -}}
-        {{- $coordsPart := "" -}}
-        {{- if ge (len $parts) 2 -}}
-          {{- $coordsPart = trim (index $parts 1) " \n\t" -}}
-        {{- end -}}
-        {{- $metaParts := slice -}}
-        {{- if ge (len $parts) 3 -}}
-          {{- range $idx, $val := $parts -}}
-            {{- if ge $idx 2 -}}
-              {{- $metaParts = $metaParts | append (trim $val " \n\t") -}}
-            {{- end -}}
-          {{- end -}}
-        {{- end -}}
-        {{- $meta := delimit $metaParts ":" -}}
-        {{- if $meta -}}
-          {{- $peakLabel = trim (printf "%s %s" $name $meta) " \n\t" -}}
-        {{- else -}}
-          {{- $peakLabel = $name -}}
-        {{- end -}}
-        {{- $coordPieces := split $coordsPart "," -}}
-        {{- if ge (len $coordPieces) 2 -}}
-          {{- $lat = trim (index $coordPieces 0) " \n\t" -}}
-          {{- $lng = trim (index $coordPieces 1) " \n\t" -}}
-        {{- end -}}
-      {{- else -}}
-        {{- $peakLabel = trim $peak " \n\t" -}}
-      {{- end -}}
-      {{- $peakDict := dict "label" $peakLabel -}}
-      {{- $hasCoords := and $lat (ne $lat "") $lng (ne $lng "") -}}
-      {{- if $hasCoords -}}
-        {{- $latFloat := float $lat -}}
-        {{- $lngFloat := float $lng -}}
-        {{- $coordsValid := and (ge $latFloat -90.0) (le $latFloat 90.0) (ge $lngFloat -180.0) (le $lngFloat 180.0) -}}
-        {{- if $coordsValid -}}
-          {{- $peakDict = merge $peakDict (dict "lat" $lat "lng" $lng) -}}
-        {{- end -}}
-      {{- end -}}
-      {{- $peaksList = $peaksList | append $peakDict -}}
-    {{- end -}}
-  {{- end -}}
-{{- end -}}
-{{- $peaksWithCoords := where $peaksList "lat" "ne" nil -}}
-{{- $peaksDataJSON := "" -}}
-{{- if gt (len $peaksWithCoords) 0 -}}
-  {{- $peaksDataJSON = $peaksList | jsonify -}}
-{{- end -}}
+{{- /* Parse peaks using partial */ -}}
+{{- $peaksData := partial "tour-parse-peaks.html" (dict "peaksRaw" $peaksRaw) -}}
+{{- $peaksList := $peaksData.peaksList -}}
+{{- $peaksWithCoords := $peaksData.peaksWithCoords -}}
+{{- $peaksDataJSON := $peaksData.peaksDataJSON -}}
+{{- $hasPeaks := gt (len $peaksList) 0 -}}
 
+{{- /* Map rendering logic */ -}}
+{{- $shouldRenderMap := and $gpx (ne $gpx "") -}}
+
+{{- /* Type label mapping */ -}}
 {{- $typeLabel := $type -}}
 {{- if eq $type "hike" -}}
   {{- $typeLabel = "Hike" -}}
@@ -103,9 +74,15 @@
   {{- $typeLabel = "Run" -}}
 {{- end -}}
 
+{{- /* Load assets once per page (not per shortcode) */ -}}
 {{- if and (not $isFeedOutput) $shouldRenderMap -}}
   {{- if not ($.Page.Scratch.Get "tour-map-assets-loaded") -}}
     {{- $.Page.Scratch.Set "tour-map-assets-loaded" true -}}
+    {{- /* Resource hints for better performance */ -}}
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="dns-prefetch" href="https://tile.openstreetmap.org">
+    {{- /* Leaflet CSS and JS */ -}}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha512-Zcn6bjR/8RZbLEpLIeOwNtzREBAJnUKESxces60Mpoj+2okopSAcSUIUOseddDm0cxnGQzxIR7vJgsLZbdLE3w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha512-BwHfrr4c9kmRkLw6iXFdzcdWV/PGkVgiIyIWLLlTSXzWQzxuSg4DiQUCpauz/EWjgk5TYQqX/kvn9pG1NpYfqg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdn.jsdelivr.net/npm/leaflet-gpx@1.7.0/gpx.min.js" integrity="sha512-/yPV78iMZW2vseexUfxggYuVB4fzq40fsDVwz3tWOl9cb8MvCnmMCOjze1omsEj+APUuwZgnpcv5NR5q363JBA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -113,216 +90,24 @@
   {{- end -}}
 {{- end -}}
 
-{{- if and (not $isFeedOutput) (not ($.Page.Scratch.Get "tour-stats-styles")) -}}
-  {{- $.Page.Scratch.Set "tour-stats-styles" true -}}
-  <style>
-    .tour-entry {
-      border: 1px solid #e0e0e0;
-      border-radius: 5px;
-      padding: 0;
-    }
-
-    .tour-entry > header {
-      padding: 1.5rem 1.5rem 0;
-    }
-
-    .tour-entry > header .tour-entry-meta {
-      margin-bottom: 0.125rem;
-    }
-
-    .tour-entry .tour-entry-meta {
-      color: #666;
-      font-size: 0.85rem;
-    }
-
-    .tour-entry .tour-entry-meta span {
-      color: inherit;
-    }
-
-    .tour-entry > header h3 {
-      margin-top: 0;
-      margin-bottom: 0.5rem;
-    }
-
-    .tour-entry h4 {
-      margin-top: 0.75rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .tour-entry .tour-map {
-      margin-left: 0 !important;
-      margin-right: 0 !important;
-      width: 100%;
-    }
-
-    .tour-entry .tour-stats-grid {
-      margin: 1.5rem auto 0;
-      padding: 0 1.5rem 0.375rem;
-      list-style: none;
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 1rem;
-      max-width: 720px;
-    }
-
-    .tour-entry .tour-stat-card {
-      background: #f5f5f5;
-      border-radius: 5px;
-      padding: 1.15rem 1rem 1.25rem;
-      text-align: center;
-    }
-
-    .tour-entry .tour-stat-card dt,
-    .tour-entry .tour-entry-meta .tour-entry-meta-label {
-      margin: 0 0 0.35rem;
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: #666;
-      display: inline-block;
-    }
-
-    .tour-entry .tour-stat-card dd {
-      margin: 0;
-      font-weight: 600;
-      color: #111;
-      display: inline-flex;
-      align-items: baseline;
-      justify-content: center;
-      gap: 0.35rem;
-      white-space: nowrap;
-    }
-
-    .tour-entry .tour-stat-value {
-      display: inline-block;
-      font-size: clamp(1.8rem, 4vw, 2.3rem);
-      line-height: 1;
-      font-weight: 700;
-    }
-
-    .tour-entry .tour-stat-unit {
-      font-size: 1rem;
-      color: #666;
-    }
-
-    @media (min-width: 768px) {
-      .tour-entry .tour-stats-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-      }
-    }
-
-    .tour-entry > section {
-      padding: 0 1.5rem 1.5rem;
-    }
-
-    .tour-entry .gipfelbuch-list {
-      list-style: none;
-      padding: 0;
-      margin: 1rem 0;
-      counter-reset: peak-counter;
-    }
-
-    .tour-entry .gipfelbuch-list li {
-      counter-increment: peak-counter;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 0.75rem;
-    }
-
-    .tour-entry .gipfelbuch-list li::before {
-      content: counter(peak-counter);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 2rem;
-      height: 2rem;
-      border-radius: 50%;
-      background: #ff8c42;
-      color: #fff;
-      font-weight: 700;
-      font-size: 0.875rem;
-      flex-shrink: 0;
-    }
-
-    .tour-entry .gpx-download-link {
-      display: block;
-      text-align: right;
-      padding: 0.25rem 0 0;
-      margin: 0;
-    }
-
-    .tour-entry .gpx-download-link a {
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: #999;
-      text-decoration: underline;
-      text-decoration-style: dashed;
-      text-underline-offset: 0.2em;
-    }
-
-    .tour-entry .gpx-download-link a:hover {
-      color: #666;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      .tour-entry {
-        border-color: #2b2f3a;
-        background-color: #11151d;
-      }
-
-      .tour-entry > header,
-      .tour-entry > section {
-        background-color: transparent;
-      }
-
-      .tour-entry .tour-entry-meta,
-      .tour-entry .tour-entry-meta span,
-      .tour-entry .tour-entry-meta .tour-entry-meta-label {
-        color: #c3cad5;
-      }
-
-      .tour-entry .tour-stat-card {
-        background: #1c2332;
-        border: 1px solid #2f3747;
-      }
-
-      .tour-entry .tour-stat-card dt {
-        color: #aeb6c4;
-      }
-
-      .tour-entry .tour-stat-card dd {
-        color: #f6f7fb;
-      }
-
-      .tour-entry .tour-stat-unit {
-        color: #9aa3b5;
-      }
-
-      .tour-entry .gpx-download-link a {
-        color: #b6becd;
-      }
-
-      .tour-entry .gpx-download-link a:hover {
-        color: #fff;
-      }
-    }
-  </style>
+{{- /* Load CSS once per page */ -}}
+{{- if and (not $isFeedOutput) (not ($.Page.Scratch.Get "tour-styles-loaded")) -}}
+  {{- $.Page.Scratch.Set "tour-styles-loaded" true -}}
+  <link rel="stylesheet" href="{{ "tours/tour-styles.css" | relURL }}">
 {{- end -}}
 
+{{- /* Feed output (simplified) */ -}}
 {{- if $isFeedOutput -}}
 <div>
   <strong>{{ $title | htmlEscape }}</strong>
   {{- if $typeLabel }} · {{ $typeLabel | htmlEscape }}{{ end -}}
   {{- if $region }} · {{ $region | htmlEscape }}{{ end -}}
-  {{- if $distanceKm }} · {{ $distanceKm | htmlEscape }} km{{ end -}}
-  {{- if $elevationM }} · {{ $elevationM | htmlEscape }} hm{{ end -}}
+  {{- if gt $distanceKm 0 }} · {{ $distanceKm | htmlEscape }} km{{ end -}}
+  {{- if gt $elevationM 0 }} · {{ $elevationM | htmlEscape }} hm{{ end -}}
   {{- if $gpx }} · <a href="{{ $gpx | htmlEscape }}">GPX</a>{{ end -}}
 </div>
 {{- else -}}
+{{- /* Regular HTML output */ -}}
 <section class="tour-entry" id="tour-{{ $id | htmlEscape }}">
   <header>
     <p class="tour-entry-meta">
@@ -348,7 +133,7 @@
   {{- end -}}
 
   <dl class="tour-stats-grid">
-    {{- if $distanceKm -}}
+    {{- if gt $distanceKm 0 -}}
     <div class="tour-stat-card">
       <dt>Distanz</dt>
       <dd>
@@ -357,7 +142,7 @@
       </dd>
     </div>
     {{- end -}}
-    {{- if $elevationM -}}
+    {{- if gt $elevationM 0 -}}
     <div class="tour-stat-card">
       <dt>Aufstieg</dt>
       <dd>
@@ -366,7 +151,7 @@
       </dd>
     </div>
     {{- end -}}
-    {{- if $maxHeight -}}
+    {{- if gt $maxHeight 0 -}}
     <div class="tour-stat-card">
       <dt>Max. Höhe</dt>
       <dd>
@@ -375,7 +160,7 @@
       </dd>
     </div>
     {{- end -}}
-    {{- if $durationH -}}
+    {{- if gt $durationH 0 -}}
     <div class="tour-stat-card">
       <dt>Dauer</dt>
       <dd>
