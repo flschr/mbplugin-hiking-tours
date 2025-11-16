@@ -1,10 +1,6 @@
-# fischr Tours Plugin
+# Micro.blog Mini-Komoot Tour-Plugin
 
-A Micro.blog plugin for interactive tour widgets with maps, statistics, and peak lists.
-
-## Installation
-
-**Settings → Plugins** → `https://github.com/flschr/mbplugin-fischr-tours` → **Install**
+A Micro.blog plugin for interactive tour widgets with maps, statistics, and peak lists for your hike and bike trips.
 
 ## Usage
 
@@ -59,9 +55,5 @@ peaks="Hoher Fricken (1940m):47.4769,11.1302;Karkopf (1738m):47.4804,11.1449"
 - Interactive Leaflet map with GPX track
 - Direction arrows and start/finish markers (A/B)
 - Numbered peak markers on the map
+- Peaks that you passed multiple times in a trip, get a larger marker
 - Statistics grid (distance, elevation, duration)
-- Feed-friendly output for RSS
-
-## Support
-
-Issues: https://github.com/flschr/mbplugin-fischr-tours/issues
