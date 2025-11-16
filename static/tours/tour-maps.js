@@ -493,13 +493,32 @@
   // ============================================================================
 
   /**
-   * Create peak icon with number
+   * Create peak icon with number(s) - supports multiple numbers separated by pipes
    */
-  function createPeakIcon(scale, number) {
+  function createPeakIcon(scale, numbers) {
     var baseSize = CONFIG.PEAK_ICON_SIZE;
     var size = Math.round(baseSize * scale);
     var sizeDelta = size - baseSize;
-    var numberText = number ? escapeHtml(number) : '';
+
+    // Build text content with pipes for multiple numbers
+    var textElement = '';
+    if (Array.isArray(numbers) && numbers.length > 0) {
+      // Create text with tspan elements for numbers and pipes
+      var textParts = [];
+      for (var i = 0; i < numbers.length; i++) {
+        textParts.push('<tspan>' + escapeHtml(numbers[i]) + '</tspan>');
+        if (i < numbers.length - 1) {
+          // Add pipe with reduced opacity
+          textParts.push('<tspan opacity="0.5">|</tspan>');
+        }
+      }
+      textElement = '<text x="14" y="' + CONFIG.PEAK_TEXT_Y + '" text-anchor="middle" font-size="' + CONFIG.PEAK_TEXT_FONT_SIZE + '" font-family="-apple-system, BlinkMacSystemFont,\"Segoe UI\", sans-serif" font-weight="400" fill="' + CONFIG.PEAK_TEXT_COLOR + '" stroke="' + CONFIG.PEAK_TEXT_STROKE + '" stroke-width="' + CONFIG.PEAK_TEXT_STROKE_WIDTH + '" paint-order="stroke fill" dominant-baseline="middle">' + textParts.join('') + '</text>';
+    } else {
+      // Fallback for single number (legacy support)
+      var numberText = numbers ? escapeHtml(numbers) : '';
+      textElement = '<text x="14" y="' + CONFIG.PEAK_TEXT_Y + '" text-anchor="middle" font-size="' + CONFIG.PEAK_TEXT_FONT_SIZE + '" font-family="-apple-system, BlinkMacSystemFont,\"Segoe UI\", sans-serif" font-weight="400" fill="' + CONFIG.PEAK_TEXT_COLOR + '" stroke="' + CONFIG.PEAK_TEXT_STROKE + '" stroke-width="' + CONFIG.PEAK_TEXT_STROKE_WIDTH + '" paint-order="stroke fill" dominant-baseline="middle">' + numberText + '</text>';
+    }
+
     var anchor = [
       Math.round(CONFIG.PEAK_ICON_ANCHOR_X + sizeDelta / 2),
       Math.round(CONFIG.PEAK_ICON_ANCHOR_Y + sizeDelta)
@@ -509,7 +528,6 @@
       Math.round(CONFIG.PEAK_POPUP_ANCHOR_Y * scale)
     ];
     var shadowId = 'mbtourShadow' + Math.random().toString(36).slice(2, 8);
-    var textElement = '<text x="14" y="' + CONFIG.PEAK_TEXT_Y + '" text-anchor="middle" font-size="' + CONFIG.PEAK_TEXT_FONT_SIZE + '" font-family="-apple-system, BlinkMacSystemFont,\"Segoe UI\", sans-serif" font-weight="400" fill="' + CONFIG.PEAK_TEXT_COLOR + '" stroke="' + CONFIG.PEAK_TEXT_STROKE + '" stroke-width="' + CONFIG.PEAK_TEXT_STROKE_WIDTH + '" paint-order="stroke fill" dominant-baseline="middle">' + numberText + '</text>';
     var svg = '' +
       '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 28 28" fill="none">' +
       '<defs>' +
@@ -545,7 +563,7 @@
       var decoded = decodeHTMLEntities(peaksRaw);
       var peaks = JSON.parse(decoded);
 
-      // Deduplicate peaks by coordinates, keeping first number
+      // Deduplicate peaks by coordinates, collecting all numbers
       var peakIndex = Object.create(null);
       peaks.forEach(function(peak) {
         if (!peak || !peak.lat || !peak.lng) {
@@ -567,10 +585,11 @@
             lat: lat,
             lng: lng,
             label: peak.label,
-            number: peak.number || 0,
+            numbers: [],
             count: 0
           };
         }
+        peakIndex[key].numbers.push(peak.number || 0);
         peakIndex[key].count += 1;
       });
 
@@ -579,7 +598,7 @@
         var info = peakIndex[key];
         var iconScale = info.count > 1 ? CONFIG.PEAK_SCALE_MULTIPLE : 1;
         var marker = L.marker([info.lat, info.lng], {
-          icon: createPeakIcon(iconScale, info.number)
+          icon: createPeakIcon(iconScale, info.numbers)
         });
         if (info.label) {
           marker.bindPopup(info.label);
