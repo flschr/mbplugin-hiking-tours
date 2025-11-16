@@ -1,14 +1,14 @@
 # fischr Tours Plugin
 
-Ein Micro.blog Plugin für interaktive Tour-Widgets mit Karte, Statistiken und Gipfellisten.
+A Micro.blog plugin for interactive tour widgets with maps, statistics, and peak lists.
 
 ## Installation
 
 **Settings → Plugins** → `https://github.com/flschr/mbplugin-fischr-tours` → **Install**
 
-## Verwendung
+## Usage
 
-Shortcode in deinen Blog-Post einfügen:
+Add the shortcode to your blog post:
 
 ```markdown
 {{< tour
@@ -25,42 +25,42 @@ Shortcode in deinen Blog-Post einfügen:
 >}}
 ```
 
-**GPX hochladen:** Posts → Uploads → GPX-Datei hochladen → Pfad notieren
+**Upload GPX:** Posts → Uploads → Upload GPX file → Note the path
 
-## Parameter
+## Parameters
 
-### Pflichtfelder
-- `id` – Eindeutige ID (slug)
-- `title` – Titel der Tour
-- `date` – Datum (YYYY-MM-DD)
-- `type` – Typ: `hike`, `mtb`, `gravel`, `run`
-- `distance_km` – Distanz in km
-- `elevation_m` – Höhenmeter
-- `gpx` – Pfad zur GPX-Datei
+### Required
+- `id` – Unique identifier (slug)
+- `title` – Tour title
+- `date` – Date (YYYY-MM-DD)
+- `type` – Type: `hike`, `mtb`, `gravel`, `run`
+- `distance_km` – Distance in kilometers
+- `elevation_m` – Elevation gain in meters
+- `gpx` – Path to GPX file
 
 ### Optional
-- `region` – Region
-- `duration_h` – Dauer in Stunden
-- `max_height` – Höchster Punkt in Metern
-- `bergfex_url` – Link zu Bergfex
-- `cover_image` – Fallback-Bild ohne Karte
-- `peaks` – Gipfelliste (siehe unten)
+- `region` – Region name
+- `duration_h` – Duration in hours
+- `max_height` – Highest point in meters
+- `bergfex_url` – Link to Bergfex
+- `cover_image` – Fallback image without map
+- `peaks` – Peak list (see below)
 
-### Gipfel
+### Peaks
 
-Gipfel als Semikolon-getrennte Liste. Mit Koordinaten (`Name:lat,lng`) werden Marker auf der Karte angezeigt:
+Peaks as semicolon-separated list. Add coordinates (`Name:lat,lng`) to display markers on the map:
 
 ```
 peaks="Hoher Fricken (1940m):47.4769,11.1302;Karkopf (1738m):47.4804,11.1449"
 ```
 
-## Was du bekommst
+## What you get
 
-- Interaktive Leaflet-Karte mit GPX-Track
-- Richtungspfeile und Start/Ziel-Marker (A/B)
-- Nummerierte Peak-Marker auf der Karte
-- Statistik-Grid (Distanz, Höhenmeter, Dauer)
-- Feed-freundliche Ausgabe für RSS
+- Interactive Leaflet map with GPX track
+- Direction arrows and start/finish markers (A/B)
+- Numbered peak markers on the map
+- Statistics grid (distance, elevation, duration)
+- Feed-friendly output for RSS
 
 ## Support
 
