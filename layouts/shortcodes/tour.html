@@ -81,7 +81,15 @@
     {{- /* Resource hints for better performance */ -}}
     <link rel="preconnect" href="https://unpkg.com" crossorigin>
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    {{- $maptilerKey := "" -}}
+    {{- with $.Site.Params.maptiler_api_key -}}
+      {{- $maptilerKey = . -}}
+    {{- end -}}
+    {{- if $maptilerKey -}}
+    <link rel="dns-prefetch" href="https://api.maptiler.com">
+    {{- else -}}
     <link rel="dns-prefetch" href="https://tile.openstreetmap.org">
+    {{- end -}}
     {{- /* Leaflet CSS and JS */ -}}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha512-Zcn6bjR/8RZbLEpLIeOwNtzREBAJnUKESxces60Mpoj+2okopSAcSUIUOseddDm0cxnGQzxIR7vJgsLZbdLE3w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha512-BwHfrr4c9kmRkLw6iXFdzcdWV/PGkVgiIyIWLLlTSXzWQzxuSg4DiQUCpauz/EWjgk5TYQqX/kvn9pG1NpYfqg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -168,7 +176,11 @@
   </header>
 
   {{- if $shouldRenderMap -}}
-  <div class="tour-map" data-tour-map data-gpx="{{ $gpx | htmlEscape }}"{{ if $peaksDataJSON }} data-peaks='{{ $peaksDataJSON | safeHTMLAttr }}'{{ end }} style="min-height:320px; margin:0.1625rem 0 0.75rem;"></div>
+  {{- $maptilerKey := "" -}}
+  {{- with $.Site.Params.maptiler_api_key -}}
+    {{- $maptilerKey = . -}}
+  {{- end -}}
+  <div class="tour-map" data-tour-map data-gpx="{{ $gpx | htmlEscape }}"{{ if $peaksDataJSON }} data-peaks='{{ $peaksDataJSON | safeHTMLAttr }}'{{ end }}{{ if $maptilerKey }} data-maptiler-key="{{ $maptilerKey | htmlEscape }}"{{ end }} style="min-height:320px; margin:0.1625rem 0 0.75rem;"></div>
   {{- else if $coverImage -}}
   <figure class="tour-image">
     <img src="{{ $coverImage | htmlEscape }}" alt="{{ $title | htmlEscape }}" loading="lazy" />

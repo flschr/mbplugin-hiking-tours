@@ -8,5 +8,14 @@
   },
   "microblog": {
     "version": "1.0"
-  }
+  },
+  "settings": [
+    {
+      "type": "text",
+      "key": "maptiler_api_key",
+      "label": "MapTiler API Key",
+      "default": "",
+      "description": "Optional: Enter your MapTiler API key to use high-quality outdoor maps. Get a free key at https://www.maptiler.com/cloud/ (100k views/month). Leave empty to use OpenTopoMap."
+    }
+  ]
 }
