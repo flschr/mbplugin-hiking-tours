@@ -147,6 +147,17 @@
   align-items: center;
   gap: 1rem;
   margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px dashed var(--tour-meta-color);
+  transition: border-color 0.2s ease;
+}
+
+.tour-entry .gipfelbuch-list li:last-child {
+  border-bottom: none;
+}
+
+.tour-entry .gipfelbuch-list li:hover {
+  border-bottom-color: var(--tour-peak-badge-bg);
 }
 
 .tour-entry .gipfelbuch-list li::before {
