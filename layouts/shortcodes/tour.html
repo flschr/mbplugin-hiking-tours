@@ -62,17 +62,12 @@
 {{- /* Map rendering logic */ -}}
 {{- $shouldRenderMap := and $gpx (ne $gpx "") -}}
 
-{{- /* Type label mapping */ -}}
-{{- $typeLabel := $type -}}
-{{- if eq $type "hike" -}}
-  {{- $typeLabel = "Hike" -}}
-{{- else if eq $type "mtb" -}}
-  {{- $typeLabel = "MTB" -}}
-{{- else if eq $type "gravel" -}}
-  {{- $typeLabel = "Gravel" -}}
-{{- else if eq $type "run" -}}
-  {{- $typeLabel = "Run" -}}
-{{- end -}}
+{{- /* Type label mapping using dict for cleaner code */ -}}
+{{- $typeLabels := dict "hike" "Hike" "mtb" "MTB" "gravel" "Gravel" "run" "Run" -}}
+{{- $typeLabel := index $typeLabels $type | default $type -}}
+
+{{- /* Get MapTiler API key once (reused throughout template) */ -}}
+{{- $maptilerKey := $.Site.Params.maptiler_api_key | default "" -}}
 
 {{- /* Load assets once per page (not per shortcode) */ -}}
 {{- if and (not $isFeedOutput) $shouldRenderMap -}}
@@ -81,10 +76,6 @@
     {{- /* Resource hints for better performance */ -}}
     <link rel="preconnect" href="https://unpkg.com" crossorigin>
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-    {{- $maptilerKey := "" -}}
-    {{- with $.Site.Params.maptiler_api_key -}}
-      {{- $maptilerKey = . -}}
-    {{- end -}}
     {{- if $maptilerKey -}}
     <link rel="dns-prefetch" href="https://api.maptiler.com">
     {{- else -}}
@@ -176,10 +167,6 @@
   </header>
 
   {{- if $shouldRenderMap -}}
-  {{- $maptilerKey := "" -}}
-  {{- with $.Site.Params.maptiler_api_key -}}
-    {{- $maptilerKey = . -}}
-  {{- end -}}
   <div class="tour-map" data-tour-map data-gpx="{{ $gpx | htmlEscape }}"{{ if $peaksDataJSON }} data-peaks='{{ $peaksDataJSON | safeHTMLAttr }}'{{ end }}{{ if $maptilerKey }} data-maptiler-key="{{ $maptilerKey | htmlEscape }}"{{ end }} style="min-height:320px; margin:0.1625rem 0 0.75rem;"></div>
   {{- else if $coverImage -}}
   <figure class="tour-image">

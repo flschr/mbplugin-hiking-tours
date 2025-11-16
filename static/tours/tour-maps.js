@@ -54,8 +54,6 @@
     PEAK_BADGE_STROKE_WIDTH: 1.75,
 
     // Map settings
-    MAP_MIN_HEIGHT: 320,
-    LAYER_READY_MAX_ATTEMPTS: 10,
     LAYER_READY_FRAME_DELAY: 16,
 
     // Lazy loading
@@ -78,17 +76,20 @@
   }
 
   /**
-   * Improved HTML entity decoder using textarea (safer than DOMParser)
+   * HTML entity decoder using DOMParser (modern & safe)
    */
   function decodeHTMLEntities(html) {
     if (!html || html.indexOf('&') === -1) {
       return html;
     }
-    var textarea = document.createElement('textarea');
-    textarea.innerHTML = html;
-    var decoded = textarea.value;
-    textarea = null; // Cleanup
-    return decoded;
+    try {
+      var parser = new DOMParser();
+      var doc = parser.parseFromString(html, 'text/html');
+      return doc.documentElement.textContent || html;
+    } catch (err) {
+      console.warn('[Tours] Failed to decode HTML entities', err);
+      return html;
+    }
   }
 
   /**
@@ -207,44 +208,43 @@
   }
 
   /**
-   * Bring layer to back once it's rendered in DOM
+   * Bring layer to back once it's rendered in DOM (simplified)
    */
-  function bringLayerToBackWhenReady(layer, attemptsLeft) {
+  function bringLayerToBackWhenReady(layer) {
     if (!layer || typeof layer.bringToBack !== 'function') {
       return;
     }
 
+    // Try immediately
     if (layer._path && layer._path.parentNode) {
       try {
         layer.bringToBack();
+        return;
       } catch (err) {
         console.warn('[Tours] Failed to move outline behind track', err);
       }
-      return;
     }
 
-    if (!attemptsLeft) {
-      return;
-    }
-
+    // Fallback: Wait for next frame
     var schedule = window.requestAnimationFrame || function(cb) {
       return setTimeout(cb, CONFIG.LAYER_READY_FRAME_DELAY);
     };
     schedule(function() {
-      bringLayerToBackWhenReady(layer, attemptsLeft - 1);
+      if (layer._path && layer._path.parentNode) {
+        try {
+          layer.bringToBack();
+        } catch (err) {
+          console.warn('[Tours] Failed to move outline behind track (delayed)', err);
+        }
+      }
     });
   }
 
   /**
    * Add white outline behind track for better visibility
    */
-  function addTrackOutline(layer, map, color) {
-    if (!window.L || !layer || !map) {
-      return;
-    }
-
-    var lines = collectTrackLines(layer);
-    if (!lines.length) {
+  function addTrackOutline(lines, map, color) {
+    if (!window.L || !lines || !map || !lines.length) {
       return;
     }
 
@@ -267,7 +267,7 @@
         lineJoin: 'round',
         lineCap: 'round'
       }).addTo(map);
-      bringLayerToBackWhenReady(outline, CONFIG.LAYER_READY_MAX_ATTEMPTS);
+      bringLayerToBackWhenReady(outline);
       if (typeof line.setStyle === 'function') {
         line.setStyle({
           color: color,
@@ -347,13 +347,8 @@
   /**
    * Add direction arrows along the track (optimized with sampling)
    */
-  function addDirectionArrows(layer, map, color) {
-    if (!window.L || !layer || !map) {
-      return;
-    }
-
-    var lines = collectTrackLines(layer);
-    if (!lines.length) {
+  function addDirectionArrows(lines, map, color) {
+    if (!window.L || !lines || !map || !lines.length) {
       return;
     }
 
@@ -459,13 +454,8 @@
   /**
    * Add start (A) and end (B) markers
    */
-  function addEndpointMarkers(layer, map) {
-    if (!window.L || !layer || !map) {
-      return;
-    }
-
-    var lines = collectTrackLines(layer);
-    if (!lines.length) {
+  function addEndpointMarkers(lines, map) {
+    if (!window.L || !lines || !map || !lines.length) {
       return;
     }
 
@@ -611,6 +601,26 @@
   var initializedMaps = new WeakMap();
 
   /**
+   * Validate GPX URL to prevent potential XSS
+   */
+  function isValidGpxUrl(url) {
+    if (!url || typeof url !== 'string') {
+      return false;
+    }
+    // Allow relative URLs and http/https protocols only
+    var trimmed = url.trim();
+    if (trimmed.startsWith('/') || trimmed.startsWith('./') || trimmed.startsWith('../')) {
+      return true;
+    }
+    try {
+      var parsed = new URL(trimmed, window.location.href);
+      return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+    } catch (err) {
+      return false;
+    }
+  }
+
+  /**
    * Initialize a single map
    */
   function initMap(canvas) {
@@ -625,7 +635,10 @@
     initializedMaps.set(canvas, true);
 
     var gpxUrl = canvas.getAttribute('data-gpx');
-    if (!gpxUrl) {
+    if (!gpxUrl || !isValidGpxUrl(gpxUrl)) {
+      if (gpxUrl) {
+        console.warn('[Tours] Invalid GPX URL:', gpxUrl);
+      }
       return;
     }
 
@@ -670,9 +683,15 @@
       if (bounds) {
         zoomTrackToMax(map, bounds);
       }
-      addTrackOutline(e.target, map, trackColor);
-      addDirectionArrows(e.target, map, trackColor);
-      addEndpointMarkers(e.target, map);
+
+      // Collect track lines once and reuse (performance optimization)
+      var trackLines = collectTrackLines(e.target);
+      if (trackLines.length) {
+        addTrackOutline(trackLines, map, trackColor);
+        addDirectionArrows(trackLines, map, trackColor);
+        addEndpointMarkers(trackLines, map);
+      }
+
       addPeakMarkers(canvas, map);
     }).addTo(map);
   }
@@ -680,6 +699,39 @@
   // ============================================================================
   // LAZY LOADING WITH INTERSECTION OBSERVER
   // ============================================================================
+
+  /**
+   * Scroll-based lazy loading fallback for older browsers
+   */
+  function initScrollFallback(canvases) {
+    var pending = Array.prototype.slice.call(canvases);
+
+    function checkVisibility() {
+      pending = pending.filter(function(canvas) {
+        if (initializedMaps.has(canvas)) {
+          return false;
+        }
+        var rect = canvas.getBoundingClientRect();
+        var viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+        var margin = 100; // Similar to CONFIG.LAZY_LOAD_MARGIN
+        if (rect.top < viewportHeight + margin && rect.bottom > -margin) {
+          initMap(canvas);
+          return false;
+        }
+        return true;
+      });
+
+      // Remove listeners if all maps are initialized
+      if (!pending.length) {
+        window.removeEventListener('scroll', checkVisibility);
+        window.removeEventListener('resize', checkVisibility);
+      }
+    }
+
+    window.addEventListener('scroll', checkVisibility, { passive: true });
+    window.addEventListener('resize', checkVisibility, { passive: true });
+    checkVisibility(); // Initial check
+  }
 
   /**
    * Initialize maps with lazy loading
@@ -692,8 +744,8 @@
 
     // Check if Intersection Observer is supported
     if (!('IntersectionObserver' in window)) {
-      // Fallback: initialize all maps immediately
-      canvases.forEach(initMap);
+      // Fallback: scroll-based lazy loading
+      initScrollFallback(canvases);
       return;
     }
 
