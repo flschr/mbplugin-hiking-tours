@@ -495,10 +495,34 @@
   /**
    * Create peak icon with number(s) - supports multiple numbers separated by pipes
    */
+  function calculatePeakFontSize(numbers) {
+    var baseFontSize = CONFIG.PEAK_TEXT_FONT_SIZE;
+    if (!Array.isArray(numbers) || numbers.length <= 1) {
+      return baseFontSize;
+    }
+
+    var totalChars = numbers
+      .filter(function(value) { return typeof value !== 'undefined' && value !== null; })
+      .map(function(value) { return String(value); })
+      .join('|')
+      .length;
+
+    if (totalChars <= 4) {
+      return baseFontSize - 1;
+    }
+
+    if (totalChars <= 8) {
+      return baseFontSize - 2;
+    }
+
+    return Math.max(7, baseFontSize - 3);
+  }
+
   function createPeakIcon(scale, numbers) {
     var baseSize = CONFIG.PEAK_ICON_SIZE;
     var size = Math.round(baseSize * scale);
     var sizeDelta = size - baseSize;
+    var fontSize = calculatePeakFontSize(numbers);
 
     // Build text content with pipes for multiple numbers
     var textElement = '';
@@ -512,11 +536,11 @@
           textParts.push('<tspan opacity="0.5">|</tspan>');
         }
       }
-      textElement = '<text x="14" y="' + CONFIG.PEAK_TEXT_Y + '" text-anchor="middle" font-size="' + CONFIG.PEAK_TEXT_FONT_SIZE + '" font-family="-apple-system, BlinkMacSystemFont,\"Segoe UI\", sans-serif" font-weight="400" fill="' + CONFIG.PEAK_TEXT_COLOR + '" stroke="' + CONFIG.PEAK_TEXT_STROKE + '" stroke-width="' + CONFIG.PEAK_TEXT_STROKE_WIDTH + '" paint-order="stroke fill" dominant-baseline="middle">' + textParts.join('') + '</text>';
+      textElement = '<text x="14" y="' + CONFIG.PEAK_TEXT_Y + '" text-anchor="middle" font-size="' + fontSize + '" font-family="-apple-system, BlinkMacSystemFont,\"Segoe UI\", sans-serif" font-weight="400" fill="' + CONFIG.PEAK_TEXT_COLOR + '" stroke="' + CONFIG.PEAK_TEXT_STROKE + '" stroke-width="' + CONFIG.PEAK_TEXT_STROKE_WIDTH + '" paint-order="stroke fill" dominant-baseline="middle">' + textParts.join('') + '</text>';
     } else {
       // Fallback for single number (legacy support)
       var numberText = numbers ? escapeHtml(numbers) : '';
-      textElement = '<text x="14" y="' + CONFIG.PEAK_TEXT_Y + '" text-anchor="middle" font-size="' + CONFIG.PEAK_TEXT_FONT_SIZE + '" font-family="-apple-system, BlinkMacSystemFont,\"Segoe UI\", sans-serif" font-weight="400" fill="' + CONFIG.PEAK_TEXT_COLOR + '" stroke="' + CONFIG.PEAK_TEXT_STROKE + '" stroke-width="' + CONFIG.PEAK_TEXT_STROKE_WIDTH + '" paint-order="stroke fill" dominant-baseline="middle">' + numberText + '</text>';
+      textElement = '<text x="14" y="' + CONFIG.PEAK_TEXT_Y + '" text-anchor="middle" font-size="' + fontSize + '" font-family="-apple-system, BlinkMacSystemFont,\"Segoe UI\", sans-serif" font-weight="400" fill="' + CONFIG.PEAK_TEXT_COLOR + '" stroke="' + CONFIG.PEAK_TEXT_STROKE + '" stroke-width="' + CONFIG.PEAK_TEXT_STROKE_WIDTH + '" paint-order="stroke fill" dominant-baseline="middle">' + numberText + '</text>';
     }
 
     var anchor = [
