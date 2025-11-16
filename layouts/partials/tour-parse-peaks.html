@@ -4,9 +4,8 @@
   Input: .peaksRaw (string) - semicolon-separated peak entries
 
   Supported formats:
-  1. "Peak Name|lat|lng" - Peak with coordinates
-  2. "Peak Name:lat,lng:optional:metadata" - Peak with coordinates and optional metadata
-  3. "Peak Name" - Peak without coordinates
+  1. "Peak Name:lat,lng:optional:metadata" - Peak with coordinates and optional metadata
+  2. "Peak Name" - Peak without coordinates
 
   Returns: dict with:
     - peaksList: array of peak dicts with "label", "lat" (optional), "lng" (optional)
@@ -29,17 +28,8 @@
         {{- $lat := "" -}}
         {{- $lng := "" -}}
 
-        {{- /* Format 1: Peak|lat|lng */ -}}
-        {{- if in $peak "|" -}}
-          {{- $parts := split $peak "|" -}}
-          {{- $peakLabel = trim (index $parts 0) " \n\t" -}}
-          {{- if ge (len $parts) 3 -}}
-            {{- $lat = trim (index $parts 1) " \n\t" -}}
-            {{- $lng = trim (index $parts 2) " \n\t" -}}
-          {{- end -}}
-
-        {{- /* Format 2: Peak:lat,lng:metadata */ -}}
-        {{- else if in $peak ":" -}}
+        {{- /* Format 1: Peak:lat,lng:metadata */ -}}
+        {{- if in $peak ":" -}}
           {{- $parts := split $peak ":" -}}
           {{- $name := trim (index $parts 0) " \n\t" -}}
           {{- $coordsPart := "" -}}
@@ -70,7 +60,7 @@
             {{- $lng = trim (index $coordPieces 1) " \n\t" -}}
           {{- end -}}
 
-        {{- /* Format 3: Just the name */ -}}
+        {{- /* Format 2: Just the name */ -}}
         {{- else -}}
           {{- $peakLabel = trim $peak " \n\t" -}}
         {{- end -}}
