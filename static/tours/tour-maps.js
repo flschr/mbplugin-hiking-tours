@@ -83,6 +83,25 @@
   }
 
   /**
+   * Basic HTML escaper for dynamic SVG text
+   */
+  var HTML_ESCAPE_LOOKUP = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;'
+  };
+
+  function escapeHtml(value) {
+    if (value === null || value === undefined) {
+      return '';
+    }
+    return String(value).replace(/[&<>"]/g, function(ch) {
+      return HTML_ESCAPE_LOOKUP[ch] || ch;
+    });
+  }
+
+  /**
    * Calculate distance between two lat/lng points
    */
   function distanceBetween(a, b) {
@@ -479,28 +498,36 @@
    */
   function createPeakIcon(scale, number) {
     var size = Math.round(CONFIG.PEAK_ICON_SIZE * scale);
-    var fontSize = Math.round(14 * scale);
-    var numberText = number ? String(number) : '';
-    var styles = [
-      'width: ' + size + 'px',
-      'height: ' + size + 'px',
-      'border-radius: ' + Math.round(size / 2) + 'px',
-      'background: #fff',
-      'color: #ea580c',
-      'font-weight: 700',
-      'font-size: ' + fontSize + 'px',
-      'display: flex',
-      'align-items: center',
-      'justify-content: center',
-      'border: ' + Math.round(3 * scale) + 'px solid #ea580c',
-      'box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45)'
-    ].join('; ');
+    var numberText = number ? escapeHtml(number) : '';
+    var anchor = [
+      Math.round(CONFIG.PEAK_ICON_ANCHOR_X * scale),
+      Math.round(CONFIG.PEAK_ICON_ANCHOR_Y * scale)
+    ];
+    var popupAnchor = [
+      Math.round(CONFIG.PEAK_POPUP_ANCHOR_X * scale),
+      Math.round(CONFIG.PEAK_POPUP_ANCHOR_Y * scale)
+    ];
+    var shadowId = 'mbtourShadow' + Math.random().toString(36).slice(2, 8);
+    var textElement = '<text x="14" y="12.5" text-anchor="middle" font-size="9" font-family="-apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif" font-weight="700" fill="#9a3412" dominant-baseline="middle">' + numberText + '</text>';
+    var svg = '' +
+      '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 28 28" fill="none">' +
+      '<defs>' +
+      '<filter id="' + shadowId + '" x="-30%" y="-10%" width="160%" height="160%" color-interpolation-filters="sRGB">' +
+      '<feDropShadow dx="0" dy="3" stdDeviation="2.2" flood-color="#000" flood-opacity="0.35" />' +
+      '</filter>' +
+      '</defs>' +
+      '<g filter="url(#' + shadowId + ')">' +
+      '<path d="M14 2C9.029 2 5 6.029 5 11c0 6.363 7.156 14.482 8.115 15.51a1.2 1.2 0 0 0 1.77 0C15.844 25.482 23 17.363 23 11c0-4.97-4.029-9-9-9Zm0 6.5A2.5 2.5 0 1 1 11.5 11 2.5 2.5 0 0 1 14 8.5Z" fill="#f97316" stroke="#ffffff" stroke-width="2" />' +
+      '<circle cx="14" cy="11" r="4.25" fill="#fff7ed" stroke="#ffffff" stroke-width="1.5" />' +
+      textElement +
+      '</g>' +
+      '</svg>';
     return L.divIcon({
-      className: '',
+      className: 'mbtour-peak-icon',
       iconSize: [size, size],
-      iconAnchor: [Math.round(size / 2), Math.round(size / 2)],
-      popupAnchor: [0, Math.round(-size / 2)],
-      html: '<div style="' + styles + '">' + numberText + '</div>'
+      iconAnchor: anchor,
+      popupAnchor: popupAnchor,
+      html: svg
     });
   }
 

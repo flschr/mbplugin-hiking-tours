@@ -68,7 +68,7 @@ peaks="Hoher Fricken (1940m)|47.4769|11.1302;Karkopf (1738m)|47.4804|11.1449"
 
 Entries without coordinates still appear in the ordered "Gipfelbuch" list below the tour details.
 
-Peak markers on GPX maps use OpenStreetMap's stock note flag icon.
+Peak markers on GPX maps use custom drop icons with integrated numbers.
 
 ### Uploading GPX files
 
@@ -88,7 +88,7 @@ mbplugin-fischr-tours/
 │   └── tour.html              # Tour widget shortcode
 ├── static/tours/
 │   ├── tour-maps.js           # Leaflet map initialization
-│   └── note.svg               # Peak marker icon
+│   └── note.svg               # Base SVG used for peak marker icon
 └── README.md                  # Documentation
 ```
 
@@ -101,7 +101,7 @@ When you provide a GPX file, the plugin renders an interactive Leaflet map with:
 - **Track visualization** – Blue track line with white outline
 - **Direction arrows** – Evenly spaced arrows showing direction of travel
 - **Start/End markers** – "A" and "B" markers showing route endpoints
-- **Peak markers** – Numbered flag markers for peaks with coordinates
+- **Peak markers** – Numbered drop markers for peaks with coordinates
 - **Responsive design** – Maps adapt to all screen sizes
 
 ### Statistics Grid
