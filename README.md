@@ -1,6 +1,6 @@
 # Micro.blog Mini-Komoot Tour-Plugin
 
-A Micro.blog plugin for interactive tour widgets with maps, statistics, and peak lists for your hike and bike trips.
+A Micro.blog plugin for interactive tour widgets with maps, statistics, and peak lists for your hike and bike trips. Very much like what you can get from Komoot, but without relying on their infrastructure.
 
 ## Usage
 
@@ -57,3 +57,7 @@ peaks="Hoher Fricken (1940m):47.4769,11.1302;Karkopf (1738m):47.4804,11.1449"
 - Numbered peak markers on the map
 - Peaks that you passed multiple times in a trip, get a larger marker
 - Statistics grid (distance, elevation, duration)
+
+## Setup
+
+Add a free MapTiler API key, to get beautiful outdoor maps. Without this key, rendering falls back to OSM standard map.
