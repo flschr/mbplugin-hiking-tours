@@ -1,9 +1,45 @@
 /* Tour Entry Styles for Micro.blog Plugin */
 
+/* CSS Custom Properties for theming */
+:root {
+  /* Colors - Light Mode */
+  --tour-border-color: #e0e0e0;
+  --tour-bg-color: transparent;
+  --tour-meta-color: #666;
+  --tour-stat-bg: #f5f5f5;
+  --tour-stat-border: transparent;
+  --tour-stat-label-color: #666;
+  --tour-stat-value-color: #111;
+  --tour-stat-unit-color: #666;
+  --tour-peak-badge-bg: #ff8c42;
+  --tour-peak-badge-color: #fff;
+  --tour-gpx-link-color: #999;
+  --tour-gpx-link-hover: #666;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Colors - Dark Mode */
+    --tour-border-color: #2b2f3a;
+    --tour-bg-color: #11151d;
+    --tour-meta-color: #c3cad5;
+    --tour-stat-bg: #1c2332;
+    --tour-stat-border: #2f3747;
+    --tour-stat-label-color: #aeb6c4;
+    --tour-stat-value-color: #f6f7fb;
+    --tour-stat-unit-color: #9aa3b5;
+    --tour-peak-badge-bg: #ff8c42;
+    --tour-peak-badge-color: #fff;
+    --tour-gpx-link-color: #b6becd;
+    --tour-gpx-link-hover: #fff;
+  }
+}
+
 .tour-entry {
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--tour-border-color);
   border-radius: 5px;
   padding: 0;
+  background-color: var(--tour-bg-color);
 }
 
 .tour-entry > header {
@@ -14,13 +50,11 @@
   margin-bottom: 0.125rem;
 }
 
-.tour-entry .tour-entry-meta {
-  color: #666;
+.tour-entry .tour-entry-meta,
+.tour-entry .tour-entry-meta span,
+.tour-entry .tour-entry-meta-label {
+  color: var(--tour-meta-color);
   font-size: 0.85rem;
-}
-
-.tour-entry .tour-entry-meta span {
-  color: inherit;
 }
 
 .tour-entry > header h3 {
@@ -50,27 +84,27 @@
 }
 
 .tour-entry .tour-stat-card {
-  background: #f5f5f5;
+  background: var(--tour-stat-bg);
+  border: 1px solid var(--tour-stat-border);
   border-radius: 5px;
   padding: 1.15rem 1rem 1.25rem;
   text-align: center;
 }
 
-.tour-entry .tour-stat-card dt,
-.tour-entry .tour-entry-meta .tour-entry-meta-label {
+.tour-entry .tour-stat-card dt {
   margin: 0 0 0.35rem;
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #666;
+  color: var(--tour-stat-label-color);
   display: inline-block;
 }
 
 .tour-entry .tour-stat-card dd {
   margin: 0;
   font-weight: 600;
-  color: #111;
+  color: var(--tour-stat-value-color);
   display: inline-flex;
   align-items: baseline;
   justify-content: center;
@@ -87,7 +121,7 @@
 
 .tour-entry .tour-stat-unit {
   font-size: 1rem;
-  color: #666;
+  color: var(--tour-stat-unit-color);
 }
 
 @media (min-width: 768px) {
@@ -123,8 +157,8 @@
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
-  background: #ff8c42;
-  color: #fff;
+  background: var(--tour-peak-badge-bg);
+  color: var(--tour-peak-badge-color);
   font-weight: 700;
   font-size: 0.875rem;
   flex-shrink: 0;
@@ -142,56 +176,12 @@
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #999;
+  color: var(--tour-gpx-link-color);
   text-decoration: underline;
   text-decoration-style: dashed;
   text-underline-offset: 0.2em;
 }
 
 .tour-entry .gpx-download-link a:hover {
-  color: #666;
-}
-
-/* Dark Mode */
-@media (prefers-color-scheme: dark) {
-  .tour-entry {
-    border-color: #2b2f3a;
-    background-color: #11151d;
-  }
-
-  .tour-entry > header,
-  .tour-entry > section {
-    background-color: transparent;
-  }
-
-  .tour-entry .tour-entry-meta,
-  .tour-entry .tour-entry-meta span,
-  .tour-entry .tour-entry-meta .tour-entry-meta-label {
-    color: #c3cad5;
-  }
-
-  .tour-entry .tour-stat-card {
-    background: #1c2332;
-    border: 1px solid #2f3747;
-  }
-
-  .tour-entry .tour-stat-card dt {
-    color: #aeb6c4;
-  }
-
-  .tour-entry .tour-stat-card dd {
-    color: #f6f7fb;
-  }
-
-  .tour-entry .tour-stat-unit {
-    color: #9aa3b5;
-  }
-
-  .tour-entry .gpx-download-link a {
-    color: #b6becd;
-  }
-
-  .tour-entry .gpx-download-link a:hover {
-    color: #fff;
-  }
+  color: var(--tour-gpx-link-hover);
 }
