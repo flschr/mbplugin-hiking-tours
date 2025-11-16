@@ -37,7 +37,7 @@
     ENDPOINT_BORDER_WIDTH: 3,
 
     // Peak markers
-    PEAK_ICON_SIZE: 28,
+    PEAK_ICON_SIZE: 36,
     PEAK_ICON_ANCHOR_X: 14,
     PEAK_ICON_ANCHOR_Y: 24,
     PEAK_POPUP_ANCHOR_X: 0,
@@ -45,7 +45,7 @@
     PEAK_SCALE_MULTIPLE: 2,
     PEAK_TEXT_FONT_SIZE: 11,
     PEAK_TEXT_Y: 12.8,
-    PEAK_TEXT_COLOR: '#7c2d12',
+    PEAK_TEXT_COLOR: '#f97316',
     PEAK_TEXT_STROKE: '#ffffff',
     PEAK_TEXT_STROKE_WIDTH: 2,
     PEAK_BADGE_RADIUS: 5.2,
@@ -517,7 +517,7 @@
       Math.round(CONFIG.PEAK_POPUP_ANCHOR_Y * scale)
     ];
     var shadowId = 'mbtourShadow' + Math.random().toString(36).slice(2, 8);
-    var textElement = '<text x="14" y="' + CONFIG.PEAK_TEXT_Y + '" text-anchor="middle" font-size="' + CONFIG.PEAK_TEXT_FONT_SIZE + '" font-family="-apple-system, BlinkMacSystemFont,\"Segoe UI\", sans-serif" font-weight="700" fill="' + CONFIG.PEAK_TEXT_COLOR + '" stroke="' + CONFIG.PEAK_TEXT_STROKE + '" stroke-width="' + CONFIG.PEAK_TEXT_STROKE_WIDTH + '" paint-order="stroke fill" dominant-baseline="middle">' + numberText + '</text>';
+    var textElement = '<text x="14" y="' + CONFIG.PEAK_TEXT_Y + '" text-anchor="middle" font-size="' + CONFIG.PEAK_TEXT_FONT_SIZE + '" font-family="-apple-system, BlinkMacSystemFont,\"Segoe UI\", sans-serif" font-weight="400" fill="' + CONFIG.PEAK_TEXT_COLOR + '" stroke="' + CONFIG.PEAK_TEXT_STROKE + '" stroke-width="' + CONFIG.PEAK_TEXT_STROKE_WIDTH + '" paint-order="stroke fill" dominant-baseline="middle">' + numberText + '</text>';
     var svg = '' +
       '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 28 28" fill="none">' +
       '<defs>' +
