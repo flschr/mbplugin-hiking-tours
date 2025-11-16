@@ -1,21 +1,15 @@
 {
+  "name": "mbplugin-tours",
   "version": "1.0.0",
   "title": "fischr Tours",
   "description": "Minimal tour shortcode + optional GPX maps for Micro.blog",
-  "author": {
-    "name": "fischr",
-    "url": "https://fischr.org"
-  },
-  "microblog": {
-    "version": "1.0"
-  },
-  "settings": [
+  "author": "René Fischer",
+  "fields": [
     {
-      "type": "text",
-      "key": "maptiler_api_key",
+      "field": "params.maptiler_api_key",
       "label": "MapTiler API Key",
-      "default": "",
-      "description": "Optional: Enter your MapTiler API key to use high-quality outdoor maps. Get a free key at https://www.maptiler.com/cloud/ (100k views/month). Leave empty to use OpenTopoMap."
+      "type": "string",
+      "default": ""
     }
   ]
 }
