@@ -43,6 +43,15 @@
     PEAK_POPUP_ANCHOR_X: 0,
     PEAK_POPUP_ANCHOR_Y: -22,
     PEAK_SCALE_MULTIPLE: 2,
+    PEAK_TEXT_FONT_SIZE: 11,
+    PEAK_TEXT_Y: 12.8,
+    PEAK_TEXT_COLOR: '#7c2d12',
+    PEAK_TEXT_STROKE: '#ffffff',
+    PEAK_TEXT_STROKE_WIDTH: 2,
+    PEAK_BADGE_RADIUS: 5.2,
+    PEAK_BADGE_FILL: '#fff4e6',
+    PEAK_BADGE_STROKE: '#ffffff',
+    PEAK_BADGE_STROKE_WIDTH: 1.75,
 
     // Map settings
     MAP_MIN_HEIGHT: 320,
@@ -508,7 +517,7 @@
       Math.round(CONFIG.PEAK_POPUP_ANCHOR_Y * scale)
     ];
     var shadowId = 'mbtourShadow' + Math.random().toString(36).slice(2, 8);
-    var textElement = '<text x="14" y="12.5" text-anchor="middle" font-size="9" font-family="-apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif" font-weight="700" fill="#9a3412" dominant-baseline="middle">' + numberText + '</text>';
+    var textElement = '<text x="14" y="' + CONFIG.PEAK_TEXT_Y + '" text-anchor="middle" font-size="' + CONFIG.PEAK_TEXT_FONT_SIZE + '" font-family="-apple-system, BlinkMacSystemFont,\"Segoe UI\", sans-serif" font-weight="700" fill="' + CONFIG.PEAK_TEXT_COLOR + '" stroke="' + CONFIG.PEAK_TEXT_STROKE + '" stroke-width="' + CONFIG.PEAK_TEXT_STROKE_WIDTH + '" paint-order="stroke fill" dominant-baseline="middle">' + numberText + '</text>';
     var svg = '' +
       '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 28 28" fill="none">' +
       '<defs>' +
@@ -518,7 +527,7 @@
       '</defs>' +
       '<g filter="url(#' + shadowId + ')">' +
       '<path d="M14 2C9.029 2 5 6.029 5 11c0 6.363 7.156 14.482 8.115 15.51a1.2 1.2 0 0 0 1.77 0C15.844 25.482 23 17.363 23 11c0-4.97-4.029-9-9-9Zm0 6.5A2.5 2.5 0 1 1 11.5 11 2.5 2.5 0 0 1 14 8.5Z" fill="#f97316" stroke="#ffffff" stroke-width="2" />' +
-      '<circle cx="14" cy="11" r="4.25" fill="#fff7ed" stroke="#ffffff" stroke-width="1.5" />' +
+      '<circle cx="14" cy="11" r="' + CONFIG.PEAK_BADGE_RADIUS + '" fill="' + CONFIG.PEAK_BADGE_FILL + '" stroke="' + CONFIG.PEAK_BADGE_STROKE + '" stroke-width="' + CONFIG.PEAK_BADGE_STROKE_WIDTH + '" />' +
       textElement +
       '</g>' +
       '</svg>';
