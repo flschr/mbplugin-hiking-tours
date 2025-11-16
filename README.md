@@ -1,30 +1,26 @@
 # fischr Tours Plugin for Micro.blog
 
-A lightweight Micro.blog/Hugo plugin that keeps the "tour" workflow simple: drop a shortcode into a post, optionally add a GPX file, and the plugin renders a clean box that inherits almost all of its styles from your blog theme. An optional `/tours/` page lists the collected tours using the data file that ships with the plugin.
+A lightweight Micro.blog/Hugo plugin that adds an interactive tour widget to your blog posts. Drop a shortcode into your post, optionally add a GPX file, and the plugin renders a clean tour box with an interactive map, statistics, and peak lists.
 
 ## Features
 
-- **Minimal tour shortcode** – semantic HTML with only the markup you need. The page theme handles the styling.
-- **Optional GPX maps** – Leaflet + leaflet-gpx are loaded only when a tour actually references a GPX file.
-- **Peak lists** – Provide peaks with or without coordinates. Named markers are added when coordinates are present.
-- **Simple archive** – `/tours/` renders a plain list plus aggregated totals directly from `data/tours.json`.
-- **Automation friendly** – Keep editing `data/tours.json` manually or generate it via the included GitHub Action example.
+- **Minimal tour shortcode** – semantic HTML with clean styling that adapts to your blog theme
+- **Optional GPX maps** – Interactive Leaflet maps with track visualization, direction arrows, and endpoint markers
+- **Peak lists** – Display peak lists with optional map markers when coordinates are provided
+- **Feed-friendly** – Simplified text output for RSS/JSON/Atom feeds
 
 ## Installation
 
-### 1. Install the plugin
-1. Open your Micro.blog **Settings → Plugins**.
-2. Add `https://github.com/flschr/mbplugin-fischr-tours` and click **Install**.
+1. Open your Micro.blog **Settings → Plugins**
+2. Add `https://github.com/flschr/mbplugin-fischr-tours` and click **Install**
 
-### 2. Create the tours page
-1. Go to **Posts → Pages → New Page**.
-2. Title: `Tours`, URL: `/tours/`.
-3. Set the page layout to `tours`.
-4. Publish the page (optional intro text becomes the page description).
+That's it! The plugin is ready to use.
 
 ## Usage
 
 ### Tour shortcode
+
+Add a tour widget to any blog post:
 
 ```markdown
 {{< tour
@@ -72,26 +68,55 @@ peaks="Hoher Fricken (1940m)|47.4769|11.1302;Karkopf (1738m)|47.4804|11.1449"
 
 Entries without coordinates still appear in the ordered "Gipfelbuch" list below the tour details.
 
-Peak markers on GPX maps reuse OpenStreetMap's stock note flag icon, so there is no custom asset to upload or maintain.
+Peak markers on GPX maps use OpenStreetMap's stock note flag icon.
 
-### Tours archive
+### Uploading GPX files
 
-`layouts/page/tours.html` renders the bundled `data/tours.json`. Edit that file manually or generate it automatically from your posts with the GitHub Action that lives in `backup-repo-example/.github/`. The archive keeps things simple: totals (count, km, hm) plus an unordered list with metadata pulled from every entry.
+1. Go to **Posts** → **Uploads** in Micro.blog
+2. Upload your GPX file
+3. Note the path: `/uploads/YYYY/filename.gpx`
+4. Use this path in the `gpx` parameter
 
-## Optional automation
-
-The `SETUP.md` file and the `backup-repo-example` directory document a minimal GitHub Actions workflow that can parse your Micro.blog backup repo and push an updated `data/tours.json` back into this plugin repository. Use it if you prefer automation; otherwise, edit `data/tours.json` whenever you publish a new tour.
+**Note**: GPX files can have `.gpx` or `.xml` extensions - both work!
 
 ## File structure
 
 ```
 mbplugin-fischr-tours/
 ├── plugin.json                # Plugin metadata
-├── data/tours.json            # Source for the /tours/ page
-├── layouts/
-│   ├── shortcodes/tour.html   # Minimal tour box markup
-│   └── page/tours.html        # Simple tours archive page
-├── static/tours/tour-maps.js  # Leaflet initialisation for GPX maps
-├── README.md / SETUP.md       # Documentation
-└── backup-repo-example/       # Optional GitHub Action helper
+├── layouts/shortcodes/
+│   └── tour.html              # Tour widget shortcode
+├── static/tours/
+│   ├── tour-maps.js           # Leaflet map initialization
+│   └── note.svg               # Peak marker icon
+└── README.md                  # Documentation
 ```
+
+## Features
+
+### Interactive Maps
+
+When you provide a GPX file, the plugin renders an interactive Leaflet map with:
+
+- **Track visualization** – Blue track line with white outline
+- **Direction arrows** – Evenly spaced arrows showing direction of travel
+- **Start/End markers** – "A" and "B" markers showing route endpoints
+- **Peak markers** – Numbered flag markers for peaks with coordinates
+- **Responsive design** – Maps adapt to all screen sizes
+
+### Statistics Grid
+
+The widget displays key tour statistics in a clean grid layout:
+
+- Distance (km)
+- Elevation gain (m)
+- Duration (hours)
+- Highest point (m)
+
+### Peak List (Gipfelbuch)
+
+Named peaks appear in a numbered list with orange badges. When coordinates are provided, clicking a peak name opens a popup on the map showing the peak location.
+
+## Support
+
+- Issues: https://github.com/flschr/mbplugin-fischr-tours/issues
