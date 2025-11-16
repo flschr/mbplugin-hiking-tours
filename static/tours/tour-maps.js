@@ -682,6 +682,8 @@
       var bounds = e.target.getBounds();
       if (bounds) {
         zoomTrackToMax(map, bounds);
+        // Register map with default bounds for peak click interaction
+        registerMap(canvas, map, bounds);
       }
 
       // Collect track lines once and reuse (performance optimization)
@@ -767,9 +769,122 @@
   }
 
   // ============================================================================
+  // PEAK CLICK INTERACTION
+  // ============================================================================
+
+  /**
+   * Store map instances and their state
+   */
+  var mapRegistry = new WeakMap();
+
+  /**
+   * Register a map with its default bounds
+   */
+  function registerMap(canvas, map, bounds) {
+    if (!canvas || !map) {
+      return;
+    }
+    mapRegistry.set(canvas, {
+      map: map,
+      defaultBounds: bounds,
+      currentPeak: null
+    });
+  }
+
+  /**
+   * Handle peak click to zoom to peak or return to default view
+   */
+  function handlePeakClick(event) {
+    var peakElement = event.target;
+    if (!peakElement || !peakElement.classList.contains('peak-name')) {
+      return;
+    }
+
+    var lat = parseFloat(peakElement.getAttribute('data-peak-lat'));
+    var lng = parseFloat(peakElement.getAttribute('data-peak-lng'));
+    var label = peakElement.getAttribute('data-peak-label');
+
+    if (!isFinite(lat) || !isFinite(lng)) {
+      return;
+    }
+
+    // Find the tour entry container
+    var tourEntry = peakElement.closest('.tour-entry');
+    if (!tourEntry) {
+      return;
+    }
+
+    // Find the map canvas
+    var mapCanvas = tourEntry.querySelector('[data-tour-map]');
+    if (!mapCanvas) {
+      return;
+    }
+
+    var mapState = mapRegistry.get(mapCanvas);
+    if (!mapState || !mapState.map) {
+      return;
+    }
+
+    var map = mapState.map;
+    var peakLatLng = L.latLng(lat, lng);
+    var peakKey = lat.toFixed(6) + ':' + lng.toFixed(6);
+
+    // Check if clicking the same peak again
+    if (mapState.currentPeak === peakKey) {
+      // Return to default view
+      if (mapState.defaultBounds) {
+        map.flyToBounds(mapState.defaultBounds, {
+          duration: 0.8,
+          easeLinearity: 0.25
+        });
+      }
+      mapState.currentPeak = null;
+
+      // Close any open popups
+      map.closePopup();
+    } else {
+      // Zoom to peak
+      var maxZoom = typeof map.getMaxZoom === 'function' ? map.getMaxZoom() : map.options.maxZoom || 18;
+      map.flyTo(peakLatLng, maxZoom, {
+        duration: 0.8,
+        easeLinearity: 0.25
+      });
+      mapState.currentPeak = peakKey;
+
+      // Find and open popup for this peak marker
+      map.eachLayer(function(layer) {
+        if (layer instanceof L.Marker) {
+          var markerLatLng = layer.getLatLng();
+          if (markerLatLng &&
+              Math.abs(markerLatLng.lat - lat) < 0.00001 &&
+              Math.abs(markerLatLng.lng - lng) < 0.00001) {
+            // Open popup if available
+            if (layer.getPopup && layer.getPopup()) {
+              setTimeout(function() {
+                layer.openPopup();
+              }, 850); // Open after zoom completes
+            }
+          }
+        }
+      });
+    }
+  }
+
+  /**
+   * Initialize peak click handlers
+   */
+  function initPeakClickHandlers() {
+    // Use event delegation for better performance
+    document.addEventListener('click', handlePeakClick);
+  }
+
+  // ============================================================================
   // INITIALIZATION
   // ============================================================================
 
-  ready(initMapsWithLazyLoading);
+  ready(function() {
+    initMapsWithLazyLoading();
+    initPeakClickHandlers();
+  });
 
 })();

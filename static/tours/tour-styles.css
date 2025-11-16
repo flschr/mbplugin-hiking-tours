@@ -164,6 +164,26 @@
   flex-shrink: 0;
 }
 
+.tour-entry .gipfelbuch-list .peak-name {
+  cursor: pointer;
+  text-decoration: underline dotted;
+  text-decoration-color: rgba(102, 102, 102, 0.4);
+  text-underline-offset: 0.25em;
+  transition: all 0.2s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  .tour-entry .gipfelbuch-list .peak-name {
+    text-decoration-color: rgba(195, 202, 213, 0.4);
+  }
+}
+
+.tour-entry .gipfelbuch-list .peak-name:hover {
+  text-decoration-style: solid;
+  text-decoration-color: var(--tour-peak-badge-bg);
+  color: var(--tour-peak-badge-bg);
+}
+
 .tour-entry .gpx-download-link {
   display: block;
   text-align: right;
