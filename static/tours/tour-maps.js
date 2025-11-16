@@ -506,11 +506,13 @@
    * Create peak icon with number
    */
   function createPeakIcon(scale, number) {
-    var size = Math.round(CONFIG.PEAK_ICON_SIZE * scale);
+    var baseSize = CONFIG.PEAK_ICON_SIZE;
+    var size = Math.round(baseSize * scale);
+    var sizeDelta = size - baseSize;
     var numberText = number ? escapeHtml(number) : '';
     var anchor = [
-      Math.round(CONFIG.PEAK_ICON_ANCHOR_X * scale),
-      Math.round(CONFIG.PEAK_ICON_ANCHOR_Y * scale)
+      Math.round(CONFIG.PEAK_ICON_ANCHOR_X + sizeDelta / 2),
+      Math.round(CONFIG.PEAK_ICON_ANCHOR_Y + sizeDelta)
     ];
     var popupAnchor = [
       Math.round(CONFIG.PEAK_POPUP_ANCHOR_X * scale),
