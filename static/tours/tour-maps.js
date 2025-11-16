@@ -497,25 +497,30 @@
    */
   function calculatePeakFontSize(numbers) {
     var baseFontSize = CONFIG.PEAK_TEXT_FONT_SIZE;
-    if (!Array.isArray(numbers) || numbers.length <= 1) {
+    if (!Array.isArray(numbers) || numbers.length === 0) {
       return baseFontSize;
     }
 
-    var totalChars = numbers
+    if (numbers.length === 1) {
+      var singleLength = String(numbers[0]).length;
+      if (singleLength <= 2) {
+        return baseFontSize;
+      }
+      return Math.max(7, baseFontSize - (singleLength - 2));
+    }
+
+    var sanitized = numbers
       .filter(function(value) { return typeof value !== 'undefined' && value !== null; })
-      .map(function(value) { return String(value); })
-      .join('|')
-      .length;
+      .map(function(value) { return String(value); });
 
-    if (totalChars <= 4) {
-      return baseFontSize - 1;
-    }
+    var charCount = sanitized.reduce(function(total, value) {
+      return total + value.length;
+    }, 0);
+    var separatorWeight = Math.max(0, numbers.length - 1) * 0.85;
+    var visualCount = charCount + separatorWeight;
+    var reduction = 1.5 + visualCount * 0.95;
 
-    if (totalChars <= 8) {
-      return baseFontSize - 2;
-    }
-
-    return Math.max(7, baseFontSize - 3);
+    return Math.max(5, Math.round(baseFontSize - reduction));
   }
 
   function createPeakIcon(scale, numbers) {
@@ -523,6 +528,12 @@
     var size = Math.round(baseSize * scale);
     var sizeDelta = size - baseSize;
     var fontSize = calculatePeakFontSize(numbers);
+    var textLengthAttr = '';
+    if (Array.isArray(numbers) && numbers.length > 1) {
+      var badgeDiameter = CONFIG.PEAK_BADGE_RADIUS * 2;
+      var maxTextWidth = Math.max(6.5, badgeDiameter - 1.2);
+      textLengthAttr = ' textLength="' + maxTextWidth.toFixed(2) + '" lengthAdjust="spacingAndGlyphs"';
+    }
 
     // Build text content with pipes for multiple numbers
     var textElement = '';
@@ -536,7 +547,7 @@
           textParts.push('<tspan opacity="0.5">|</tspan>');
         }
       }
-      textElement = '<text x="14" y="' + CONFIG.PEAK_TEXT_Y + '" text-anchor="middle" font-size="' + fontSize + '" font-family="-apple-system, BlinkMacSystemFont,\"Segoe UI\", sans-serif" font-weight="400" fill="' + CONFIG.PEAK_TEXT_COLOR + '" stroke="' + CONFIG.PEAK_TEXT_STROKE + '" stroke-width="' + CONFIG.PEAK_TEXT_STROKE_WIDTH + '" paint-order="stroke fill" dominant-baseline="middle">' + textParts.join('') + '</text>';
+      textElement = '<text x="14" y="' + CONFIG.PEAK_TEXT_Y + '" text-anchor="middle" font-size="' + fontSize + '" font-family="-apple-system, BlinkMacSystemFont,\"Segoe UI\", sans-serif" font-weight="400" fill="' + CONFIG.PEAK_TEXT_COLOR + '" stroke="' + CONFIG.PEAK_TEXT_STROKE + '" stroke-width="' + CONFIG.PEAK_TEXT_STROKE_WIDTH + '" paint-order="stroke fill" dominant-baseline="middle"' + textLengthAttr + '>' + textParts.join('') + '</text>';
     } else {
       // Fallback for single number (legacy support)
       var numberText = numbers ? escapeHtml(numbers) : '';
