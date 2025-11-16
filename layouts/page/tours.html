@@ -9,11 +9,26 @@
     {{ end }}
   </header>
 
-  {{- if .Site.Data.tours -}}
-    {{- $count := len .Site.Data.tours -}}
+  {{- $scratch := newScratch -}}
+  {{- $scratch.Set "tours" .Site.Data.tours -}}
+  {{- if not ($scratch.Get "tours") -}}
+    {{- with .Site.Data.plugins -}}
+      {{- range $pluginID, $pluginData := . -}}
+        {{- if not ($scratch.Get "tours") -}}
+          {{- with index $pluginData "tours" -}}
+            {{- $scratch.Set "tours" . -}}
+          {{- end -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $toursData := $scratch.Get "tours" -}}
+
+  {{- if $toursData -}}
+    {{- $count := len $toursData -}}
     {{- $totalKm := 0.0 -}}
     {{- $totalHm := 0 -}}
-    {{- range .Site.Data.tours -}}
+    {{- range $toursData -}}
       {{- if .distance_km -}}
         {{- $totalKm = add $totalKm .distance_km -}}
       {{- end -}}
@@ -25,7 +40,7 @@
       {{ $count }} Tour{{ if ne $count 1 }}s{{ end }} · {{ printf "%.1f" $totalKm }} km · {{ $totalHm }} hm
     </p>
     <ul>
-      {{- range .Site.Data.tours -}}
+      {{- range $toursData -}}
       <li>
         <h3>
           {{- if .post_url -}}
