@@ -14,53 +14,81 @@
   // CONFIGURATION
   // ============================================================================
 
-  var CONFIG = {
-    // Track styling
-    TRACK_COLOR: '#1d4ed8',
-    TRACK_WEIGHT: 4,
-    OUTLINE_COLOR: '#ffffff',
-    OUTLINE_WEIGHT_OFFSET: 4,
-    OUTLINE_OPACITY: 0.95,
-    TRACK_OPACITY: 0.9,
+  /**
+   * Detect if dark mode is active
+   */
+  function isDarkMode() {
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
 
-    // Direction arrows
-    ARROW_SPACING_METERS: 400,
-    ARROW_SIZE: 14,
-    ARROW_STROKE_COLOR: '#dbeafe',
-    ARROW_PANE_ZINDEX: 450,
-    ARROW_ZINDEX_OFFSET: -200,
-    ARROW_SAMPLE_RATE: 5, // Only process every Nth point for performance
+  /**
+   * Get theme-specific configuration
+   */
+  function getThemeConfig() {
+    var isDark = isDarkMode();
+    return {
+      // Track styling
+      TRACK_COLOR: isDark ? '#3b82f6' : '#1d4ed8', // Brighter blue for dark mode
+      TRACK_WEIGHT: 4,
+      OUTLINE_COLOR: isDark ? '#1a1a1a' : '#ffffff', // Dark outline for dark mode
+      OUTLINE_WEIGHT_OFFSET: 4,
+      OUTLINE_OPACITY: isDark ? 0.85 : 0.95,
+      TRACK_OPACITY: 0.9,
 
-    // Endpoint markers
-    ENDPOINT_SIZE: 28,
-    ENDPOINT_FONT_SIZE: 14,
-    ENDPOINT_BORDER_WIDTH: 3,
+      // Direction arrows
+      ARROW_SPACING_METERS: 400,
+      ARROW_SIZE: 14,
+      ARROW_BG_COLOR: isDark ? '#2a2a2a' : '#fff', // Dark bg for dark mode
+      ARROW_STROKE_COLOR: isDark ? '#1e3a8a' : '#dbeafe', // Darker stroke for dark mode
+      ARROW_PANE_ZINDEX: 450,
+      ARROW_ZINDEX_OFFSET: -200,
+      ARROW_SAMPLE_RATE: 5, // Only process every Nth point for performance
 
-    // Peak markers
-    PEAK_ICON_SIZE: 36,
-    PEAK_ICON_ANCHOR_X: 14,
-    PEAK_ICON_ANCHOR_Y: 24,
-    PEAK_POPUP_ANCHOR_X: 0,
-    PEAK_POPUP_ANCHOR_Y: -22,
-    PEAK_SCALE_MULTIPLE: 2,
-    PEAK_TEXT_FONT_SIZE: 11,
-    PEAK_TEXT_Y: 12.8,
-    PEAK_TEXT_COLOR: '#f97316',
-    PEAK_TEXT_STROKE: '#ffffff',
-    PEAK_TEXT_STROKE_WIDTH: 2,
-    PEAK_BADGE_RADIUS: 5.2,
-    PEAK_BADGE_FILL: '#fff4e6',
-    PEAK_BADGE_STROKE: '#ffffff',
-    PEAK_BADGE_STROKE_WIDTH: 1.75,
+      // Endpoint markers
+      ENDPOINT_SIZE: 28,
+      ENDPOINT_FONT_SIZE: 14,
+      ENDPOINT_BORDER_WIDTH: 3,
+      ENDPOINT_BG_COLOR: isDark ? '#f3f4f6' : '#000000', // Light bg for dark mode
+      ENDPOINT_TEXT_COLOR: isDark ? '#000000' : '#ffffff', // Dark text for dark mode
+      ENDPOINT_BORDER_COLOR: isDark ? '#1a1a1a' : '#ffffff',
 
-    // Map settings
-    MAP_MIN_HEIGHT: 320,
-    LAYER_READY_MAX_ATTEMPTS: 10,
-    LAYER_READY_FRAME_DELAY: 16,
+      // Peak markers
+      PEAK_ICON_SIZE: 36,
+      PEAK_ICON_ANCHOR_X: 14,
+      PEAK_ICON_ANCHOR_Y: 24,
+      PEAK_POPUP_ANCHOR_X: 0,
+      PEAK_POPUP_ANCHOR_Y: -22,
+      PEAK_SCALE_MULTIPLE: 2,
+      PEAK_TEXT_FONT_SIZE: 11,
+      PEAK_TEXT_Y: 12.8,
+      PEAK_TEXT_COLOR: '#f97316',
+      PEAK_TEXT_STROKE: isDark ? '#1a1a1a' : '#ffffff',
+      PEAK_TEXT_STROKE_WIDTH: 2,
+      PEAK_BADGE_RADIUS: 5.2,
+      PEAK_BADGE_FILL: '#fff4e6',
+      PEAK_BADGE_STROKE: isDark ? '#1a1a1a' : '#ffffff',
+      PEAK_BADGE_STROKE_WIDTH: 1.75,
 
-    // Lazy loading
-    LAZY_LOAD_MARGIN: '100px' // Load maps 100px before they enter viewport
-  };
+      // Map settings
+      MAP_MIN_HEIGHT: 320,
+      LAYER_READY_MAX_ATTEMPTS: 10,
+      LAYER_READY_FRAME_DELAY: 16,
+
+      // Lazy loading
+      LAZY_LOAD_MARGIN: '100px', // Load maps 100px before they enter viewport
+
+      // Tile layer
+      TILE_URL: isDark
+        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+        : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      TILE_ATTRIBUTION: isDark
+        ? '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>'
+        : '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+    };
+  }
+
+  // Get initial config
+  var CONFIG = getThemeConfig();
 
   // ============================================================================
   // UTILITIES
@@ -321,12 +349,13 @@
    */
   function createDirectionIcon(rotationDeg, color) {
     var size = CONFIG.ARROW_SIZE;
+    var bgColor = CONFIG.ARROW_BG_COLOR;
     var stroke = CONFIG.ARROW_STROKE_COLOR;
     var arrowColor = color || CONFIG.TRACK_COLOR;
     var rotation = typeof rotationDeg === 'number' && isFinite(rotationDeg) ? rotationDeg : 0;
     var svg = [
       '<svg viewBox="0 0 32 32" width="' + size + '" height="' + size + '" xmlns="http://www.w3.org/2000/svg" style="display:block">',
-      '<rect x="2" y="2" width="28" height="28" rx="6" ry="6" fill="#fff" stroke="' + stroke + '" stroke-width="2" />',
+      '<rect x="2" y="2" width="28" height="28" rx="6" ry="6" fill="' + bgColor + '" stroke="' + stroke + '" stroke-width="2" />',
       '<g transform="rotate(' + rotation + ', 16, 16)">',
       '<path d="M16 6l7 10h-4.5v10h-5v-10H9z" fill="' + arrowColor + '" />',
       '</g>',
@@ -438,14 +467,14 @@
       'width: ' + size + 'px',
       'height: ' + size + 'px',
       'border-radius: ' + Math.round(size / 2) + 'px',
-      'background: #000',
-      'color: #fff',
+      'background: ' + CONFIG.ENDPOINT_BG_COLOR,
+      'color: ' + CONFIG.ENDPOINT_TEXT_COLOR,
       'font-weight: 700',
       'font-size: ' + CONFIG.ENDPOINT_FONT_SIZE + 'px',
       'display: flex',
       'align-items: center',
       'justify-content: center',
-      'border: ' + CONFIG.ENDPOINT_BORDER_WIDTH + 'px solid #fff',
+      'border: ' + CONFIG.ENDPOINT_BORDER_WIDTH + 'px solid ' + CONFIG.ENDPOINT_BORDER_COLOR,
       'box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45)'
     ].join('; ');
     return L.divIcon({
@@ -634,8 +663,8 @@
       tap: false
     });
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+    L.tileLayer(CONFIG.TILE_URL, {
+      attribution: CONFIG.TILE_ATTRIBUTION
     }).addTo(map);
 
     var trackColor = CONFIG.TRACK_COLOR;
